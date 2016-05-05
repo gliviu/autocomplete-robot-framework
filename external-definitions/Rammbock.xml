@@ -1,0 +1,1168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keywordspec generated="20160428 17:27:05" type="library" name="Rammbock" format="ROBOT">
+<version>0.4.0.1</version>
+<scope>global</scope>
+<namedargs>yes</namedargs>
+<doc>Rammbock is a binary protocol testing library for Robot Test Automation Framework.
+
+To use Rammbock you need to first define a protocol, start the clients and servers you are going to mock,
+and then define a message template for each message you are going to send or receive.
+
+Example:
+
+| *Settings * |
+| Library     | Rammbock |
+
+| *Test Cases*  |
+|  Send message |  Define simple protocol  |
+|               |  Start server     |
+|               |  Start client     |
+|               |  Send message     | status:0xcafebabe |
+|               |  Verify server gets status |  0xcafebabe |
+|               |  [Teardown]       |   `Reset Rammbock` |
+
+| *Keywords*      |
+| Define simple protocol  |  `New protocol`   | SimpleProtocol |
+|                 |  `u8`                     | msgId             |
+|                 |  `u8`                     | messageLength     |
+|                 |  `pdu`                    | messageLength - 2 |
+|                 |  `End protocol`           |
+|  |
+| Start server    |  `Start UDP server` | 127.0.0.1 |  8282 | protocol=SimpleProtocol |
+|  |
+| Start client    |  `Start UDP client` | protocol=SimpleProtocol |
+|                 |  `Connect`          | 127.0.0.1 |  8282 |
+|     |   |    |  |  |
+| Send message    | [Arguments] | @{params} |
+|                 | `New message` | SimpleRequest | SimpleProtocol |  msgId:0xff |
+|                 |  `u32`         | status        |
+|                 |  `Client sends message` | @{params} |
+|  |
+| Verify server gets status | [Arguments] | ${status} |
+|                 | ${msg} = | `Server receives message` |
+|                 | Should be equal | ${msg.status.hex} | ${status} |</doc>
+<kw name="Accept Connection">
+<arguments>
+<arg>name=None</arg>
+<arg>alias=None</arg>
+</arguments>
+<doc>Accepts a connection to server identified by `name` or the latest
+server if `name` is empty.
+
+If given an `alias`, the connection is named and can be later referenced
+with that name.
+
+Examples:
+| Accept connection |
+| Accept connection | Server1 | my_connection |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Array">
+<arguments>
+<arg>size</arg>
+<arg>type</arg>
+<arg>name</arg>
+<arg>*parameters</arg>
+</arguments>
+<doc>Define a new array of given `size` and containing fields of type `type`.
+
+`name` if the name of this array element. The `type` is the name of keyword that is executed as the contents of
+the array and optional extra parameters are passed as arguments to this keyword.
+
+Examples:
+| Array | 8 | u16 | myArray |
+
+| u32 | length |
+| Array | length | someStruct | myArray | &lt;argument for someStruct&gt; |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Bin">
+<arguments>
+<arg>size</arg>
+<arg>name</arg>
+<arg>value=None</arg>
+</arguments>
+<doc>Add new binary field to template.
+
+This keyword has to be called within a binary container. See `New Binary
+Container`.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Bin To Hex">
+<arguments>
+<arg>bin_value</arg>
+</arguments>
+<doc>Converts given binary to hex string.
+
+Examples:
+| ${hex} = | Bin to hex | Hello! |
+| ${hex} = | Bin to hex | ${binary} |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Case">
+<arguments>
+<arg>size</arg>
+<arg>kw</arg>
+<arg>*parameters</arg>
+</arguments>
+<doc>An element inside a bag started with `Start Bag`.
+
+The first argument is size which can be absolute value like `1`, a range
+like `0-3`, or just `*` to accept any number of elements.
+
+Examples:
+| Start bag | intBag |
+| case | 0-1 | u8 | foo | 42 |
+| case | 0-2 | u8 | bar | 1 |
+| End bag |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Chars">
+<arguments>
+<arg>length</arg>
+<arg>name</arg>
+<arg>value=None</arg>
+<arg>terminator=None</arg>
+</arguments>
+<doc>Add a char array to template.
+
+`length` is given in bytes and can refer to earlier numeric fields in
+template. Special value '*' in length means that length is encoded to
+length of value and decoded as all available bytes.
+
+`value` is optional.
+
+Examples:
+| chars | 16 | field | Hello World! |
+
+| u8 | charLength |
+| chars | charLength | field |
+
+| chars | * | field | Hello World! |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Clear Message Streams">
+<arguments>
+</arguments>
+<doc>Resets streams and sockets of incoming messages.
+
+You can use this method to reuse the same connections for several
+consecutive test cases.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Client Receives Binary">
+<arguments>
+<arg>name=None</arg>
+<arg>timeout=None</arg>
+<arg>label=None</arg>
+</arguments>
+<doc>Receive raw binary message.
+
+If client `name` is not given, uses the latest client. Optional message
+`label` is shown on logs.
+
+Examples:
+| ${binary} = | Client receives binary |
+| ${binary} = | Client receives binary | Client1 | timeout=5 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Client Receives Message">
+<arguments>
+<arg>*parameters</arg>
+</arguments>
+<doc>Receive a message with template defined using `New Message` and
+validate field values.
+
+Message template has to be defined with `New Message` before calling
+this.
+
+Optional parameters:
+- `name` the client name (default is the latest used) example: `name=Client 1`
+- `timeout` for receiving message. example: `timeout=0.1`
+- `latest` if set to True, get latest message from buffer instead first. Default is False. Example: `latest=True`
+-  message field values for validation separated with colon. example: `some_field:0xaf05`
+
+Examples:
+| ${msg} = | Client receives message |
+| ${msg} = | Client receives message | name=Client1 | timeout=5 |
+| ${msg} = | Client receives message | message_field:(0|1) |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Client Receives Without Validation">
+<arguments>
+<arg>*parameters</arg>
+</arguments>
+<doc>Receive a message with template defined using `New Message`.
+
+Message template has to be defined with `New Message` before calling
+this.
+
+Optional parameters:
+- `name` the client name (default is the latest used) example: `name=Client 1`
+- `timeout` for receiving message. example: `timeout=0.1`
+- `latest` if set to True, get latest message from buffer instead first. Default is False. Example: `latest=True`
+
+Examples:
+| ${msg} = | Client receives without validation |
+| ${msg} = | Client receives without validation | name=Client1 | timeout=5 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Client Sends Binary">
+<arguments>
+<arg>message</arg>
+<arg>name=None</arg>
+<arg>label=None</arg>
+</arguments>
+<doc>Send raw binary `message`.
+
+If client `name` is not given, uses the latest client. Optional message
+`label` is shown on logs.
+
+Examples:
+| Client sends binary | Hello! |
+| Client sends binary | ${some binary} | Client1 | label=DebugMessage |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Client Sends Message">
+<arguments>
+<arg>*parameters</arg>
+</arguments>
+<doc>Send a message defined with `New Message`.
+
+Optional parameters are client `name` separated with equals and message
+field values separated with colon. Protocol header values can be set
+with syntax header:header_field_name:value.
+
+Examples:
+| Client sends message |
+| Client sends message | field_name:value | field_name2:value |
+| Client sends message | name=Client1 | header:message_code:0x32 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Conditional">
+<arguments>
+<arg>condition</arg>
+<arg>name</arg>
+</arguments>
+<doc>Defines a 'condition' when conditional element of 'name' exists if `condition` is true.
+
+Example:
+| Conditional | mycondition == 1 | foo |
+| u8   | myelement | 42 |
+| End conditional |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Connect">
+<arguments>
+<arg>host</arg>
+<arg>port</arg>
+<arg>name=None</arg>
+</arguments>
+<doc>Connects a client to given `host` and `port`. If client `name` is not
+given then connects the latest client.
+
+Examples:
+| Connect | 127.0.0.1 | 8080 |
+| Connect | 127.0.0.1 | 8080 | Client1 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Container">
+<arguments>
+<arg>name</arg>
+<arg>length</arg>
+<arg>type</arg>
+<arg>*parameters</arg>
+</arguments>
+<doc>Define a container with given length.
+
+This is a convenience method creating a `Struct` with `length` containing fields defined in `type`.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Embed Seqdiag Sequence">
+<arguments>
+</arguments>
+<doc>Create a message sequence diagram png file to output folder and embed the image to log file.
+
+You need to have seqdiag installed to create the sequence diagram. See http://blockdiag.com/en/seqdiag/</doc>
+<tags>
+</tags>
+</kw>
+<kw name="End Bag">
+<arguments>
+</arguments>
+<doc>Ends a bag started with `Start Bag`.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="End Binary Container">
+<arguments>
+</arguments>
+<doc>End binary container. See `New Binary Container`.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="End Conditional">
+<arguments>
+</arguments>
+<doc>End conditional definition. See `Conditional`.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="End Protocol">
+<arguments>
+</arguments>
+<doc>End protocol definition.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="End Struct">
+<arguments>
+</arguments>
+<doc>End struct definition. See `New Struct`.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="End Tbcd Container">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="End Union">
+<arguments>
+</arguments>
+<doc>End union definition. See `New Union`.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Client Protocol">
+<arguments>
+<arg>name=None</arg>
+</arguments>
+<doc>Returns name of the protocol client uses or empty if client does not
+use a protocol.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Client Unread Messages Count">
+<arguments>
+<arg>client_name=None</arg>
+</arguments>
+<doc>Gets count of unread messages from client</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Message">
+<arguments>
+<arg>*parameters</arg>
+</arguments>
+<doc>Get encoded message.
+
+* Send Message -keywords are convenience methods, that will call this to
+get the message object and then send it. Optional parameters are message
+field values separated with colon.
+
+Examples:
+| ${msg} = | Get message |
+| ${msg} = | Get message | field_name:value |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Server Unread Messages Count">
+<arguments>
+<arg>server_name=None</arg>
+</arguments>
+<doc>Gets count of unread messages from server</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Hex To Bin">
+<arguments>
+<arg>hex_value</arg>
+</arguments>
+<doc>Converts given hex value to binary.
+
+Examples:
+| ${bin} = | Hex to bin | 0xcafe |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="I 32">
+<arguments>
+<arg>name</arg>
+<arg>value=None</arg>
+<arg>align=None</arg>
+</arguments>
+<doc>Add an 32 byte integer field to template.
+
+This is an convenience method that simply calls `Int` keyword with predefined length.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="I 8">
+<arguments>
+<arg>name</arg>
+<arg>value=None</arg>
+<arg>align=None</arg>
+</arguments>
+<doc>Add an 1 byte integer field to template.
+
+This is an convenience method that simply calls `Int` keyword with predefined length.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Int">
+<arguments>
+<arg>length</arg>
+<arg>name</arg>
+<arg>value=None</arg>
+<arg>align=None</arg>
+</arguments>
+<doc>Add an signed integer to template.
+
+`length` is given in bytes and `value` is optional. `align` can be used
+to align the field to longer byte length.
+Signed integer uses twos-complement with bits numbered in big-endian.
+
+Examples:
+| int | 2 | foo |
+| int | 2 | foo | 42 |
+| int | 2 | fourByteFoo | 42 | align=4 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Load Copy Of Template">
+<arguments>
+<arg>name</arg>
+<arg>*parameters</arg>
+</arguments>
+<doc>Load a copy of message template saved with `Save template` when originally saved values need to be preserved
+from test to test.
+Optional parameters are default values for message header separated with
+colon.
+
+Examples:
+| Load Copy Of Template | MyMessage | header_field:value |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Load Template">
+<arguments>
+<arg>name</arg>
+<arg>*parameters</arg>
+</arguments>
+<doc>Load a message template saved with `Save template`.
+Optional parameters are default values for message header separated with
+colon.
+
+Examples:
+| Load Template | MyMessage | header_field:value |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Log Handler Messages">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="New Binary Container">
+<arguments>
+<arg>name</arg>
+</arguments>
+<doc>Defines a new binary container to template.
+
+Binary container can only contain binary fields defined with `Bin`
+keyword.
+
+Examples:
+| New binary container | flags |
+| bin | 2 | foo |
+| bin | 6 | bar |
+| End binary container |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="New Message">
+<arguments>
+<arg>message_name</arg>
+<arg>protocol=None</arg>
+<arg>*parameters</arg>
+</arguments>
+<doc>Define a new message template with `message_name`.
+
+`protocol` has to be defined earlier with `Start Protocol Description`.
+Optional parameters are default values for message header separated with
+colon.
+
+Examples:
+| New message | MyMessage | MyProtocol | header_field:value |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="New Protocol">
+<arguments>
+<arg>protocol_name</arg>
+</arguments>
+<doc>Start defining a new protocol template.
+
+All messages sent and received from a connection that uses a protocol
+have to conform to this protocol template.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="New Struct">
+<arguments>
+<arg>type</arg>
+<arg>name</arg>
+<arg>*parameters</arg>
+</arguments>
+<doc>Defines a new struct to template.
+
+You must call `End Struct` to end struct definition. `type` is the name
+for generic type and `name` is the field name in containing structure.
+Possible parameters are values for struct fields separated with colon
+and optional struct length defined with `length=`. Length can be used in
+receiveing to validate that struct matches predfeined length. When
+sending, the struct length can refer to other message field which will
+then be set dynamically.
+
+Examples:
+| New struct | Pair | myPair |
+| u8     | first |
+| u8     | second |
+| End Struct |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="New Tbcd Container">
+<arguments>
+<arg>name</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="New Union">
+<arguments>
+<arg>type</arg>
+<arg>name</arg>
+</arguments>
+<doc>Defines a new union to template of `type` and `name`.
+
+Fields inside the union are alternatives and the length of the union is
+the length of its longest field.
+
+Example:
+| New union | IntOrAddress | foo |
+| Chars | 16 | ipAddress |
+| u32   | int |
+| End union |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Pdu">
+<arguments>
+<arg>length</arg>
+</arguments>
+<doc>Defines the message in protocol template.
+
+Length must be the name of a previous field in template definition or a
+static value for fixed length protocols.
+
+Examples:
+| pdu | 5 |
+
+| u8  | length |
+| pdu | length - 1 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Reset Handler Messages">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Reset Rammbock">
+<arguments>
+</arguments>
+<doc>Closes all connections, deletes all servers, clients, and protocols.
+
+You should call this method before exiting your test run. This will
+close all the connections and the ports will therefore be available for
+reuse faster.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Save Template">
+<arguments>
+<arg>name</arg>
+<arg>unlocked=False</arg>
+</arguments>
+<doc>Save a message template for later use with `Load template`.
+
+If saved template is marked as unlocked, then changes can be made to it
+afterwards. By default tempaltes are locked.
+
+Examples:
+| Save Template | MyMessage |
+| Save Template | MyOtherMessage | unlocked=True |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Server Receives Binary">
+<arguments>
+<arg>name=None</arg>
+<arg>timeout=None</arg>
+<arg>connection=None</arg>
+<arg>label=None</arg>
+</arguments>
+<doc>Receive raw binary message.
+
+If server `name` is not given, uses the latest server. Optional message
+`label` is shown on logs.
+
+Examples:
+| ${binary} = | Server receives binary |
+| ${binary} = | Server receives binary | Server1 | connection=my_connection | timeout=5 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Server Receives Binary From">
+<arguments>
+<arg>name=None</arg>
+<arg>timeout=None</arg>
+<arg>connection=None</arg>
+<arg>label=None</arg>
+</arguments>
+<doc>Receive raw binary message. Returns message, ip, and port.
+
+If server `name` is not given, uses the latest server. Optional message
+`label` is shown on logs.
+
+Examples:
+| ${binary} | ${ip} | ${port} = | Server receives binary from |
+| ${binary} | ${ip} | ${port} = | Server receives binary from | Server1 | connection=my_connection | timeout=5 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Server Receives Message">
+<arguments>
+<arg>*parameters</arg>
+</arguments>
+<doc>Receive a message with template defined using `New Message` and
+validate field values.
+
+Message template has to be defined with `New Message` before calling
+this.
+
+Optional parameters:
+- `name` the client name (default is the latest used) example: `name=Client 1`
+- `connection` alias. example: `connection=connection 1`
+- `timeout` for receiving message. example: `timeout=0.1`
+- `latest` if set to True, get latest message from buffer instead first. Default is False. Example: `latest=True`
+-  message field values for validation separated with colon. example: `some_field:0xaf05`
+
+Optional parameters are server `name`, `connection` alias and
+possible `timeout` separated with equals and message field values for
+validation separated with colon.
+
+Examples:
+| ${msg} = | Server receives message |
+| ${msg} = | Server receives message | name=Server1 | alias=my_connection | timeout=5 |
+| ${msg} = | Server receives message | message_field:(0|1) |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Server Receives Without Validation">
+<arguments>
+<arg>*parameters</arg>
+</arguments>
+<doc>Receive a message with template defined using `New Message`.
+
+Message template has to be defined with `New Message` before calling
+this.
+
+Optional parameters:
+- `name` the client name (default is the latest used) example: `name=Client 1`
+- `connection` alias. example: `connection=connection 1`
+- `timeout` for receiving message. example: `timeout=0.1`
+- `latest` if set to True, get latest message from buffer instead first. Default is False. Example: `latest=True`
+
+Examples:
+| ${msg} = | Server receives without validation |
+| ${msg} = | Server receives without validation | name=Server1 | alias=my_connection | timeout=5 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Server Sends Binary">
+<arguments>
+<arg>message</arg>
+<arg>name=None</arg>
+<arg>connection=None</arg>
+<arg>label=None</arg>
+</arguments>
+<doc>Send raw binary `message`.
+
+If server `name` is not given, uses the latest server. Optional message
+`label` is shown on logs.
+
+Examples:
+| Server sends binary | Hello! |
+| Server sends binary | ${some binary} | Server1 | label=DebugMessage |
+| Server sends binary | ${some binary} | connection=my_connection |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Server Sends Message">
+<arguments>
+<arg>*parameters</arg>
+</arguments>
+<doc>Send a message defined with `New Message`.
+
+Optional parameters are server `name` and possible `connection` alias
+separated with equals and message field values separated with colon.
+Protocol header values can be set with syntax header:header_field_name:value.
+
+Examples:
+| Server sends message |
+| Server sends message | field_name:value | field_name2:value |
+| Server sends message | name=Server1 | connection=my_connection | header:message_code:0x32 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Client Handler">
+<arguments>
+<arg>handler_func</arg>
+<arg>name=None</arg>
+<arg>header_filter=None</arg>
+<arg>interval=0.5</arg>
+</arguments>
+<doc>Sets an automatic handler for the type of message template currently loaded.
+
+This feature allows users to set a python handler function which is called
+automatically by the Rammbock message queue when message matches the expected
+template. The optional name argument defines the client node to which the
+handler will be bound. Otherwise the default client will be used.
+
+The header_filter defines which header field will be used to identify the
+message defined in template. (Otherwise all incoming messages will match!)
+
+The interval defines the interval in seconds on which the handler will
+be called on background. By default the incoming messages are checked
+every 0.5 seconds.
+
+The handler function will be called with two arguments: the rammbock library
+instance and the received message.
+
+Example:
+| Load template      | SomeMessage |
+| Set client handler | my_module.respond_to_sample |
+
+my_module.py:
+| def respond_to_sample(rammbock, msg):
+|     rammbock.save_template("__backup_template", unlocked=True)
+|     try:
+|         rammbock.load_template("sample response")
+|         rammbock.client_sends_message()
+|     finally:
+|         rammbock.load_template("__backup_template")</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Server Handler">
+<arguments>
+<arg>handler_func</arg>
+<arg>name=None</arg>
+<arg>header_filter=None</arg>
+<arg>alias=None</arg>
+<arg>interval=0.5</arg>
+</arguments>
+<doc>Sets an automatic handler for the type of message template currently loaded.
+
+This feature allows users to set a python handler function which is called
+automatically by the Rammbock message queue when message matches the expected
+template. The optional name argument defines the server node to which the
+handler will be bound. Otherwise the default server will be used.
+
+The header_filter defines which header field will be used to identify the
+message defined in template. (Otherwise all incoming messages will match!)
+
+The interval defines the interval in seconds on which the handler will
+be called on background. By default the incoming messages are checked
+every 0.5 seconds.
+
+The alias is the alias for the connection. By default the current active
+connection will be used.
+
+The handler function will be called with two arguments: the rammbock library
+instance and the received message.
+
+Example:
+| Load template      | SomeMessage |
+| Set server handler | my_module.respond_to_sample | messageType |
+
+my_module.py:
+| def respond_to_sample(rammbock, msg):
+|     rammbock.save_template("__backup_template", unlocked=True)
+|     try:
+|         rammbock.load_template("sample response")
+|         rammbock.server_sends_message()
+|     finally:
+|         rammbock.load_template("__backup_template")</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Start Bag">
+<arguments>
+<arg>name</arg>
+</arguments>
+<doc>Bags are sets of optional elements with an optional count.
+
+The optional elements are given each as a `Case` with the accepted count
+as first argument. The received elements are matched from the list of
+cases in order. If the the received value does not validate against the
+case (for example a value of a field does not match expected), then the
+next case is tried until a match is found. Note that although the received
+elements are matched in order that the cases are given, the elements dont
+need to arrive in the same order as the cases are.
+
+
+This example would match int value 42 0-1 times and in value 1 0-2 times.
+For example 1, 42, 1 would match, as would 1, 1:
+| Start bag | intBag |
+| case | 0-1 | u8 | foo | 42 |
+| case | 0-2 | u8 | bar | 1 |
+| End bag |
+
+
+A more real world example, where each AVP entry has a type field with a
+value that is used for matching:
+| Start bag | avps |
+| Case | 1 | AVP | result | Result-Code |
+| Case | 1 | AVP | originHost | Origin-Host |
+| Case | 1 | AVP | originRealm | Origin-Realm |
+| Case | 1 | AVP | hostIP | Host-IP-Address |
+| Case | * | AVP | appId | Vendor-Specific-Application-Id |
+| Case | 0-1 | AVP | originState | Origin-State |
+| End bag |
+
+For a more complete example on bags, see the
+[https://github.com/robotframework/Rammbock/blob/master/atest/diameter.robot|diameter.robot]
+file from Rammbock's acceptance tests.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Start Sctp Client">
+<arguments>
+<arg>ip=None</arg>
+<arg>port=None</arg>
+<arg>name=None</arg>
+<arg>timeout=None</arg>
+<arg>protocol=None</arg>
+<arg>family=ipv4</arg>
+</arguments>
+<doc>Starts a new SCTP client.
+
+Client can be optionally given `ip` and `port` to bind to, as well as
+`name`, default `timeout` and a `protocol`.  `family` can be either
+ipv4 (default) or ipv6.
+
+You should use `Connect` keyword to connect client to a host.
+
+Examples:
+| Start TCP client |
+| Start TCP client | name=Client1 | protocol=GTPV2 |
+| Start TCP client | 10.10.10.2 | 53 | name=Server1 | protocol=GTPV2 |
+| Start TCP client | timeout=5 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Start Sctp Server">
+<arguments>
+<arg>ip</arg>
+<arg>port</arg>
+<arg>name=None</arg>
+<arg>timeout=None</arg>
+<arg>protocol=None</arg>
+<arg>family=ipv4</arg>
+</arguments>
+<doc>Starts a new STCP server to given `ip` and `port`.
+
+`family` can be either ipv4 (default) or ipv6.
+
+pysctp (https://github.com/philpraxis/pysctp) need to be installed your system.
+Server can be given a `name`, default `timeout` and a `protocol`.
+Notice that you have to use `Accept Connection` keyword for server to
+receive connections.
+
+Examples:
+| Start STCP server | 10.10.10.2 | 53 |
+| Start STCP server | 10.10.10.2 | 53 | Server1 |
+| Start STCP server | 10.10.10.2 | 53 | name=Server1 | protocol=GTPV2 |
+| Start STCP server | 10.10.10.2 | 53 | timeout=5 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Start Tcp Client">
+<arguments>
+<arg>ip=None</arg>
+<arg>port=None</arg>
+<arg>name=None</arg>
+<arg>timeout=None</arg>
+<arg>protocol=None</arg>
+<arg>family=ipv4</arg>
+</arguments>
+<doc>Starts a new TCP client.
+
+Client can be optionally given `ip` and `port` to bind to, as well as
+`name`, default `timeout` and a `protocol`. `family` can be either
+ipv4 (default) or ipv6.
+
+You should use `Connect` keyword to connect client to a host.
+
+Examples:
+| Start TCP client |
+| Start TCP client | name=Client1 | protocol=GTPV2 |
+| Start TCP client | 10.10.10.2 | 53 | name=Server1 | protocol=GTPV2 |
+| Start TCP client | timeout=5 |
+| Start TCP client | 0:0:0:0:0:0:0:1 | 53 | family=ipv6 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Start Tcp Server">
+<arguments>
+<arg>ip</arg>
+<arg>port</arg>
+<arg>name=None</arg>
+<arg>timeout=None</arg>
+<arg>protocol=None</arg>
+<arg>family=ipv4</arg>
+</arguments>
+<doc>Starts a new TCP server to given `ip` and `port`.
+
+Server can be given a `name`, default `timeout` and a `protocol`.
+`family` can be either ipv4 (default) or ipv6. Notice that you have to
+use `Accept Connection` keyword for server to receive connections.
+
+Examples:
+| Start TCP server | 10.10.10.2 | 53 |
+| Start TCP server | 10.10.10.2 | 53 | Server1 |
+| Start TCP server | 10.10.10.2 | 53 | name=Server1 | protocol=GTPV2 |
+| Start TCP server | 10.10.10.2 | 53 | timeout=5 |
+| Start TCP server | 0:0:0:0:0:0:0:1 | 53 | family=ipv6 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Start Udp Client">
+<arguments>
+<arg>ip=None</arg>
+<arg>port=None</arg>
+<arg>name=None</arg>
+<arg>timeout=None</arg>
+<arg>protocol=None</arg>
+<arg>family=ipv4</arg>
+</arguments>
+<doc>Starts a new UDP client.
+
+Client can be optionally given `ip` and `port` to bind to, as well as
+`name`, default `timeout` and a `protocol`.  `family` can be either
+ipv4 (default) or ipv6.
+
+You should use `Connect` keyword to connect client to a host.
+
+Examples:
+| Start UDP client |
+| Start UDP client | name=Client1 | protocol=GTPV2 |
+| Start UDP client | 10.10.10.2 | 53 | name=Server1 | protocol=GTPV2 |
+| Start UDP client | timeout=5 |
+| Start UDP client | 0:0:0:0:0:0:0:1 | 53 | family=ipv6 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Start Udp Server">
+<arguments>
+<arg>ip</arg>
+<arg>port</arg>
+<arg>name=None</arg>
+<arg>timeout=None</arg>
+<arg>protocol=None</arg>
+<arg>family=ipv4</arg>
+</arguments>
+<doc>Starts a new UDP server to given `ip` and `port`.
+
+Server can be given a `name`, default `timeout` and a `protocol`.
+`family` can be either ipv4 (default) or ipv6.
+
+Examples:
+| Start UDP server | 10.10.10.2 | 53 |
+| Start UDP server | 10.10.10.2 | 53 | Server1 |
+| Start UDP server | 10.10.10.2 | 53 | name=Server1 | protocol=GTPV2 |
+| Start UDP server | 10.10.10.2 | 53 | timeout=5 |
+| Start UDP server | 0:0:0:0:0:0:0:1 | 53 | family=ipv6 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Tbcd">
+<arguments>
+<arg>size</arg>
+<arg>name</arg>
+<arg>value=None</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="U 128">
+<arguments>
+<arg>name</arg>
+<arg>value=None</arg>
+<arg>align=None</arg>
+</arguments>
+<doc>Add an unsigned 16 byte integer field to template.
+
+This is an convenience method that simply calls `Uint` keyword with predefined length.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="U 16">
+<arguments>
+<arg>name</arg>
+<arg>value=None</arg>
+<arg>align=None</arg>
+</arguments>
+<doc>Add an unsigned 2 byte integer field to template.
+
+This is an convenience method that simply calls `Uint` keyword with predefined length.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="U 24">
+<arguments>
+<arg>name</arg>
+<arg>value=None</arg>
+<arg>align=None</arg>
+</arguments>
+<doc>Add an unsigned 3 byte integer field to template.
+
+This is an convenience method that simply calls `Uint` keyword with predefined length.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="U 32">
+<arguments>
+<arg>name</arg>
+<arg>value=None</arg>
+<arg>align=None</arg>
+</arguments>
+<doc>Add an unsigned 4 byte integer field to template.
+
+This is an convenience method that simply calls `Uint` keyword with predefined length.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="U 40">
+<arguments>
+<arg>name</arg>
+<arg>value=None</arg>
+<arg>align=None</arg>
+</arguments>
+<doc>Add an unsigned 5 byte integer field to template.
+
+This is an convenience method that simply calls `Uint` keyword with predefined length.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="U 64">
+<arguments>
+<arg>name</arg>
+<arg>value=None</arg>
+<arg>align=None</arg>
+</arguments>
+<doc>Add an unsigned 8 byte integer field to template.
+
+This is an convenience method that simply calls `Uint` keyword with predefined length.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="U 8">
+<arguments>
+<arg>name</arg>
+<arg>value=None</arg>
+<arg>align=None</arg>
+</arguments>
+<doc>Add an unsigned 1 byte integer field to template.
+
+This is an convenience method that simply calls `Uint` keyword with predefined length.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Uint">
+<arguments>
+<arg>length</arg>
+<arg>name</arg>
+<arg>value=None</arg>
+<arg>align=None</arg>
+</arguments>
+<doc>Add an unsigned integer to template.
+
+`length` is given in bytes and `value` is optional. `align` can be used
+to align the field to longer byte length.
+
+Examples:
+| uint | 2 | foo |
+| uint | 2 | foo | 42 |
+| uint | 2 | fourByteFoo | 42 | align=4 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Validate Message">
+<arguments>
+<arg>msg</arg>
+<arg>*parameters</arg>
+</arguments>
+<doc>Validates given message using template defined with `New Message` and
+field values given as optional arguments.
+
+Examples:
+| Validate message | ${msg} |
+| Validate message | ${msg} | status:0 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Value">
+<arguments>
+<arg>name</arg>
+<arg>value</arg>
+</arguments>
+<doc>Defines a default `value` for a template field identified by `name`.
+
+Default values for header fields can be set with header:field syntax.
+
+Examples:
+| Value | foo | 42 |
+| Value | struct.sub_field | 0xcafe |
+| Value | header:version | 0x02 |</doc>
+<tags>
+</tags>
+</kw>
+</keywordspec>

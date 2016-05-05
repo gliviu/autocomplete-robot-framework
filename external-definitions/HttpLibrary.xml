@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keywordspec generated="20160428 17:22:48" type="library" name="HttpLibrary" format="ROBOT">
+<version>0.4.2</version>
+<scope>global</scope>
+<namedargs>yes</namedargs>
+<doc>Documentation for test library ``HttpLibrary``.</doc>
+<kw name="B 64 Encode">
+<arguments>
+<arg>s</arg>
+<arg>altchars=None</arg>
+</arguments>
+<doc>Encode a string using Base64.
+
+s is the string to encode.  Optional altchars must be a string of at least
+length 2 (additional characters are ignored) which specifies an
+alternative alphabet for the '+' and '/' characters.  This allows an
+application to e.g. generate url or filesystem safe Base64 strings.
+
+The encoded string is returned.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Load Json">
+<arguments>
+<arg>json_string</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Urlparse">
+<arguments>
+<arg>url</arg>
+<arg>scheme=</arg>
+<arg>allow_fragments=True</arg>
+</arguments>
+<doc>Parse a URL into 6 components:
+&lt;scheme&gt;://&lt;netloc&gt;/&lt;path&gt;;&lt;params&gt;?&lt;query&gt;#&lt;fragment&gt;
+Return a 6-tuple: (scheme, netloc, path, params, query, fragment).
+Note that we don't break the components up in smaller bits
+(e.g. netloc is a single string) and we don't expand % escapes.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Wraps">
+<arguments>
+<arg>wrapped</arg>
+<arg>assigned=('__module__', '__name__', '__doc__')</arg>
+<arg>updated=('__dict__',)</arg>
+</arguments>
+<doc>Decorator factory to apply update_wrapper() to a wrapper function
+
+Returns a decorator that invokes update_wrapper() with the decorated
+function as the wrapper argument and the arguments to wraps() as the
+remaining arguments. Default arguments are as for update_wrapper().
+This is a convenience function to simplify applying partial() to
+update_wrapper().</doc>
+<tags>
+</tags>
+</kw>
+</keywordspec>

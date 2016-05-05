@@ -1,0 +1,24 @@
+{
+  "name": "autocomplete-robot-framework",
+  "main": "./lib/main",
+  "version": "1.0.0",
+  "description": "Robot Framework autocomplete for Atom",
+  "repository": "https://github.com/gliviu/autocomplete-robot-framework",
+  "license": "MIT",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "providedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "2.0.0": "getProvider"
+      }
+    }
+  },
+  "dependencies": {
+    "named-js-regexp": "1.3.1"
+  },
+  "scripts": {
+    "test": "apm test"
+  }
+}
