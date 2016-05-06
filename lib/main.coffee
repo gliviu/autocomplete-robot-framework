@@ -75,8 +75,12 @@ module.exports =
           title: 'Show FtpLibrary suggestions'
           type: 'boolean'
           default: false
-        HttpLibrary:
-          title: 'Show HttpLibrary suggestions'
+        HttpLibraryHTTP:
+          title: 'Show HttpLibrary.HTTP suggestions'
+          type: 'boolean'
+          default: false
+        MongoDBLibrary:
+          title: 'Show MongoDBLibrary suggestions'
           type: 'boolean'
           default: false
         Rammbock:

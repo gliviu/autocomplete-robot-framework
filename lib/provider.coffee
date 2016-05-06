@@ -5,7 +5,7 @@ robotParser = require './parse-robot'
 libdocParser = require './parse-libdoc'
 
 STANDARD_LIBS = ['BuiltIn', 'Collections', 'DateTime', 'Dialogs', 'OperatingSystem', 'Process', 'Screenshot', 'String', 'Telnet', 'XML']
-EXTERNAL_LIBS = ['FtpLibrary', 'HttpLibrary', 'Rammbock', 'RemoteSwingLibrary', 'RequestsLibrary', 'Selenium2Library', 'SeleniumLibrary', 'SSHLibrary', 'SwingLibrary']
+EXTERNAL_LIBS = ['FtpLibrary', 'HttpLibrary.HTTP', 'MongoDBLibrary', 'Rammbock', 'RemoteSwingLibrary', 'RequestsLibrary', 'Selenium2Library', 'SeleniumLibrary', 'SSHLibrary', 'SwingLibrary']
 STANDARD_DEFINITIONS_DIR = pathUtils.join(__dirname, '../standard-definitions')
 EXTERNAL_DEFINITIONS_DIR = pathUtils.join(__dirname, '../external-definitions')
 CFG_KEY = 'autocomplete-robot-framework'
@@ -98,10 +98,14 @@ readConfig = ()->
   settings.processLibdocFiles = atom.config.get("#{CFG_KEY}.processLibdocFiles")
   settings.showLibrarySuggestions = atom.config.get("#{CFG_KEY}.showLibrarySuggestions")
   for lib in STANDARD_LIBS
-    settings.standardLibrary[lib]=atom.config.get("#{CFG_KEY}.standardLibrary.#{lib}")
+    settings.standardLibrary[lib]=atom.config.get("#{CFG_KEY}.standardLibrary.#{escapeLibraryName(lib)}")
   for lib in EXTERNAL_LIBS
-    settings.externalLibrary[lib]=atom.config.get("#{CFG_KEY}.externalLibrary.#{lib}")
+    settings.externalLibrary[lib]=atom.config.get("#{CFG_KEY}.externalLibrary.#{escapeLibraryName(lib)}")
 
+# Some library names contain characters forbidden in config property names, such as '.'.
+# This function removes offending characters.
+escapeLibraryName = (libraryName) ->
+    return libraryName.replace(/\./, '');
 
 projectDirectoryExists = (filePath) ->
   try

@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keywordspec generated="20160504 12:13:35" type="library" name="MongoDBLibrary" format="ROBOT">
+<version>0.3</version>
+<scope>global</scope>
+<namedargs>yes</namedargs>
+<doc>MongoDB Library contains utilities meant for Robot Framework's usage.
+
+This can allow you to query your Mongo database after an action has been made to verify the results.
+
+References:
+
+ + PyMongo 3.0.3 Documentation - http://api.mongodb.org/python/3.0.3/
+ 
+Example Usage:
+    | Connect To MongoDB | foo.bar.org | ${27017} |
+    | ${QueryJSON}  | Set Variable | {"name" : "username" ,"in_use": false} |
+    | ${UpdateJSON} | Set Variable | {"$set": {"in_use" : true}} |
+    | &amp;{allResults} | Retrieve and Update One Mongodb Record | DBName | CollectionName | ${QueryJSON} | ${UpdateJSON} |
+    | Log | ${allResults} |</doc>
+<kw name="Connect To Mongodb">
+<arguments>
+<arg>dbHost=localhost</arg>
+<arg>dbPort=27017</arg>
+<arg>dbMaxPoolSize=10</arg>
+<arg>dbNetworkTimeout=None</arg>
+<arg>dbDocClass=&lt;type 'dict'&gt;</arg>
+<arg>dbTZAware=False</arg>
+</arguments>
+<doc>Loads pymongo and connects to the MongoDB host using parameters submitted.
+
+Example usage:
+| # To connect to foo.bar.org's MongoDB service on port 27017 |
+| Connect To MongoDB | foo.bar.org | ${27017} |
+| # Or for an authenticated connection |
+| Connect To MongoDB | admin:admin@foo.bar.org | ${27017} |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Disconnect From Mongodb">
+<arguments>
+</arguments>
+<doc>Disconnects from the MongoDB server.
+
+For example:
+| Disconnect From MongoDB | # disconnects from current connection to the MongoDB server |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Drop Mongodb Collection">
+<arguments>
+<arg>dbName</arg>
+<arg>dbCollName</arg>
+</arguments>
+<doc>Deletes the named collection passed in from the database named.
+If the collection does not exist, no errors are thrown.
+
+Usage is:
+| Drop MongoDB Collection | myDB | CollectionName |
+| @{allCollections} | Get MongoDB Collections | myDB |
+| Should Not Contain | ${allCollections} | CollectionName |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Drop Mongodb Database">
+<arguments>
+<arg>dbDelName</arg>
+</arguments>
+<doc>Deletes the database passed in from the MongoDB server if it exists.
+If the database does not exist, no errors are thrown.
+
+Usage is:
+| Drop MongoDB Database | myDB |
+| @{allDBs} | Get MongoDB Collections | myDB |
+| Should Not Contain | ${allDBs} | myDB |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Mongodb Collection Count">
+<arguments>
+<arg>dbName</arg>
+<arg>dbCollName</arg>
+</arguments>
+<doc>Returns the number records for the collection specified.
+
+Usage is:
+| ${allResults} | Get MongoDB Collection Count | DBName | CollectionName |
+| Log | ${allResults} |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Mongodb Collections">
+<arguments>
+<arg>dbName</arg>
+</arguments>
+<doc>Returns a list of all of the collections for the database you
+passed in on the connected MongoDB server.
+
+Usage is:
+| @{allCollections} | Get MongoDB Collections | DBName |
+| Log Many | @{allCollections} |
+| Should Contain | ${allCollections} | CollName |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Mongodb Databases">
+<arguments>
+</arguments>
+<doc>Returns a list of all of the databases currently on the MongoDB 
+server you are connected to.
+
+Usage is:
+| @{allDBs} | Get Mongodb Databases |
+| Log Many | @{allDBs} |
+| Should Contain | ${allDBs} | DBName |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Remove Mongodb Records">
+<arguments>
+<arg>dbName</arg>
+<arg>dbCollName</arg>
+<arg>recordJSON</arg>
+</arguments>
+<doc>Remove some of the records from a given MongoDB database collection
+based on the JSON entered.
+
+The JSON fed in must be double quoted but when doing a comparison, it
+has to be single quoted.  See Usage below
+
+Usage is:
+| ${allResults} | Remove MongoDB Records | ${MDBDB} | ${MDBColl} | {"_id": "4dacab2d52dfbd26f1000000"} |
+| Log | ${allResults} |
+| ${output} | Retrieve All MongoDB Records | ${MDBDB} | ${MDBColl} |
+| Should Not Contain | ${output} | '4dacab2d52dfbd26f1000000' |
+or
+| ${allResults} | Remove MongoDB Records | ${MDBDB} | ${MDBColl} | {"timestamp": {"$lt": 2}} |
+| Log | ${allResults} |
+| ${output} | Retrieve All MongoDB Records | ${MDBDB} | ${MDBColl} |
+| Should Not Contain | ${output} | 'timestamp', 1 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Retrieve All Mongodb Records">
+<arguments>
+<arg>dbName</arg>
+<arg>dbCollName</arg>
+<arg>returnDocuments=False</arg>
+</arguments>
+<doc>Retrieve ALL of the records in a give MongoDB database collection.
+Returned value must be single quoted for comparison, otherwise you will
+get a TypeError error.
+
+Usage is:
+| ${allResults} | Retrieve All MongoDB Records | DBName | CollectionName |
+| Log | ${allResults} |
+| Should Contain X Times | ${allResults} | '${recordNo1}' | 1 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Retrieve And Update One Mongodb Record">
+<arguments>
+<arg>dbName</arg>
+<arg>dbCollName</arg>
+<arg>queryJSON</arg>
+<arg>updateJSON</arg>
+<arg>returnBeforeDocument=False</arg>
+</arguments>
+<doc>Retrieve and update one record from a given MongoDB database collection
+based on the JSON query string. Return format is robot dictionary.
+``returnBeforeDocument`` if return document should be before or after the update, default is ``False``.
+
+Usage is:
+| ${QueryJSON}  | Set Variable | {"type" : "basic_user" ,"in_use": false} |
+| ${UpdateJSON} | Set Variable | {"$set": {"in_use" : true}} |
+| &amp;{allResults} | Retrieve and Update One Mongodb Record | DBName | CollectionName | ${QueryJSON} | ${UpdateJSON} |
+| Log | ${allResults} |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Retrieve Mongodb Records With Desired Fields">
+<arguments>
+<arg>dbName</arg>
+<arg>dbCollName</arg>
+<arg>recordJSON</arg>
+<arg>fields</arg>
+<arg>return__id=True</arg>
+<arg>returnDocuments=False</arg>
+</arguments>
+<doc>Retrieves from a document(s) the desired projection. In a sql terms: select a and b from table;
+For more details about querying records from Mongodb and comparison to sql see the
+[http://docs.mongodb.org/manual/reference/sql-comparison|Mongodb]
+documentation.
+
+In Mongodb terms would correspond: db.collection.find({ }, { fieldA: 1, fieldB: 1 })
+
+For usage of the dbName, dbCollName and recordJSON arguments, see the keyword
+``Retrieve Some Mongodb Records`` documentation.
+
+fields argument control what field(s) are returned from the document(s),
+it is a comma separated string of fields. It is also possible to return fields
+inside of the array element, by separating field by dot notation. See the
+usage examples for more details how to use fields argument.
+
+return__id controls is the _id field also returned with the projections.
+Possible values are True and False
+
+The following usages assume a database name account, collection named users and
+that contain documents of the following prototype:
+{"firstName": "Clark", "lastName": "Kent", "address": {"streetAddress": "21 2nd Street", "city": "Metropolis"}}
+
+Usage is:
+| ${firstName} | Retrieve MongoDB Records With Desired Fields | account | users | {} | firstName | 0 |
+| ${address} | Retrieve MongoDB Records With Desired Fields | account | users | {} | address | ${false} | # Robot BuiltIn boolean value |
+| ${address_city} | Retrieve MongoDB Records With Desired Fields | account | users | {} | address.city | False |
+| ${address_city_and_streetAddress} | Retrieve MongoDB Records With Desired Fields | account | users | {} | address.city, address.streetAddress | False |
+| ${_id} | Retrieve MongoDB Records With Desired Fields | account | users | {} | firstName | True |
+=&gt;
+| ${firstName} = [(u'firstName', u'Clark')] |
+| ${address} = [(u'address', {u'city': u'Metropolis', u'streetAddress': u'21 2nd Street'})] |
+| ${address_city} = [(u'address', {u'city': u'Metropolis'})] |
+| ${address_city_and_streetAddress} = [(u'address', {u'city': u'Metropolis', u'streetAddress': u'21 2nd Street'})] # Same as retrieving only address |
+| ${_id} = [(u'_id', ObjectId('...')), (u'firstName', u'Clark')] |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Retrieve Some Mongodb Records">
+<arguments>
+<arg>dbName</arg>
+<arg>dbCollName</arg>
+<arg>recordJSON</arg>
+<arg>returnDocuments=False</arg>
+</arguments>
+<doc>Retrieve some of the records from a given MongoDB database collection
+based on the JSON entered.
+Returned value must be single quoted for comparison, otherwise you will
+get a TypeError error.
+
+Usage is:
+| ${allResults} | Retrieve Some MongoDB Records | DBName | CollectionName | JSON |
+| Log | ${allResults} |
+| Should Contain X Times | ${allResults} | '${recordNo1}' | 1 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Save Mongodb Records">
+<arguments>
+<arg>dbName</arg>
+<arg>dbCollName</arg>
+<arg>recordJSON</arg>
+</arguments>
+<doc>If to_save already has an "_id" then an update() (upsert) operation is 
+performed and any existing document with that "_id" is overwritten. 
+Otherwise an insert() operation is performed. In this case if manipulate 
+is True an "_id" will be added to to_save and this method returns the 
+"_id" of the saved document.
+
+| ${allResults} | Save MongoDB Records | DBName | CollectionName | JSON |
+
+Enter a new record usage is:
+| ${allResults} | Save MongoDB Records | foo | bar | {"timestamp":1, "msg":"Hello 1"} |
+| Log | ${allResults} |
+
+Update an existing record usage is:
+| ${allResults} | Save MongoDB Records | foo | bar | {"timestamp":1, "msg":"Hello 1"} |
+| Log | ${allResults} |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Update Many Mongodb Records">
+<arguments>
+<arg>dbName</arg>
+<arg>dbCollName</arg>
+<arg>queryJSON</arg>
+<arg>updateJSON</arg>
+<arg>upsert=False</arg>
+</arguments>
+<doc>Update many MongoDB records at ones based on the given query string and
+return number of modified documents.
+
+Usage is:
+| ${QueryJSON}  | Set Variable | {"type" : "basic_user" ,"in_use": false} |
+| ${UpdateJSON} | Set Variable | {"$set": {"in_use" : true}} |
+| &amp;{allResults} | Update Many Mongodb Records | DBName | CollectionName | ${QueryJSON} | ${UpdateJSON} |
+| Log | ${allResults} |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Validate Mongodb Collection">
+<arguments>
+<arg>dbName</arg>
+<arg>dbCollName</arg>
+</arguments>
+<doc>Returns a string of validation info. Raises CollectionInvalid if 
+validation fails.
+
+Usage is:
+| ${allResults} | Validate MongoDB Collection | DBName | CollectionName |
+| Log | ${allResults} |</doc>
+<tags>
+</tags>
+</kw>
+</keywordspec>

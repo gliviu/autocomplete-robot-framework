@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keywordspec generated="20160504 12:03:43" type="library" name="HttpLibrary.HTTP" format="ROBOT">
+<version>0.4.2</version>
+<scope>test suite</scope>
+<namedargs>yes</namedargs>
+<doc>HttpLibrary for Robot Framework
+
+*JSON*
+
+The JSON related keywords use JSON Pointer. To learn more about JSON
+Pointer, go to http://tools.ietf.org/html/draft-pbryan-zyp-json-pointer-00.</doc>
+<kw name="Create Http Context">
+<arguments>
+<arg>host=None</arg>
+<arg>scheme=http</arg>
+</arguments>
+<doc>Sets the HTTP host to use for future requests. You must call this
+before issuing any HTTP requests.
+
+`host` is the name of the host, optionally with port (e.g. 'google.com' or 'localhost:5984')
+`scheme` the protocol scheme to use. Valid values are 'http', 'https'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="DELETE">
+<arguments>
+<arg>url</arg>
+</arguments>
+<doc>Issues a HTTP DELETE request.
+
+`url` is the URL relative to the server root, e.g. '/_utils/config.html'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Follow Response">
+<arguments>
+</arguments>
+<doc>Follows a HTTP redirect if the previous response status code was a 301 or 302.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="GET">
+<arguments>
+<arg>url</arg>
+</arguments>
+<doc>Issues a HTTP GET request.
+
+`url` is the URL relative to the server root, e.g. '/_utils/config.html'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Json Value">
+<arguments>
+<arg>json_string</arg>
+<arg>*args</arg>
+<arg>**kwargs</arg>
+</arguments>
+<doc>Get the target node of the JSON document `json_string` specified by `json_pointer`.
+
+Example:
+| ${result}=       | Get Json Value   | {"foo": {"bar": [1,2,3]}} | /foo/bar |
+| Should Be Equal  | ${result}        | [1, 2, 3]                 |          |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Response Body">
+<arguments>
+</arguments>
+<doc>Get the response body.
+
+Example:
+| GET                 | /foo.xml          |                                      |
+| ${body}=            | Get Response Body |                                      |
+| Should Start With   | ${body}           | &lt;?xml version="1.0" encoding="UTF-8" |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Response Header">
+<arguments>
+<arg>header_name</arg>
+</arguments>
+<doc>Get the response header with the name `header_name`
+
+If there are two headers with the same key, the return value of this
+keyword is a list containing both values.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Response Status">
+<arguments>
+</arguments>
+<doc>Returns the response status line (e.g. "200 OK" or "404 Not found")
+
+Notice, this is not the response status code (e.g. 200), but the entire
+first line of the response. To check for a status code, use the
+following:
+
+Example:
+| ${status}=        | Get Response Status |           |
+| Should Start With | 200                 | ${status} |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="HEAD">
+<arguments>
+<arg>url</arg>
+</arguments>
+<doc>Issues a HTTP HEAD request.
+
+`url` is the URL relative to the server root, e.g. '/_utils/config.html'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Http Request">
+<arguments>
+<arg>verb</arg>
+<arg>url</arg>
+</arguments>
+<doc>Issues a HTTP request with an uncommon HTTP Verb.
+
+`verb` is the HTTP Verb to use, e.g. "PROPFIND", "PATCH", "OPTIONS"
+`url` is the URL relative to the server root, e.g. '/_utils/config.html'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Json Value Should Equal">
+<arguments>
+<arg>json_string</arg>
+<arg>json_pointer</arg>
+<arg>expected_value</arg>
+</arguments>
+<doc>Fails if the value of the target node of the JSON document
+`json_string` specified by JSON Pointer `json_pointer` is not `expected_value`.
+
+Example:
+| Set Test Variable       | ${doc}  | {"foo": {"bar": [1,2,3]}} |             |
+| Json Value Should Equal | ${doc}  | /foo/bar                  | "[1, 2, 3]" |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Json Value Should Not Equal">
+<arguments>
+<arg>json_string</arg>
+<arg>json_pointer</arg>
+<arg>expected_value</arg>
+</arguments>
+<doc>Fails if the value of the target node of the JSON document
+`json_string` specified by JSON Pointer `json_pointer` is `expected_value`.
+
+Example:
+| Set Test Variable           | ${doc}  | {"foo": {"bar": [1,2,3]}} |             |
+| Json Value Should Not Equal | ${doc}  | /foo/bar                  | "[1, 2, 3]" |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Log Json">
+<arguments>
+<arg>json_string</arg>
+<arg>*args</arg>
+<arg>**kwargs</arg>
+</arguments>
+<doc>Logs a pretty printed version of the JSON document `json_string`.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Log Response Body">
+<arguments>
+<arg>log_level=INFO</arg>
+</arguments>
+<doc>Logs the response body.
+
+Specify `log_level` (default: "INFO") to set the log level.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Log Response Headers">
+<arguments>
+<arg>log_level=INFO</arg>
+</arguments>
+<doc>Logs the response headers, line by line.
+
+Specify `log_level` (default: "INFO") to set the log level.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Log Response Status">
+<arguments>
+<arg>log_level=INFO</arg>
+</arguments>
+<doc>Logs the response status line
+
+Specify `log_level` (default: "INFO") to set the log level.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Next Request May Not Succeed">
+<arguments>
+</arguments>
+<doc>Don't fail the next request if it's status code is &gt;= 400</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Next Request Should Have Status Code">
+<arguments>
+<arg>status_code=None</arg>
+</arguments>
+<doc>Fails the next request if it's status code is different from `status_code`.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Next Request Should Not Succeed">
+<arguments>
+</arguments>
+<doc>Fails the next request if it's status code is &lt; 400</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Next Request Should Succeed">
+<arguments>
+</arguments>
+<doc>Fails the next request if it's status code is &gt;= 400. This is the
+standard behaviour (only use this keyword if you specified `Next
+Request Should Not Succeed` earlier.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Parse Json">
+<arguments>
+<arg>json_string</arg>
+</arguments>
+<doc>Parses the JSON document `json_string` and returns a data structure.
+
+Example:
+| ${result}=       | Parse Json  | [1, 2, 3] |
+| Length Should Be | ${result}   | 3         |
+
+`json_string` is the string containg JSON that will be parsed</doc>
+<tags>
+</tags>
+</kw>
+<kw name="POST">
+<arguments>
+<arg>url</arg>
+</arguments>
+<doc>Issues a HTTP POST request.
+
+`url` is the URL relative to the server root, e.g. '/_utils/config.html'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="PUT">
+<arguments>
+<arg>url</arg>
+</arguments>
+<doc>Issues a HTTP PUT request.
+
+`url` is the URL relative to the server root, e.g. '/_utils/config.html'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Response Body Should Contain">
+<arguments>
+<arg>should_contain</arg>
+</arguments>
+<doc>Fails if the response body does not contain `should_contain`
+
+Example:
+| GET                          | /foo.xml         |
+| Response Body Should Contain | version="1.0"    |
+| Response Body Should Contain | encoding="UTF-8" |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Response Header Should Equal">
+<arguments>
+<arg>header_name</arg>
+<arg>expected</arg>
+</arguments>
+<doc>Fails if the value of response header `header_name` does not equal
+`expected`. Also fails if the last response does not have a
+`header_name` header.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Response Header Should Not Equal">
+<arguments>
+<arg>header_name</arg>
+<arg>not_expected</arg>
+</arguments>
+<doc>Fails if the value of response header `header_name` equals `expected`
+Also fails if the last response does not have a `header_name` header.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Response Should Have Header">
+<arguments>
+<arg>header_name</arg>
+</arguments>
+<doc>Fails if the response does not have a header named `header_name`</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Response Should Not Have Header">
+<arguments>
+<arg>header_name</arg>
+</arguments>
+<doc>Fails if the response does has a header named `header_name`</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Response Status Code Should Equal">
+<arguments>
+<arg>status_code</arg>
+</arguments>
+<doc>Fails if the response status code of the previous request was not the
+specified one.
+
+`status_code` the status code to compare against.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Response Status Code Should Not Equal">
+<arguments>
+<arg>status_code</arg>
+</arguments>
+<doc>Fails if the response status code of the previous request is equal to
+the one specified.
+
+`status_code` the status code to compare against.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Restore Http Context">
+<arguments>
+</arguments>
+<doc>Restores HttpLibrary's state to the point before the last "Create Http
+Context" call.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Basic Auth">
+<arguments>
+<arg>username</arg>
+<arg>password</arg>
+</arguments>
+<doc>Set HTTP Basic Auth for next request.
+
+See http://en.wikipedia.org/wiki/Basic_access_authentication
+
+`username` is the username to authenticate with, e.g. 'Aladdin'
+
+`password` is the password to use, e.g. 'open sesame'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Http Host">
+<arguments>
+<arg>host</arg>
+</arguments>
+<doc>*DEPRECATED* Use `Create HTTP Context` instead.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Json Value">
+<arguments>
+<arg>json_string</arg>
+<arg>*args</arg>
+<arg>**kwargs</arg>
+</arguments>
+<doc>Set the target node of the JSON document `json_string` specified by
+JSON Pointer `json_pointer` to `json_value`.
+
+Example:
+| ${result}=       | Set Json Value | {"foo": {"bar": [1,2,3]}} | /foo | 12 |
+| Should Be Equal  | ${result}      | {"foo": 12}               |      |    |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Request Body">
+<arguments>
+<arg>body</arg>
+</arguments>
+<doc>Set the request body for the next HTTP request.
+
+Example:
+| Set Request Body           | user=Aladdin&amp;password=open%20sesame |
+| POST                       | /login                              |
+| Response Should Succeed  |                                     |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Request Header">
+<arguments>
+<arg>header_name</arg>
+<arg>header_value</arg>
+</arguments>
+<doc>Sets a request header for the next request.
+
+`header_name` is the name of the header, e.g. `User-Agent`
+`header_value` is the key of the header, e.g. `RobotFramework HttpLibrary (Mozilla/4.0)`</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Should Be Valid Json">
+<arguments>
+<arg>json_string</arg>
+</arguments>
+<doc>Attempts to parse `json_string` as JSON. Fails, if `json_string` is invalid JSON.
+
+Example:
+| Should Be Valid Json | {"foo": "bar"} |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Show Response Body In Browser">
+<arguments>
+</arguments>
+<doc>Opens your default web browser with the last request's response body.
+
+This is meant for debugging response body's with complex media types.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Stringify Json">
+<arguments>
+<arg>data</arg>
+</arguments>
+<doc>Converts the data structure to a string containing its JSON string representation
+
+Example:
+| ${data} =                   | Create List    |  1  2  3          |
+| ${json_string}=             | Stringify JSON |  ${data}          |
+| Should Be Equal As Strings  | ${json_string} |  ["1", "2", "3"]  |
+
+`data` is the data structure to convert to json</doc>
+<tags>
+</tags>
+</kw>
+</keywordspec>

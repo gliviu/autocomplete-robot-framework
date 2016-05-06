@@ -267,6 +267,25 @@ describe 'Robot Framework keywords autocompletions', ->
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(0)
+    it 'react on showLibrarySuggestions configuration changes', ->
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' built')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0].displayText).toEqual('BuiltIn')
+      runs ->
+        atom.config.set("#{CFG_KEY}.showLibrarySuggestions", false)
+      waitsFor ->
+        return !provider.loading
+      , 'Provider should finish loading', 500
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' built')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(0)
 
 describe "Robot file detection", ->
   it 'should detect correct robot files', ->
