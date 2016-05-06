@@ -70,6 +70,8 @@ processStandardDefinitionsFile = (dirPath, fileName, settings) ->
 
 processStandardDefinitions = (settings) ->
   autocomplete.reset(STANDARD_DEFINITIONS_DIR)
+  autocomplete.reset(EXTERNAL_DEFINITIONS_DIR)
+
   for lib in STANDARD_LIBS
     if settings.standardLibrary[lib]         then processStandardDefinitionsFile(STANDARD_DEFINITIONS_DIR, "#{lib}.xml", settings)
   for lib in EXTERNAL_LIBS

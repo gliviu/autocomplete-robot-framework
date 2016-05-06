@@ -219,6 +219,13 @@ describe 'Robot Framework keywords autocompletions', ->
             expect(suggestions.length).toEqual(1)
             expect(suggestions[0].displayText).toEqual('Call Method')
       runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' built')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0].displayText).toEqual('BuiltIn')
+      runs ->
         atom.config.set("#{CFG_KEY}.standardLibrary.BuiltIn", false)
       waitsFor ->
         return !provider.loading
@@ -229,6 +236,44 @@ describe 'Robot Framework keywords autocompletions', ->
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(0)
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' built')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(0)
+    it 'react on externalLibrary configuration changes', ->
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' cw')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(0)
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' ftp')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(0)
+      runs ->
+        atom.config.set("#{CFG_KEY}.externalLibrary.FtpLibrary", true)
+      waitsFor ->
+        return !provider.loading
+      , 'Provider should finish loading', 500
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' cw')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0].displayText).toEqual('Cwd')
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' ftpli')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0].displayText).toEqual('FtpLibrary')
     it 'react on processLibdocFiles configuration changes', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
