@@ -1,9 +1,13 @@
 {
   "name": "autocomplete-robot-framework",
   "main": "./lib/main",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Robot Framework autocomplete for Atom",
-  "keywords": ["autocomplete", "robot", "framework"],
+  "keywords": [
+    "autocomplete",
+    "robot",
+    "framework"
+  ],
   "repository": "https://github.com/gliviu/autocomplete-robot-framework",
   "bugs": {
     "url": "https://github.com/gliviu/autocomplete-robot-framework/issues"
