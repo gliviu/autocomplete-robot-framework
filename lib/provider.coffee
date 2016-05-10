@@ -227,12 +227,16 @@ provider =
         editorDestroySubscription.dispose()
 
     # Atom commands
-    atom.commands.add 'atom-text-editor', 'Robot Framework:Print debug info', ->
+    atom.commands.add 'atom-text-editor', 'Robot Framework:Print autocomplete debug info', ->
       autocomplete.printDebugInfo({
         showRobotFiles: true,
         showLibdocFiles: true,
         showAllSuggestions: true
       })
+    atom.commands.add 'atom-text-editor', 'Robot Framework:Reload autocomplete data', ->
+      for path of provider.robotProjectPaths
+        provider.robotProjectPaths[path].status = 'project-initial'
+      reloadAutocompleteData()
 
   printDebugInfo: ->
     autocomplete.printDebugInfo()

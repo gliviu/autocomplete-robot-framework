@@ -156,7 +156,6 @@ describe 'Robot Framework keywords autocompletions', ->
     waitsForPromise ->
       getCompletions(editor, provider).then (suggestions) ->
         expect(suggestions.length).toBeGreaterThan(2)
-        debugger
         expect(suggestions[0]?.displayText).toEqual('Set Variable')
         expect(suggestions[1]?.displayText).toEqual('Set Variable If')
 
