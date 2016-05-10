@@ -129,17 +129,19 @@ reloadAutocompleteData = ->
     provider.loading = true
     processStandardDefinitions(provider.settings)
     promise = Promise.resolve()
-    # Chain promises to avoid freezing atom ui
+    # Chain promises to avoid freezing atom ui due to too many concurrent processes
     for path of provider.robotProjectPaths when (projectDirectoryExists(path) and
     provider.robotProjectPaths[path].status == 'project-initial')
       do (path) ->
         projectName = pathUtils.basename(path)
         console.log  "Loading project #{projectName}" if provider.settings.debug
+        console.time "Robot project #{projectName} loading time:" if provider.settings.debug
         provider.robotProjectPaths[path].status = 'project-loading'
         autocomplete.reset(path)
         promise = promise.then ->
           return scanDirectory(path, provider.settings).then ->
             console.log  "Project #{projectName} loaded" if provider.settings.debug
+            console.timeEnd "Robot project #{projectName} loading time:" if provider.settings.debug
             provider.robotProjectPaths[path].status = 'project-loaded'
     promise.then ->
       console.log 'Autocomplete data loaded' if provider.settings.debug
@@ -223,6 +225,14 @@ provider =
         editorSaveSubscription.dispose()
         editorStopChangingSubscription.dispose()
         editorDestroySubscription.dispose()
+
+    # Atom commands
+    atom.commands.add 'atom-text-editor', 'Robot Framework:Print debug info', ->
+      autocomplete.printDebugInfo({
+        showRobotFiles: true,
+        showLibdocFiles: true,
+        showAllSuggestions: true
+      })
 
   printDebugInfo: ->
     autocomplete.printDebugInfo()
