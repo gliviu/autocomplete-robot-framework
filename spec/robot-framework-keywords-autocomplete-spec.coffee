@@ -109,6 +109,19 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(0)
           expect(suggestions[0]?.displayText).toEqual('With embedded ${arg1} arguments ${arg2}')
+    it 'accept prefix containing dot', ->
+      runs ->
+        atom.config.set("#{CFG_KEY}.externalLibrary.HttpLibraryHTTP", true)
+      waitsFor ->
+        return !provider.loading
+      , 'Provider should finish loading', 500
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' HttpLibrary.HTTPd')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(0)
+          expect(suggestions[0]?.displayText).toEqual('DELETE')
 
   describe 'Autocomplete suggestion order', ->
     it 'show suggestions from current editor first', ->
@@ -118,46 +131,46 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(2)
           expect(suggestions[0]?.displayText).toEqual('Run Program')
-  it 'matches beginning of word', ->
-    runs ->
-      editor.setCursorBufferPosition([Infinity, Infinity])
-      editor.insertText(' sbe')
-    waitsForPromise ->
-      getCompletions(editor, provider).then (suggestions) ->
-        expect(suggestions.length).toBeGreaterThan(3)
-        expect(suggestions[0]?.displayText).toEqual('Should Be Byte String')
-        expect(suggestions[1]?.displayText).toEqual('Should Be Empty')
-        expect(suggestions[2]?.displayText).toEqual('Should Be Equal')
-    runs ->
-      editor.setCursorBufferPosition([Infinity, Infinity])
-      editor.insertText(' dp')
-    waitsForPromise ->
-      getCompletions(editor, provider).then (suggestions) ->
-        expect(suggestions.length).toEqual(1)
-        expect(suggestions[0]?.displayText).toEqual('Dot.punctuation keyword')
-    runs ->
-      editor.setCursorBufferPosition([Infinity, Infinity])
-      editor.insertText(' dot')
-    waitsForPromise ->
-      getCompletions(editor, provider).then (suggestions) ->
-        expect(suggestions.length).toEqual(1)
-        expect(suggestions[0]?.displayText).toEqual('Dot.punctuation keyword')
-    runs ->
-      editor.setCursorBufferPosition([Infinity, Infinity])
-      editor.insertText(' punct')
-    waitsForPromise ->
-      getCompletions(editor, provider).then (suggestions) ->
-        expect(suggestions.length).toEqual(1)
-        expect(suggestions[0]?.displayText).toEqual('Dot.punctuation keyword')
-  it 'show results ordered by score 1', ->
-    runs ->
-      editor.setCursorBufferPosition([Infinity, Infinity])
-      editor.insertText(' sevar')
-    waitsForPromise ->
-      getCompletions(editor, provider).then (suggestions) ->
-        expect(suggestions.length).toBeGreaterThan(2)
-        expect(suggestions[0]?.displayText).toEqual('Set Variable')
-        expect(suggestions[1]?.displayText).toEqual('Set Variable If')
+    it 'matches beginning of word', ->
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' sbe')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(3)
+          expect(suggestions[0]?.displayText).toEqual('Should Be Byte String')
+          expect(suggestions[1]?.displayText).toEqual('Should Be Empty')
+          expect(suggestions[2]?.displayText).toEqual('Should Be Equal')
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' dp')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('Dot.punctuation keyword')
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' dot')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('Dot.punctuation keyword')
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' punct')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('Dot.punctuation keyword')
+    it 'show results ordered by score 1', ->
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' sevar')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(2)
+          expect(suggestions[0]?.displayText).toEqual('Set Variable')
+          expect(suggestions[1]?.displayText).toEqual('Set Variable If')
 
   describe 'Autocomplete configuration', ->
     it 'react on showArguments configuration changes', ->

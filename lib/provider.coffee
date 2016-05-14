@@ -188,6 +188,19 @@ getAtomProjectPathsForEditor = (editor) ->
       res.push(projectDirectory.getPath())
   return res
 
+# Normally autocomplete-plus considers '.' as delimiter when building prefixes.
+# ie. for 'HttpLibrary.HTTP' it reports only 'HTTP' as prefix.
+# This method considers everything until it meets a space.
+getPrefix = (editor, bufferPosition) ->
+  line = editor.lineTextForBufferRow(bufferPosition.row)
+  textBeforeCursor = line.substr(0, bufferPosition.column)
+  reversed = textBeforeCursor.split("").reverse().join("")
+  reversedPrefixMatch = /^[\S]+/.exec(reversed)
+  if(reversedPrefixMatch)
+    return reversedPrefixMatch[0].split("").reverse().join("")
+  else
+    return ''
+
 provider =
   settings : {}
   selector: '.text.robot'
@@ -197,9 +210,12 @@ provider =
   # once user starts editing files.
   robotProjectPaths: undefined
   getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix}) ->
+    replacementPrefix = getPrefix(editor, bufferPosition)
     new Promise (resolve) ->
       path = editor?.buffer.file?.path
-      suggestions = autocomplete.getSuggestions(prefix, path, provider.settings)
+      suggestions = autocomplete.getSuggestions(replacementPrefix, path, provider.settings)
+      for suggestion in suggestions
+        suggestion.replacementPrefix = replacementPrefix
       resolve(suggestions)
   unload: ->
   load: ->
