@@ -223,6 +223,14 @@ describe 'Robot Framework keywords autocompletions', ->
           expect(suggestions.length).toEqual(2)
           expect(suggestions[0]?.displayText).toEqual('priv.keyword')
           expect(suggestions[1]?.displayText).toEqual('Priv test keyword')
+    it 'show results ordered by score', ->
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' rri')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('Run Keyword And Return If')
 
   describe 'Autocomplete configuration', ->
     it 'react on showArguments configuration changes', ->
