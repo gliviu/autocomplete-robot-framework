@@ -17,7 +17,6 @@ getCompletions = (editor, provider)->
     prefix: prefix
   provider.getSuggestions(request)
 
-
 describe 'Robot Framework keywords autocompletions', ->
   [editor, provider] = []
   beforeEach ->
@@ -162,7 +161,17 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('Dot.punctuation keyword')
-    it 'show results ordered by score 1', ->
+    it 'order alphabetically when suggestions have the same score', ->
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' ord')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(2)
+          expect(suggestions[0]?.displayText).toEqual('Ord 1')
+          expect(suggestions[1]?.displayText).toEqual('Ord 2')
+          expect(suggestions[2]?.displayText).toEqual('Ord 3')
+    it 'show results ordered by score', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText(' sevar')
@@ -171,6 +180,49 @@ describe 'Robot Framework keywords autocompletions', ->
           expect(suggestions.length).toBeGreaterThan(2)
           expect(suggestions[0]?.displayText).toEqual('Set Variable')
           expect(suggestions[1]?.displayText).toEqual('Set Variable If')
+    it 'show results ordered by score', ->
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' runif')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(7)
+          expect(suggestions[0]?.displayText).toEqual('Run Keyword If')
+          for i in [1..7]
+            expect(suggestions[i].displayText.indexOf('Run Keyword If')).toEqual(0)
+    it 'show results ordered by score', ->
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' cp')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(1)
+          expect(suggestions[0]?.displayText).toEqual('C p')
+    it 'show results ordered by score', ->
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' convertda')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('Convert Date')
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' convertd')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(2)
+          expect(suggestions[0]?.displayText).toEqual('Convert Date')
+          expect(suggestions[1]?.displayText).toEqual('Convert To Dictionary')
+    it 'show results ordered by score', ->
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' privk')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(2)
+          expect(suggestions[0]?.displayText).toEqual('priv.keyword')
+          expect(suggestions[1]?.displayText).toEqual('Priv test keyword')
 
   describe 'Autocomplete configuration', ->
     it 'react on showArguments configuration changes', ->
