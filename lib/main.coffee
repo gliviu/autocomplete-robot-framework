@@ -111,3 +111,8 @@ module.exports =
           title: 'Show SwingLibrary suggestions'
           type: 'boolean'
           default: false
+    debug:
+      title: 'Debug'
+      type: 'boolean'
+      default: false
+      order: 200
