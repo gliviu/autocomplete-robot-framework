@@ -30,7 +30,6 @@ This package depends on Robot Framework grammar support in Atom. It won't work u
 * More information can be shown by enabling debug mode in package configuration.
 
 ## Changelog
-*  v1.1.0
+*  v1.0.1
   *  Added Atom commands for data reload and debug info
-  *  Debug config option is now available in GUI
-  *  bug fixes
+  *  Debug config option is now available in UI
