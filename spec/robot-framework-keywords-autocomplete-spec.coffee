@@ -121,8 +121,6 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(0)
           expect(suggestions[0]?.displayText).toEqual('DELETE')
-
-  describe 'Autocomplete suggestion order', ->
     it 'show suggestions from current editor first', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
       editor.insertText(' run')
@@ -130,29 +128,37 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(2)
           expect(suggestions[0]?.displayText).toEqual('Run Program')
-    it 'matches beginning of word', ->
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' sbe')
+    it 'do not show keywords private to other files', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      editor.insertText(' privatek')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toBeGreaterThan(3)
-          expect(suggestions[0]?.displayText).toEqual('Should Be Byte String')
-          expect(suggestions[1]?.displayText).toEqual('Should Be Empty')
-          expect(suggestions[2]?.displayText).toEqual('Should Be Equal')
+          expect(suggestions.length).toEqual(0)
+    it 'show keywords visible onlyinside current file', ->
+      waitsForPromise -> atom.workspace.open('autocomplete/test_autocomplete_testcase.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        debugger
+        editor.insertText(' privatek')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('Private keyword')
+    it 'matches beginning of word', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText(' dp')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
+          expect(suggestions.length).toBeGreaterThan(1)
           expect(suggestions[0]?.displayText).toEqual('Dot.punctuation keyword')
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText(' dot')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
+          expect(suggestions.length).toBeGreaterThan(1)
           expect(suggestions[0]?.displayText).toEqual('Dot.punctuation keyword')
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
@@ -161,76 +167,6 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('Dot.punctuation keyword')
-    it 'order alphabetically when suggestions have the same score', ->
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' ord')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toBeGreaterThan(2)
-          expect(suggestions[0]?.displayText).toEqual('Ord 1')
-          expect(suggestions[1]?.displayText).toEqual('Ord 2')
-          expect(suggestions[2]?.displayText).toEqual('Ord 3')
-    it 'show results ordered by score', ->
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' sevar')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toBeGreaterThan(2)
-          expect(suggestions[0]?.displayText).toEqual('Set Variable')
-          expect(suggestions[1]?.displayText).toEqual('Set Variable If')
-    it 'show results ordered by score', ->
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' runif')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toBeGreaterThan(7)
-          expect(suggestions[0]?.displayText).toEqual('Run Keyword If')
-          for i in [1..7]
-            expect(suggestions[i].displayText.indexOf('Run Keyword If')).toEqual(0)
-    it 'show results ordered by score', ->
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' cp')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toBeGreaterThan(1)
-          expect(suggestions[0]?.displayText).toEqual('C p')
-    it 'show results ordered by score', ->
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' convertda')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('Convert Date')
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' convertd')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(2)
-          expect(suggestions[0]?.displayText).toEqual('Convert Date')
-          expect(suggestions[1]?.displayText).toEqual('Convert To Dictionary')
-    it 'show results ordered by score', ->
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' privk')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(2)
-          expect(suggestions[0]?.displayText).toEqual('priv.keyword')
-          expect(suggestions[1]?.displayText).toEqual('Priv test keyword')
-    it 'show results ordered by score', ->
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' rri')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('Run Keyword And Return If')
 
   describe 'Autocomplete configuration', ->
     it 'react on showArguments configuration changes', ->
@@ -317,7 +253,7 @@ describe 'Robot Framework keywords autocompletions', ->
     it 'react on externalLibrary configuration changes', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' cw')
+        editor.insertText(' dowfi')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(0)
@@ -326,7 +262,8 @@ describe 'Robot Framework keywords autocompletions', ->
         editor.insertText(' ftp')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
-            expect(suggestions.length).toEqual(0)
+            expect(suggestions.length).toBeGreaterThan(0)
+            expect(suggestions[0].displayText).not.toEqual('FtpLibrary')
       runs ->
         atom.config.set("#{CFG_KEY}.externalLibrary.FtpLibrary", true)
       waitsFor ->
@@ -334,11 +271,11 @@ describe 'Robot Framework keywords autocompletions', ->
       , 'Provider should finish loading', 500
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' cw')
+        editor.insertText(' dowfi')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(1)
-            expect(suggestions[0].displayText).toEqual('Cwd')
+            expect(suggestions[0].displayText).toEqual('Download File')
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText(' ftpli')

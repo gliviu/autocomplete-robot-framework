@@ -1,6 +1,7 @@
 fs = require 'fs'
 pathUtils = require 'path'
 autocomplete = require './autocomplete'
+keywordsRepo = require './keywords'
 robotParser = require './parse-robot'
 libdocParser = require './parse-libdoc'
 
@@ -10,6 +11,7 @@ STANDARD_DEFINITIONS_DIR = pathUtils.join(__dirname, '../standard-definitions')
 EXTERNAL_DEFINITIONS_DIR = pathUtils.join(__dirname, '../external-definitions')
 CFG_KEY = 'autocomplete-robot-framework'
 MAX_FILE_SIZE = 1024 * 1024
+MAX_KEYWORDS_SUGGESTIONS_CAP = 100
 
 # Used to avoid multiple concurrent reloadings
 scheduleReload = false
@@ -35,7 +37,6 @@ readdir = (path) ->
         resolve(files)
     fs.readdir(path, callback)
 
-
 scanDirectory = (path, settings) ->
   return readdir(path).then (result) ->
     promise = Promise.resolve()
@@ -54,10 +55,10 @@ processFile = (path, name, stat, settings) ->
   if stat.isFile() and stat.size < settings.maxFileSize
     fileContent = fs.readFileSync(fullPath).toString()
     if isRobotFile(fileContent, fullPath, settings)
-      autocomplete.processRobotBuffer(fileContent, fullPath, settings)
+      keywordsRepo.addRobotKeywords(fileContent, fullPath, settings)
       return Promise.resolve()
     if settings.processLibdocFiles and isLibdocXmlFile(fileContent, fullPath, settings)
-      autocomplete.processLibdocBuffer(fileContent, fullPath, settings)
+      keywordsRepo.addLibdocKeywords(fileContent, fullPath, settings)
       return Promise.resolve()
   return Promise.resolve()
 
@@ -66,11 +67,11 @@ processStandardDefinitionsFile = (dirPath, fileName, settings) ->
   path = pathUtils.join dirPath, fileName
   fileContent = fs.readFileSync(path).toString()
   if isLibdocXmlFile(fileContent, path, settings)
-    autocomplete.processLibdocBuffer(fileContent, path, settings)
+    keywordsRepo.addLibdocKeywords(fileContent, path, settings)
 
 processStandardDefinitions = (settings) ->
-  autocomplete.reset(STANDARD_DEFINITIONS_DIR)
-  autocomplete.reset(EXTERNAL_DEFINITIONS_DIR)
+  keywordsRepo.reset(STANDARD_DEFINITIONS_DIR)
+  keywordsRepo.reset(EXTERNAL_DEFINITIONS_DIR)
 
   for lib in STANDARD_LIBS
     if settings.standardLibrary[lib]         then processStandardDefinitionsFile(STANDARD_DEFINITIONS_DIR, "#{lib}.xml", settings)
@@ -80,14 +81,14 @@ processStandardDefinitions = (settings) ->
 
 readConfig = ()->
   settings =
-    matchPrefixStartOnly: false # If true, suggests only if prefix matches start of keyword
-    matchFileName: true # If true will show only results from the file name specified by prefix (Ie. 'builtinshould' will return all suggestions from BuiltIn library that contain 'should')
+    matchFileName: true           # If true will show only results from the file name specified by prefix (Ie. 'builtinshould' will return all suggestions from BuiltIn library that contain 'should')
     robotExtensions: ['.robot', '.txt']
-    debug: undefined    # True/false for verbose console output
-    maxFileSize: undefined    # Files bigger than this will not be loaded in memory
+    debug: undefined              # True/false for verbose console output
+    maxFileSize: undefined        # Files bigger than this will not be loaded in memory
+    maxKeywordsSuggestionsCap: undefined  # Maximum number of suggested keywords
     excludeDirectories: undefined # Directories not to be scanned
-    showArguments: undefined # Shows keyword arguments in suggestions
-    processLibdocFiles: undefined    # Process '.xml' files representing libdoc definitions
+    showArguments: undefined      # Shows keyword arguments in suggestions
+    processLibdocFiles: undefined # Process '.xml' files representing libdoc definitions
     showLibrarySuggestions: undefined # Suggest library names
     standardLibrary: {}
     externalLibrary: {}
@@ -96,6 +97,7 @@ readConfig = ()->
   settings.debug = atom.config.get("#{CFG_KEY}.debug") || false
   settings.showArguments = atom.config.get("#{CFG_KEY}.showArguments") || false
   settings.maxFileSize = atom.config.get("#{CFG_KEY}.maxFileSize") || MAX_FILE_SIZE
+  settings.maxKeywordsSuggestionsCap = atom.config.get("#{CFG_KEY}.maxKeywordsSuggestionsCap") || MAX_KEYWORDS_SUGGESTIONS_CAP
   settings.excludeDirectories = atom.config.get("#{CFG_KEY}.excludeDirectories")
   settings.processLibdocFiles = atom.config.get("#{CFG_KEY}.processLibdocFiles")
   settings.showLibrarySuggestions = atom.config.get("#{CFG_KEY}.showLibrarySuggestions")
@@ -137,7 +139,7 @@ reloadAutocompleteData = ->
         console.log  "Loading project #{projectName}" if provider.settings.debug
         console.time "Robot project #{projectName} loading time:" if provider.settings.debug
         provider.robotProjectPaths[path].status = 'project-loading'
-        autocomplete.reset(path)
+        keywordsRepo.reset(path)
         promise = promise.then ->
           return scanDirectory(path, provider.settings).then ->
             console.log  "Project #{projectName} loaded" if provider.settings.debug
@@ -163,9 +165,9 @@ reloadAutocompleteDataForEditor = (editor, useBuffer, settings) ->
   if path and fileExists(path)
     fileContent = if useBuffer then editor.getBuffer().getText() else fs.readFileSync(path).toString()
     if isRobotFile(fileContent, path, settings)
-      autocomplete.processRobotBuffer(fileContent, path, settings)
+      keywordsRepo.addRobotKeywords(fileContent, path, settings)
     else
-      autocomplete.reset(path)
+      keywordsRepo.reset(path)
 
 updateRobotProjectPathsWhenEditorOpens = (editor, settings) ->
   editorPath = editor.getPath()
@@ -244,7 +246,7 @@ provider =
 
     # Atom commands
     atom.commands.add 'atom-text-editor', 'Robot Framework:Print autocomplete debug info', ->
-      autocomplete.printDebugInfo({
+      keywordsRepo.printDebugInfo({
         showRobotFiles: true,
         showLibdocFiles: true,
         showAllSuggestions: true
@@ -255,6 +257,6 @@ provider =
       reloadAutocompleteData()
 
   printDebugInfo: ->
-    autocomplete.printDebugInfo()
+    keywordsRepo.printDebugInfo()
 
 module.exports = provider
