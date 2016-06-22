@@ -87,6 +87,7 @@ readConfig = ()->
     maxFileSize: undefined        # Files bigger than this will not be loaded in memory
     maxKeywordsSuggestionsCap: undefined  # Maximum number of suggested keywords
     excludeDirectories: undefined # Directories not to be scanned
+    avoidDotNotation: undefined   # Avoid dot notation in suggestions, ie. BuiltIn.convhex will be suggested as "Convert To Hex" instead of "BuiltIn.Convert To Hex"
     showArguments: undefined      # Shows keyword arguments in suggestions
     processLibdocFiles: undefined # Process '.xml' files representing libdoc definitions
     showLibrarySuggestions: undefined # Suggest library names
@@ -99,6 +100,7 @@ readConfig = ()->
   settings.maxFileSize = atom.config.get("#{CFG_KEY}.maxFileSize") || MAX_FILE_SIZE
   settings.maxKeywordsSuggestionsCap = atom.config.get("#{CFG_KEY}.maxKeywordsSuggestionsCap") || MAX_KEYWORDS_SUGGESTIONS_CAP
   settings.excludeDirectories = atom.config.get("#{CFG_KEY}.excludeDirectories")
+  settings.avoidDotNotation = atom.config.get("#{CFG_KEY}.avoidDotNotation")
   settings.processLibdocFiles = atom.config.get("#{CFG_KEY}.processLibdocFiles")
   settings.showLibrarySuggestions = atom.config.get("#{CFG_KEY}.showLibrarySuggestions")
   for lib in STANDARD_LIBS
@@ -212,12 +214,10 @@ provider =
   # once user starts editing files.
   robotProjectPaths: undefined
   getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix}) ->
-    replacementPrefix = getPrefix(editor, bufferPosition)
+    prefix = getPrefix(editor, bufferPosition)
     new Promise (resolve) ->
       path = editor?.buffer.file?.path
-      suggestions = autocomplete.getSuggestions(replacementPrefix, path, provider.settings)
-      for suggestion in suggestions
-        suggestion.replacementPrefix = replacementPrefix
+      suggestions = autocomplete.getSuggestions(prefix, path, provider.settings)
       resolve(suggestions)
   unload: ->
   load: ->

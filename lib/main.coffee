@@ -14,13 +14,18 @@ module.exports =
       type: 'boolean'
       default: true
       order: 3
+    avoidDotNotation:
+      title: 'Avoid dot notation in suggestions, ie. \'BuiltIn.convhex\' will be suggested as \'Convert To Hex\' instead of \'BuiltIn.Convert To Hex\''
+      type: 'boolean'
+      default: true
+      order: 4
     excludeDirectories:
       title: 'Names of directories or files to be excluded from showing suggestions (comma sepparated)'
       type: 'array'
       default: []
       items:
         type: 'string'
-      order: 4
+      order: 5
     standardLibrary:
       title: 'Standard library autocomplete'
       type: 'object'
