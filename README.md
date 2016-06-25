@@ -4,6 +4,8 @@ An [autocomplete-plus](https://github.com/atom/autocomplete-plus) provider for [
 
 ![Demo](https://raw.githubusercontent.com/gliviu/autocomplete-robot-framework/master/anim.gif)
 
+**As of version 1.2.0 dot notation is used to suggest all keywords in a certain library - ie. 'BuiltIn.should' shall be used instead of 'BuiltInshould'**
+
 ## Installation
 ```shell
 apm install language-robot-framework
@@ -30,7 +32,10 @@ This package depends on Robot Framework grammar support in Atom. It won't work u
 * More information can be shown by enabling debug mode in package configuration.
 
 ## Changelog
+*  v1.2.0
+  *  Use dot notation to have all suggestions inside single library
+  *  Better suggestions are provided by [fuzzaldrin-plus](https://www.npmjs.com/package/fuzzaldrin-plus)
 *  v1.1.0
   *  Added Atom commands for data reload and debug info
   *  Debug config option is now available in GUI
-  *  bug fixes
+  * bug fixes
