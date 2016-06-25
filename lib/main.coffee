@@ -14,7 +14,7 @@ module.exports =
       type: 'boolean'
       default: true
       order: 3
-    avoidDotNotation:
+    removeDotNotation:
       title: 'Avoid dot notation in suggestions, ie. \'BuiltIn.convhex\' will be suggested as \'Convert To Hex\' instead of \'BuiltIn.Convert To Hex\''
       type: 'boolean'
       default: true

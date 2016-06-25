@@ -81,13 +81,12 @@ processStandardDefinitions = (settings) ->
 
 readConfig = ()->
   settings =
-    matchFileName: true           # If true will show only results from the file name specified by prefix (Ie. 'builtinshould' will return all suggestions from BuiltIn library that contain 'should')
     robotExtensions: ['.robot', '.txt']
     debug: undefined              # True/false for verbose console output
     maxFileSize: undefined        # Files bigger than this will not be loaded in memory
     maxKeywordsSuggestionsCap: undefined  # Maximum number of suggested keywords
     excludeDirectories: undefined # Directories not to be scanned
-    avoidDotNotation: undefined   # Avoid dot notation in suggestions, ie. BuiltIn.convhex will be suggested as "Convert To Hex" instead of "BuiltIn.Convert To Hex"
+    removeDotNotation: undefined   # Avoid dot notation in suggestions, ie. BuiltIn.convhex will be suggested as "Convert To Hex" instead of "BuiltIn.Convert To Hex"
     showArguments: undefined      # Shows keyword arguments in suggestions
     processLibdocFiles: undefined # Process '.xml' files representing libdoc definitions
     showLibrarySuggestions: undefined # Suggest library names
@@ -100,7 +99,7 @@ readConfig = ()->
   settings.maxFileSize = atom.config.get("#{CFG_KEY}.maxFileSize") || MAX_FILE_SIZE
   settings.maxKeywordsSuggestionsCap = atom.config.get("#{CFG_KEY}.maxKeywordsSuggestionsCap") || MAX_KEYWORDS_SUGGESTIONS_CAP
   settings.excludeDirectories = atom.config.get("#{CFG_KEY}.excludeDirectories")
-  settings.avoidDotNotation = atom.config.get("#{CFG_KEY}.avoidDotNotation")
+  settings.removeDotNotation = atom.config.get("#{CFG_KEY}.removeDotNotation")
   settings.processLibdocFiles = atom.config.get("#{CFG_KEY}.processLibdocFiles")
   settings.showLibrarySuggestions = atom.config.get("#{CFG_KEY}.showLibrarySuggestions")
   for lib in STANDARD_LIBS

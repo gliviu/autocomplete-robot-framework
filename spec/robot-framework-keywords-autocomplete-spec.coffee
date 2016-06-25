@@ -45,15 +45,6 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('Run Program')
-    it 'suggest all keywords from that file when prefix is identical with file name', ->
-      editor.setCursorBufferPosition([Infinity, Infinity])
-      editor.insertText(' fileprefix')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(3)
-          expect(suggestions[0]?.displayText).toEqual('FilePrefix')
-          expect(suggestions[1]?.displayText).toEqual('File keyword 1')
-          expect(suggestions[2]?.displayText).toEqual('File keyword 2')
     it 'show documentation in suggestions', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
@@ -116,7 +107,7 @@ describe 'Robot Framework keywords autocompletions', ->
       , 'Provider should finish loading', 500
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' HttpLibrary.HTTPd')
+        editor.insertText(' HttpLibrary.HTTP.d')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(0)
@@ -184,19 +175,29 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('Call Method')
+    it 'suggests nothing for empty prefix', ->
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('   ')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(0)
+
+  describe 'Dot notation', ->
     it 'supports dot notation', ->
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' builtin.callme')
+        editor.insertText(' fileprefix.')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('Call Method')
+          expect(suggestions.length).toEqual(2)
+          expect(suggestions[0]?.displayText).toEqual('File keyword 1')
+          expect(suggestions[1]?.displayText).toEqual('File keyword 2')
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' builtincallme')
+        editor.insertText(' builtin.callme')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -215,8 +216,35 @@ describe 'Robot Framework keywords autocompletions', ->
         editor.insertText(' builtin')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toBeGreaterThan(1)
+          expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('BuiltIn')
+    it 'react on removeDotNotation configuration changes', ->
+      runs ->
+        atom.config.set("#{CFG_KEY}.removeDotNotation", true)
+      waitsFor ->
+        return !provider.loading
+      , 'Provider should finish loading', 500
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' builtin.callme')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('Call Method')
+          expect(suggestions[0]?.replacementPrefix).toEqual('builtin.callme')
+      runs ->
+        atom.config.set("#{CFG_KEY}.removeDotNotation", false)
+      waitsFor ->
+        return !provider.loading
+      , 'Provider should finish loading', 500
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' builtin.callme')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('Call Method')
+          expect(suggestions[0]?.replacementPrefix).toEqual('callme')
     it 'supports dot notation with mixed case', ->
       runs ->
         editor = atom.workspace.getActiveTextEditor()
@@ -226,14 +254,45 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('Call Method')
+    it 'does not replace unknown library name when dot notation is used', ->
+      runs ->
+        atom.config.set("#{CFG_KEY}.removeDotNotation", true)
+      waitsFor ->
+        return !provider.loading
+      , 'Provider should finish loading', 500
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' BUILTINCALLME')
+        editor.insertText(' UnknownLibrary.callmethod')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('Call Method')
+          expect(suggestions[0]?.replacementPrefix).toEqual('callmethod');
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' builtin.callme')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('Call Method')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' builtin.')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(1)
+          expect(suggestions[0]?.displayText).not.toEqual('BuiltIn')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText(' builtin')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('BuiltIn')
 
   describe 'Library name autocomplete', ->
     it 'suggest library names', ->
@@ -432,33 +491,6 @@ describe 'Robot Framework keywords autocompletions', ->
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(0)
-    it 'react on avoidDotNotation configuration changes', ->
-      runs ->
-        atom.config.set("#{CFG_KEY}.avoidDotNotation", true)
-      waitsFor ->
-        return !provider.loading
-      , 'Provider should finish loading', 500
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' builtin.callme')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('Call Method')
-          expect(suggestions[0]?.replacementPrefix).toEqual('builtin.callme')
-      runs ->
-        atom.config.set("#{CFG_KEY}.avoidDotNotation", false)
-      waitsFor ->
-        return !provider.loading
-      , 'Provider should finish loading', 500
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' builtin.callme')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('Call Method')
-          expect(suggestions[0]?.replacementPrefix).toEqual('callme')
 
 describe "Robot file detection", ->
   it 'should detect correct robot files', ->
