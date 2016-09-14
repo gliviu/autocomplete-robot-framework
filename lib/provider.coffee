@@ -182,8 +182,18 @@ updateRobotProjectPathsWhenEditorOpens = (editor, settings) ->
       if !provider.robotProjectPaths[projectPath] and isRobot
         # New robot project detected
         provider.robotProjectPaths[projectPath] = {status: 'project-initial'}
-
         reloadAutocompleteData()
+
+# Removes paths that are no longer opened in Atom tree view
+cleanRobotProjectPaths = () ->
+  atomPaths = atom.project.getDirectories().map( (directory) ->
+    directory.path
+  )
+  for path of provider.robotProjectPaths when path not in atomPaths
+    delete provider.robotProjectPaths[path]
+    keywordsRepo.reset(path)
+    console.log  "Removed previously indexed robot projec: '#{path}'" if provider.settings.debug
+
 
 getAtomProjectPathsForEditor = (editor) ->
   res = []
@@ -211,6 +221,7 @@ provider =
   selector: '.text.robot'
   disableForSelector: '.comment, .variable, .punctuation, .string, .storage, .keyword'
   loading: undefined    # Set to 'true' during autocomplete data async loading
+  pathsChangedSubscription: undefined
   # List of projects that contain robot files. Initially empty, will be completed
   # once user starts editing files.
   robotProjectPaths: undefined
@@ -221,6 +232,7 @@ provider =
       suggestions = autocomplete.getSuggestions(prefix, path, provider.settings)
       resolve(suggestions)
   unload: ->
+    @pathsChangedSubscription.dispose()
   load: ->
     @robotProjectPaths = {}
     # Configuration
@@ -244,6 +256,10 @@ provider =
         editorSaveSubscription.dispose()
         editorStopChangingSubscription.dispose()
         editorDestroySubscription.dispose()
+
+    # React on project paths changes
+    @pathsChangedSubscription = atom.project.onDidChangePaths (projectPaths) ->
+      cleanRobotProjectPaths()
 
     # Atom commands
     atom.commands.add 'atom-text-editor', 'Robot Framework:Print autocomplete debug info', ->
