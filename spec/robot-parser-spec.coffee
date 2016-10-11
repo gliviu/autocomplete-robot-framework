@@ -15,10 +15,8 @@ describe 'Robot parser', ->
     expect(robot.keywords[3]?.name).toEqual 'test7 kw'
     expect(robot.keywords[4]).toBeUndefined()
   describe 'Section parsing', ->
-    validSections = ['*keywords*', '* keywords *', '***** keywords ******', '     *keywords*', '*keywords*    ', '     *keywords*    ', '* keywords  2 * ', '* keywords   2', '* keywords  *2', '* keywords  *2  ', '* keywords *  2', '* keywords  *  2']
-    invalidSections = ['*keywords2*', '* keywords 2 *', '* keywords *2', '* keywords * 2', '*  keywords', '****  keywords', '    ****  keywords', '**  keywords  **', ' ****  keywords']
-    it 'test1', ->
-      expect(1).toEqual(1)
+    validSections = ['*** Keywords      ***', ' *keywords*', ' **** keywords ****', '*keywords*', '* keywords *', '***** keywords ******', '*keywords*    ', '* keywords  2 * ', '* keywords   2', '* keywords  *2', '* keywords  *2  ', '* keywords *  2', '* keywords  *  2', ' *** keywords    ** 22']
+    invalidSections = ['  *** Keywords ***', '***   Keywords ***', '     *keywords*', '     *keywords*    ', '*keywords2*', '* keywords 2 *', '* keywords *2', '* keywords * 2', '*  keywords', '****  keywords', '    ****  keywords', '**  keywords  **', ' ****  keywords', ' ***************************************************************** keywords ********************************************************************** 22222222222222222222222222222222222222222222222222222222222222222222']
     it 'correctly interpret line ending', ->
       delim = '\n'
       robot = robotParser.parse("*test cases*#{delim}t1#{delim}#{body}#{delim}*keywords*#{delim}k1#{delim}#{body}#{delim}")
@@ -76,3 +74,7 @@ describe 'Robot parser', ->
       expect(robot.testCases[1]?.name).toEqual 't2'
       expect(robot.testCases[2]?.name).toEqual 't4'
       expect(robot.testCases[3]).toBeUndefined()
+    it 'be able to parse keywords containing escapes', ->
+      file = fs.readFileSync("#{fixturePath}/keywords2.robot").toString()
+      robot = robotParser.parse(file)
+      expect(robot.keywords[0]?.name).toEqual 'test escapes'

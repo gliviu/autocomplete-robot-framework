@@ -55,19 +55,22 @@ processFile = (path, name, stat, settings) ->
   if stat.isFile() and stat.size < settings.maxFileSize
     fileContent = fs.readFileSync(fullPath).toString()
     if isRobotFile(fileContent, fullPath, settings)
+      console.log "Parsing #{fullPath} ..."  if provider.settings.debug
       keywordsRepo.addRobotKeywords(fileContent, fullPath)
       return Promise.resolve()
     if settings.processLibdocFiles and isLibdocXmlFile(fileContent, fullPath, settings)
+      console.log "Parsing #{fullPath} ..."  if provider.settings.debug
       keywordsRepo.addLibdocKeywords(fileContent, fullPath)
       return Promise.resolve()
   return Promise.resolve()
 
 
 processStandardDefinitionsFile = (dirPath, fileName, settings) ->
-  path = pathUtils.join dirPath, fileName
-  fileContent = fs.readFileSync(path).toString()
-  if isLibdocXmlFile(fileContent, path, settings)
-    keywordsRepo.addLibdocKeywords(fileContent, path)
+  fullPath = pathUtils.join dirPath, fileName
+  fileContent = fs.readFileSync(fullPath).toString()
+  if isLibdocXmlFile(fileContent, fullPath, settings)
+    console.log "Parsing #{fullPath} ..."  if provider.settings.debug
+    keywordsRepo.addLibdocKeywords(fileContent, fullPath)
 
 processStandardDefinitions = (settings) ->
   keywordsRepo.reset(STANDARD_DEFINITIONS_DIR)
