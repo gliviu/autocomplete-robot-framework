@@ -78,3 +78,57 @@ describe 'Robot parser', ->
       file = fs.readFileSync("#{fixturePath}/keywords2.robot").toString()
       robot = robotParser.parse(file)
       expect(robot.keywords[0]?.name).toEqual 'test escapes'
+describe "Robot file detection", ->
+  it 'should detect correct robot files', ->
+    fixturePath = "#{__dirname}/../fixtures/parser/detectRobot"
+
+    content = fs.readFileSync("#{fixturePath}/detect-ok1.robot").toString()
+    isRobot = robotParser.isRobot(content)
+    expect(isRobot).toBe(true);
+
+    content = fs.readFileSync("#{fixturePath}/detect-ok2.robot").toString()
+    isRobot = robotParser.isRobot(content)
+    expect(isRobot).toBe(true);
+
+    content = fs.readFileSync("#{fixturePath}/detect-ok3.robot").toString()
+    isRobot = robotParser.isRobot(content)
+    expect(isRobot).toBe(true);
+
+    content = fs.readFileSync("#{fixturePath}/detect-ok4.robot").toString()
+    isRobot = robotParser.isRobot(content)
+    expect(isRobot).toBe(true);
+
+    content = fs.readFileSync("#{fixturePath}/detect-ok5.robot").toString()
+    isRobot = robotParser.isRobot(content)
+    expect(isRobot).toBe(true);
+
+    content = fs.readFileSync("#{fixturePath}/detect-ok6.robot").toString()
+    isRobot = robotParser.isRobot(content)
+    expect(isRobot).toBe(true);
+
+    content = fs.readFileSync("#{fixturePath}/detect-ok7.robot").toString()
+    isRobot = robotParser.isRobot(content)
+    expect(isRobot).toBe(true);
+
+  it 'should detect incorrect robot files', ->
+    fixturePath = "#{__dirname}/../fixtures/parser/detectRobot"
+
+    content = fs.readFileSync("#{fixturePath}/detect-wrong1.robot").toString()
+    isRobot = robotParser.isRobot(content)
+    expect(isRobot).toBe(false);
+
+    content = fs.readFileSync("#{fixturePath}/detect-wrong2.robot").toString()
+    isRobot = robotParser.isRobot(content)
+    expect(isRobot).toBe(false);
+
+    content = fs.readFileSync("#{fixturePath}/detect-wrong3.robot").toString()
+    isRobot = robotParser.isRobot(content)
+    expect(isRobot).toBe(false);
+
+    content = fs.readFileSync("#{fixturePath}/detect-wrong4.robot").toString()
+    isRobot = robotParser.isRobot(content)
+    expect(isRobot).toBe(false);
+
+    content = fs.readFileSync("#{fixturePath}/detect-wrong5.robot").toString()
+    isRobot = robotParser.isRobot(content)
+    expect(isRobot).toBe(false);
