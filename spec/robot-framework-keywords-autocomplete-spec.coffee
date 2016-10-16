@@ -45,7 +45,7 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('Run Program')
-    it 'show documentation in suggestions', ->
+    it 'shows documentation in suggestions', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText(' withdoc')
@@ -70,7 +70,7 @@ describe 'Robot Framework keywords autocompletions', ->
           expect(suggestions.length).toBeGreaterThan(0)
           expect(suggestions[0]?.displayText).toEqual('Without documentation')
           expect(suggestions[0]?.description).toEqual(' Arguments: arg1, arg2, arg3')
-    it 'show arguments in suggestions', ->
+    it 'shows arguments in suggestions', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText(' witharg')
@@ -112,20 +112,20 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(0)
           expect(suggestions[0]?.displayText).toEqual('DELETE')
-    it 'show suggestions from current editor first', ->
+    it 'shows suggestions from current editor first', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
       editor.insertText(' run')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(2)
           expect(suggestions[0]?.displayText).toEqual('Run Program')
-    it 'do not show keywords private to other files', ->
+    it 'does not show keywords private to other files', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
       editor.insertText(' privatek')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(0)
-    it 'show keywords visible onlyinside current file', ->
+    it 'shows keywords visible only inside current file', ->
       waitsForPromise -> atom.workspace.open('autocomplete/test_autocomplete_testcase.robot')
       runs ->
         editor = atom.workspace.getActiveTextEditor()
