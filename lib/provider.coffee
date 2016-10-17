@@ -167,6 +167,8 @@ reloadAutocompleteDataForEditor = (editor, useBuffer, settings) ->
     fileContent = if useBuffer then editor.getBuffer().getText() else fs.readFileSync(path).toString()
     if isRobotFile(fileContent, path, settings)
       keywordsRepo.addRobotKeywords(fileContent, path, settings)
+    else if isLibdocXmlFile(fileContent, path, settings)
+      keywordsRepo.addLibdocKeywords(fileContent, path, settings)
     else
       keywordsRepo.reset(path)
 
