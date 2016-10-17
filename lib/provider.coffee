@@ -55,10 +55,10 @@ processFile = (path, name, stat, settings) ->
   if stat.isFile() and stat.size < settings.maxFileSize
     fileContent = fs.readFileSync(fullPath).toString()
     if isRobotFile(fileContent, fullPath, settings)
-      keywordsRepo.addRobotKeywords(fileContent, fullPath, settings)
+      keywordsRepo.addRobotKeywords(fileContent, fullPath)
       return Promise.resolve()
     if settings.processLibdocFiles and isLibdocXmlFile(fileContent, fullPath, settings)
-      keywordsRepo.addLibdocKeywords(fileContent, fullPath, settings)
+      keywordsRepo.addLibdocKeywords(fileContent, fullPath)
       return Promise.resolve()
   return Promise.resolve()
 
@@ -67,7 +67,7 @@ processStandardDefinitionsFile = (dirPath, fileName, settings) ->
   path = pathUtils.join dirPath, fileName
   fileContent = fs.readFileSync(path).toString()
   if isLibdocXmlFile(fileContent, path, settings)
-    keywordsRepo.addLibdocKeywords(fileContent, path, settings)
+    keywordsRepo.addLibdocKeywords(fileContent, path)
 
 processStandardDefinitions = (settings) ->
   keywordsRepo.reset(STANDARD_DEFINITIONS_DIR)
@@ -166,9 +166,9 @@ reloadAutocompleteDataForEditor = (editor, useBuffer, settings) ->
   if path and fileExists(path)
     fileContent = if useBuffer then editor.getBuffer().getText() else fs.readFileSync(path).toString()
     if isRobotFile(fileContent, path, settings)
-      keywordsRepo.addRobotKeywords(fileContent, path, settings)
+      keywordsRepo.addRobotKeywords(fileContent, path)
     else if isLibdocXmlFile(fileContent, path, settings)
-      keywordsRepo.addLibdocKeywords(fileContent, path, settings)
+      keywordsRepo.addLibdocKeywords(fileContent, path)
     else
       keywordsRepo.reset(path)
 
