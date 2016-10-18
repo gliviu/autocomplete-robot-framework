@@ -38,3 +38,13 @@ test5 kw
     [Arguments]    ${a3}
     log    test1kw
     test1 kw        ${a3}
+
+	test6 kw
+    [Arguments]    ${a3}
+    log    test1kw
+    test1 kw        ${a3}
+
+test7 kw
+    [Arguments]    ${a3}
+    log    test1kw
+    test1 kw        ${a3}
