@@ -1,10 +1,10 @@
-provider = require './provider'
+autocompletePlusProvider = require './autocomplete-plus-provider'
 autocompleteRobotProvider = require('./autocomplete-robot-provider')
 
 module.exports =
-  activate: -> provider.load()
-  deactivate: -> provider.unload()
-  getAutocompletePlusProvider: -> provider
+  activate: -> autocompletePlusProvider.load()
+  deactivate: -> autocompletePlusProvider.unload()
+  getAutocompletePlusProvider: -> autocompletePlusProvider
   getAutocompleteRobotProvider: -> autocompleteRobotProvider
   config:
     processLibdocFiles:
