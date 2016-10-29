@@ -19,7 +19,12 @@
   "providedServices": {
     "autocomplete.provider": {
       "versions": {
-        "2.0.0": "getProvider"
+        "2.0.0": "getAutocompletePlusProvider"
+      }
+    },
+    "autocomplete.robot.provider": {
+      "versions": {
+        "1.0.0": "getAutocompleteRobotProvider"
       }
     }
   },

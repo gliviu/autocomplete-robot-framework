@@ -22,7 +22,7 @@ describe 'Robot Framework keywords autocompletions', ->
   beforeEach ->
     waitsForPromise -> atom.packages.activatePackage(PACKAGE_NAME)
     runs ->
-      provider = atom.packages.getActivePackage(PACKAGE_NAME).mainModule.getProvider()
+      provider = atom.packages.getActivePackage(PACKAGE_NAME).mainModule.getAutocompletePlusProvider()
     waitsForPromise -> atom.workspace.open('autocomplete/test_autocomplete_keywords.robot')
     waitsFor ->
       return !provider.loading

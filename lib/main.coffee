@@ -1,8 +1,11 @@
 provider = require './provider'
+autocompleteRobotProvider = require('./autocomplete-robot-provider')
+
 module.exports =
   activate: -> provider.load()
   deactivate: -> provider.unload()
-  getProvider: -> provider
+  getAutocompletePlusProvider: -> provider
+  getAutocompleteRobotProvider: -> autocompleteRobotProvider
   config:
     processLibdocFiles:
       title: 'Show suggestions from libdoc definition files'

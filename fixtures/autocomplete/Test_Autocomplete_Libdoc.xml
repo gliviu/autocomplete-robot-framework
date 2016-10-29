@@ -13,4 +13,13 @@
 <tags>
 </tags>
 </kw>
+<kw name="Duplicated keyword">
+<arguments>
+<arg>arg1</arg>
+<arg>arg2</arg>
+</arguments>
+<doc>Autocomplete libdoc test documentation</doc>
+<tags>
+</tags>
+</kw>
 </keywordspec>
