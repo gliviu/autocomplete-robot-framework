@@ -4,7 +4,7 @@ An [autocomplete-plus](https://github.com/atom/autocomplete-plus) provider for [
 
 ![Demo](https://raw.githubusercontent.com/gliviu/autocomplete-robot-framework/master/anim.gif)
 
-**Check out [hyperclick-robot-framework](https://atom.io/packages/hyperclick-robot-framework) that uses new  [robot provider API](#API) to  enable 'go to definition' functionality**
+**Check out [hyperclick-robot-framework](https://atom.io/packages/hyperclick-robot-framework) that uses new  [robot provider API](#api) to  enable 'go to definition' functionality**
 
 ## Install
 ```shell
