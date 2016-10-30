@@ -4,7 +4,7 @@ An [autocomplete-plus](https://github.com/atom/autocomplete-plus) provider for [
 
 ![Demo](https://raw.githubusercontent.com/gliviu/autocomplete-robot-framework/master/anim.gif)
 
-**Check out this [package](https://atom.io/packages/hyperclick-robot-framework) that uses new  [robot provider API](#API) to  enable 'go to definition' functionality**
+**Check out [hyperclick-robot-framework](https://atom.io/packages/hyperclick-robot-framework) that uses new  [robot provider API](#API) to  enable 'go to definition' functionality**
 
 ## Install
 ```shell
@@ -32,8 +32,6 @@ Troubleshooting
 *  Should anything else go wrong, use 'Robot Framework:Print autocomplete debug info' to display internal state in developer console  - 'Window: Toggle dev tools' (ctrl-shift-i on Linux or ctrl-alt-i on Windows).
 *  More information can be shown by enabling debug mode in package configuration.
 
-<a name="API"></a>
-
 ##API
 An API is available to enable cooperation with other packages by providing access to underlying keyword repository.
 * getKeywordNames()
@@ -42,7 +40,7 @@ An API is available to enable cooperation with other packages by providing acces
 * getResourceByPath(path)
 
 Keyword
-```json
+```
   {
     name: 'keyword name',
     documentation : 'documentation',
@@ -57,7 +55,7 @@ Keyword
 ```
 
 Resource
-```json
+```
   {
     path: 'resource path',
     hasTestCases: true/false,
