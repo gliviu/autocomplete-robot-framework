@@ -17,7 +17,7 @@ MAX_KEYWORDS_SUGGESTIONS_CAP = 100
 scheduleReload = false
 
 isRobotFile = (fileContent, filePath, settings) ->
-  ext = pathUtils.extname(filePath).toLowerCase()
+  ext = pathUtils.extname(filePath)
   if ext == '.robot'
     return true
   if ext in settings.robotExtensions and robotParser.isRobot(fileContent)
@@ -25,7 +25,7 @@ isRobotFile = (fileContent, filePath, settings) ->
   return false
 
 isLibdocXmlFile = (fileContent, filePath, settings) ->
-  ext = pathUtils.extname(filePath).toLowerCase()
+  ext = pathUtils.extname(filePath)
   return ext is '.xml' and libdocParser.isLibdoc(fileContent)
 
 readdir = (path) ->
@@ -206,16 +206,14 @@ getAtomProjectPathsForEditor = (editor) ->
       res.push(projectDirectory.getPath())
   return res
 
-
 # Normally autocomplete-plus considers '.' as delimiter when building prefixes.
 # ie. for 'HttpLibrary.HTTP' it reports only 'HTTP' as prefix.
-# This method considers everything until it meets a robot syntax separator (multiple spaces, tabs, ...).
+# This method considers everything until it meets a space.
 getPrefix = (editor, bufferPosition) ->
   line = editor.lineTextForBufferRow(bufferPosition.row)
   textBeforeCursor = line.substr(0, bufferPosition.column)
-  normalized = textBeforeCursor.replace(/[ \t]{2,}/g, '\t')
-  reversed = normalized.split("").reverse().join("")
-  reversedPrefixMatch = /^[^\t]+/.exec(reversed)
+  reversed = textBeforeCursor.split("").reverse().join("")
+  reversedPrefixMatch = /^[\S]+/.exec(reversed)
   if(reversedPrefixMatch)
     return reversedPrefixMatch[0].split("").reverse().join("")
   else
