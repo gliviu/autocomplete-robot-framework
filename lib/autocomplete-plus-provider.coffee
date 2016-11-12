@@ -206,14 +206,16 @@ getAtomProjectPathsForEditor = (editor) ->
       res.push(projectDirectory.getPath())
   return res
 
+
 # Normally autocomplete-plus considers '.' as delimiter when building prefixes.
 # ie. for 'HttpLibrary.HTTP' it reports only 'HTTP' as prefix.
-# This method considers everything until it meets a space.
+# This method considers everything until it meets a robot syntax separator (multiple spaces, tabs, ...).
 getPrefix = (editor, bufferPosition) ->
   line = editor.lineTextForBufferRow(bufferPosition.row)
   textBeforeCursor = line.substr(0, bufferPosition.column)
-  reversed = textBeforeCursor.split("").reverse().join("")
-  reversedPrefixMatch = /^[\S]+/.exec(reversed)
+  normalized = textBeforeCursor.replace(/[ \t]{2,}/g, '\t')
+  reversed = normalized.split("").reverse().join("")
+  reversedPrefixMatch = /^[^\t]+/.exec(reversed)
   if(reversedPrefixMatch)
     return reversedPrefixMatch[0].split("").reverse().join("")
   else

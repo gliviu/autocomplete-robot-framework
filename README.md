@@ -14,7 +14,6 @@ apm install autocomplete-robot-framework
 
 ## Usage
 Add your robot project folder in Atom then open a robot file and the whole project will be scanned for keywords.
-
 Space separated **.robot** and **.txt** files are supported. Libdoc xml files should work as well.
 
 Official [libraries](http://robotframework.org/#test-libraries) are included for convenience.
@@ -24,7 +23,26 @@ External libraries suggestions are disabled by default. They can be toggled in p
 
 If you have your own xml libdoc library, add it together with the other robot files to have it parsed for keywords.
 
-Troubleshooting
+## Suggestions
+Suggestion scoring is powered by [fuzzaldrin-plus](https://github.com/jeancroy/fuzzaldrin-plus). It is able to find keywords by partial keyword name separated or not by spaces, or even acronyms.
+It is also possible to limit keywords to a certain library or resource as in sample below.
+
+```text
+Library    Collections
+Resource   path/MyKeywords.robot
+
+run if # suggests 'Run Keyword If', 'Run Keyword And Return If', ...
+sheq   # suggests 'Should Be Equal', 'Should Not Be Equal', ...
+cfl    # acronyms also work and suggest 'Continue For Loop', ...
+
+Collections.       # Shows all keywords from Collections
+Collections.list   # Same as above but limits the scope
+MyKeywords.        # Same rules apply for resources as well
+```
+
+
+
+## Troubleshooting
 *  Works only for files that are inside an Atom project. Opening an independent Robot file won't provide any suggestions.
 *  When files are modified outside Atom, autocomplete index may become invalid. Use Command Pallete (ctrl+shift+p) and choose 'Robot Framework:Reload autocomplete data'. Restarting Atom would have the same effect.
 *  .txt files are not detected as Robot format automatically. Work around by manually choosing the grammar (open Grammar Selector ctrl-shift-L and pick Robot Framework).
@@ -66,7 +84,9 @@ Resource
 
 
 ## Changelog
-*  v2.0.0
+* v2.1.0
+	* Allow multi-word suggestions
+* v2.0.0
 	* Bug fixes
 	* Added provider API
 *  v1.1.0
