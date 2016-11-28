@@ -1,17 +1,21 @@
 fs = require 'fs'
 pathUtils = require 'path'
+os = require 'os'
 autocomplete = require './autocomplete'
 keywordsRepo = require './keywords'
 robotParser = require './parse-robot'
 libdocParser = require './parse-libdoc'
+libManager = require './library-manager'
+common = require './common'
 
-STANDARD_LIBS = ['BuiltIn', 'Collections', 'DateTime', 'Dialogs', 'OperatingSystem', 'Process', 'Screenshot', 'String', 'Telnet', 'XML']
-EXTERNAL_LIBS = ['FtpLibrary', 'HttpLibrary.HTTP', 'MongoDBLibrary', 'Rammbock', 'RemoteSwingLibrary', 'RequestsLibrary', 'Selenium2Library', 'SeleniumLibrary', 'SSHLibrary', 'SwingLibrary']
-STANDARD_DEFINITIONS_DIR = pathUtils.join(__dirname, '../standard-definitions')
-EXTERNAL_DEFINITIONS_DIR = pathUtils.join(__dirname, '../external-definitions')
+BUILTIN_STANDARD_LIBS = ['BuiltIn', 'Collections', 'DateTime', 'Dialogs', 'OperatingSystem', 'Process', 'Screenshot', 'String', 'Telnet', 'XML']
+BUILTIN_EXTERNAL_LIBS = ['FtpLibrary', 'HttpLibrary.HTTP', 'MongoDBLibrary', 'Rammbock', 'RemoteSwingLibrary', 'RequestsLibrary', 'Selenium2Library', 'SeleniumLibrary', 'SSHLibrary', 'SwingLibrary']
+BUILTIN_STANDARD_DEFINITIONS_DIR = pathUtils.join(__dirname, '../standard-definitions')
+BUILTIN_EXTERNAL_DEFINITIONS_DIR = pathUtils.join(__dirname, '../external-definitions')
 CFG_KEY = 'autocomplete-robot-framework'
 MAX_FILE_SIZE = 1024 * 1024
 MAX_KEYWORDS_SUGGESTIONS_CAP = 100
+PYTHON_LIBDOC_DIR = pathUtils.join(os.tmpdir(), 'robot-lib-cache') # Place to store imported Python libdoc files
 
 # Used to avoid multiple concurrent reloadings
 scheduleReload = false
@@ -56,31 +60,38 @@ processFile = (path, name, stat, settings) ->
     fileContent = fs.readFileSync(fullPath).toString()
     if isRobotFile(fileContent, fullPath, settings)
       console.log "Parsing #{fullPath} ..."  if provider.settings.debug
-      keywordsRepo.addRobotKeywords(fileContent, fullPath)
+      parsedRobotInfo = robotParser.parse(fileContent);
+      keywordsRepo.addKeywords(parsedRobotInfo, fullPath)
       return Promise.resolve()
     if settings.processLibdocFiles and isLibdocXmlFile(fileContent, fullPath, settings)
       console.log "Parsing #{fullPath} ..."  if provider.settings.debug
-      keywordsRepo.addLibdocKeywords(fileContent, fullPath)
+      parsedRobotInfo = libdocParser.parse(fileContent);
+      keywordsRepo.addKeywords(parsedRobotInfo, fullPath)
       return Promise.resolve()
   return Promise.resolve()
 
+loadBuiltInLibraries = (settings) ->
+  keywordsRepo.reset(BUILTIN_STANDARD_DEFINITIONS_DIR)
+  keywordsRepo.reset(BUILTIN_EXTERNAL_DEFINITIONS_DIR)
 
-processStandardDefinitionsFile = (dirPath, fileName, settings) ->
-  fullPath = pathUtils.join dirPath, fileName
-  fileContent = fs.readFileSync(fullPath).toString()
-  if isLibdocXmlFile(fileContent, fullPath, settings)
-    console.log "Parsing #{fullPath} ..."  if provider.settings.debug
-    keywordsRepo.addLibdocKeywords(fileContent, fullPath)
+  resourcesByName = {}
+  for resourceKey, resource of keywordsRepo.resourcesMap
+    resourcesByName[resource.name] = resource
 
-processStandardDefinitions = (settings) ->
-  keywordsRepo.reset(STANDARD_DEFINITIONS_DIR)
-  keywordsRepo.reset(EXTERNAL_DEFINITIONS_DIR)
-
-  for lib in STANDARD_LIBS
-    if settings.standardLibrary[lib]         then processStandardDefinitionsFile(STANDARD_DEFINITIONS_DIR, "#{lib}.xml", settings)
-  for lib in EXTERNAL_LIBS
-    if settings.externalLibrary[lib]         then processStandardDefinitionsFile(EXTERNAL_DEFINITIONS_DIR, "#{lib}.xml", settings)
-
+  for libraryName in BUILTIN_STANDARD_LIBS
+    if !resourcesByName[libraryName] and settings.standardLibrary[libraryName]
+      fullPath = pathUtils.join(BUILTIN_STANDARD_DEFINITIONS_DIR, "#{libraryName}.xml")
+      fileContent = fs.readFileSync(fullPath).toString()
+      console.log "Parsing #{fullPath} ..."  if provider.settings.debug
+      parsedRobotInfo = libdocParser.parse(fileContent);
+      keywordsRepo.addKeywords(parsedRobotInfo, fullPath)
+  for libraryName in BUILTIN_EXTERNAL_LIBS
+    if !resourcesByName[libraryName] and settings.externalLibrary[libraryName]
+      fullPath = pathUtils.join(BUILTIN_EXTERNAL_DEFINITIONS_DIR, "#{libraryName}.xml")
+      fileContent = fs.readFileSync(fullPath).toString()
+      console.log "Parsing #{fullPath} ..."  if provider.settings.debug
+      parsedRobotInfo = libdocParser.parse(fileContent);
+      keywordsRepo.addKeywords(parsedRobotInfo, fullPath)
 
 readConfig = ()->
   settings =
@@ -105,9 +116,9 @@ readConfig = ()->
   settings.removeDotNotation = atom.config.get("#{CFG_KEY}.removeDotNotation")
   settings.processLibdocFiles = atom.config.get("#{CFG_KEY}.processLibdocFiles")
   settings.showLibrarySuggestions = atom.config.get("#{CFG_KEY}.showLibrarySuggestions")
-  for lib in STANDARD_LIBS
+  for lib in BUILTIN_STANDARD_LIBS
     settings.standardLibrary[lib]=atom.config.get("#{CFG_KEY}.standardLibrary.#{escapeLibraryName(lib)}")
-  for lib in EXTERNAL_LIBS
+  for lib in BUILTIN_EXTERNAL_LIBS
     settings.externalLibrary[lib]=atom.config.get("#{CFG_KEY}.externalLibrary.#{escapeLibraryName(lib)}")
 
 # Some library names contain characters forbidden in config property names, such as '.'.
@@ -133,7 +144,6 @@ reloadAutocompleteData = ->
   else
     console.log  'Loading autocomplete data' if provider.settings.debug
     provider.loading = true
-    processStandardDefinitions(provider.settings)
     promise = Promise.resolve()
     # Chain promises to avoid freezing atom ui due to too many concurrent processes
     for path of provider.robotProjectPaths when (projectDirectoryExists(path) and
@@ -149,7 +159,12 @@ reloadAutocompleteData = ->
             console.log  "Project #{projectName} loaded" if provider.settings.debug
             console.timeEnd "Robot project #{projectName} loading time:" if provider.settings.debug
             provider.robotProjectPaths[path].status = 'project-loaded'
-    promise.then ->
+    promise = promise.then ->
+      console.log 'Importing libraries...' if provider.settings.debug
+      return libManager.importLibraries(PYTHON_LIBDOC_DIR, provider.settings)
+    .then ->
+      loadBuiltInLibraries(provider.settings)
+    .then ->
       console.log 'Autocomplete data loaded' if provider.settings.debug
       provider.printDebugInfo()  if provider.settings.debug
       provider.loading = false
@@ -157,27 +172,46 @@ reloadAutocompleteData = ->
         scheduleReload = false
         reloadAutocompleteData()
     .catch (error) ->
-      console.error "Error occurred while reloading robot autocomplete data: #{error}"
+      console.error "Error occurred while reloading robot autocomplete data: #{if error.stack then error.stack else error}"
       provider.loading = false
       if scheduleReload
         scheduleReload = false
         reloadAutocompleteData()
 
+# true/false when new libraries have been added since last edit.
+isLibraryInfoUpdatedForEditor = (oldLibraries, newLibraries) ->
+  oldLibraries = oldLibraries.map((library) -> library.name)
+  newLibraries = newLibraries.map((library) -> library.name)
+  return !common.arrEqual(oldLibraries, newLibraries)
 
 reloadAutocompleteDataForEditor = (editor, useBuffer, settings) ->
   path = editor.getPath()
-  if path and fileExists(path)
+  if !path
+    return
+  dirPath = pathUtils.dirname(path)
+  if fileExists(path) and pathUtils.normalize(dirPath)!=PYTHON_LIBDOC_DIR
     fileContent = if useBuffer then editor.getBuffer().getText() else fs.readFileSync(path).toString()
     if isRobotFile(fileContent, path, settings)
-      keywordsRepo.addRobotKeywords(fileContent, path)
+      parsedRobotInfo = robotParser.parse(fileContent);
+      resourceKey = common.getResourceKey(path)
+      oldLibraries = if keywordsRepo.resourcesMap[resourceKey] then keywordsRepo.resourcesMap[resourceKey].libraries else []
+      keywordsRepo.addKeywords(parsedRobotInfo, path)
+      newLibraries = keywordsRepo.resourcesMap[resourceKey].libraries
+      libraryInfoUpdated = isLibraryInfoUpdatedForEditor(oldLibraries, newLibraries)
+      if libraryInfoUpdated
+        libManager.importLibraries(PYTHON_LIBDOC_DIR, settings)
     else if isLibdocXmlFile(fileContent, path, settings)
-      keywordsRepo.addLibdocKeywords(fileContent, path)
+      parsedRobotInfo = libdocParser.parse(fileContent);
+      keywordsRepo.addKeywords(parsedRobotInfo, path)
     else
       keywordsRepo.reset(path)
 
 updateRobotProjectPathsWhenEditorOpens = (editor, settings) ->
   editorPath = editor.getPath()
-  if editorPath
+  if !editorPath
+    return
+  dirPath = pathUtils.dirname(editorPath)
+  if pathUtils.normalize(dirPath)!=PYTHON_LIBDOC_DIR
     text = editor.getBuffer().getText()
     ext = pathUtils.extname(editorPath)
     isRobot = isRobotFile(text, editorPath, settings)
@@ -206,14 +240,16 @@ getAtomProjectPathsForEditor = (editor) ->
       res.push(projectDirectory.getPath())
   return res
 
+
 # Normally autocomplete-plus considers '.' as delimiter when building prefixes.
 # ie. for 'HttpLibrary.HTTP' it reports only 'HTTP' as prefix.
-# This method considers everything until it meets a space.
+# This method considers everything until it meets a robot syntax separator (multiple spaces, tabs, ...).
 getPrefix = (editor, bufferPosition) ->
   line = editor.lineTextForBufferRow(bufferPosition.row)
   textBeforeCursor = line.substr(0, bufferPosition.column)
-  reversed = textBeforeCursor.split("").reverse().join("")
-  reversedPrefixMatch = /^[\S]+/.exec(reversed)
+  normalized = textBeforeCursor.replace(/[ \t]{2,}/g, '\t')
+  reversed = normalized.split("").reverse().join("")
+  reversedPrefixMatch = /^[^\t]+/.exec(reversed)
   if(reversedPrefixMatch)
     return reversedPrefixMatch[0].split("").reverse().join("")
   else
@@ -271,6 +307,7 @@ provider =
         showLibdocFiles: true,
         showAllSuggestions: true
       })
+      libManager.printDebugInfo()
     atom.commands.add 'atom-text-editor', 'Robot Framework:Reload autocomplete data', ->
       for path of provider.robotProjectPaths
         provider.robotProjectPaths[path].status = 'project-initial'

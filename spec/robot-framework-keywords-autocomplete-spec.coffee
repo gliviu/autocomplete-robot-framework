@@ -1,6 +1,7 @@
 robotParser = require('../lib/parse-robot')
 libdocParser = require('../lib/parse-libdoc')
 fs = require 'fs'
+pathUtils = require 'path'
 PACKAGE_NAME = 'autocomplete-robot-framework'
 CFG_KEY = 'autocomplete-robot-framework'
 
@@ -30,17 +31,53 @@ describe 'Robot Framework keywords autocompletions', ->
     runs ->
       editor = atom.workspace.getActiveTextEditor()
 
+  describe 'Library management', ->
+    process.env.PYTHONPATH=pathUtils.join(__dirname, '../fixtures/libraries')
+    beforeEach ->
+      waitsForPromise -> atom.workspace.open('autocomplete/Test_Libraries.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+    it 'should import modules', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      editor.setText('  testmod')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('Test Module Keyword')
+          expect(suggestions[0].description).toEqual('Test module documentation. Arguments: param1, param2')
+    it 'should import classes', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      editor.setText('  testclas')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('Test Class Keyword')
+          expect(suggestions[0].description).toEqual('Test class documentation. Arguments: param1')
+    it 'should import Robot Framework builtin libraries', ->
+      runs ->
+        atom.config.set("#{CFG_KEY}.standardLibrary.OperatingSystem", false)
+      waitsFor ->
+        return !provider.loading
+      , 'Provider should finish loading', 500
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.setText('  appefi')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('Append To File')
+      
   describe 'Keywords autocomplete', ->
     it 'suggest standard keywords', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
-      editor.insertText(' callm')
+      editor.insertText('  callm')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0].displayText).toEqual('Call Method')
     it 'suggest keywords in current editor', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
-      editor.insertText(' runprog')
+      editor.insertText('  runprog')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -48,7 +85,7 @@ describe 'Robot Framework keywords autocompletions', ->
     it 'shows documentation in suggestions', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' withdoc')
+        editor.insertText('  withdoc')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(3)
@@ -56,7 +93,7 @@ describe 'Robot Framework keywords autocompletions', ->
           expect(suggestions[0]?.description).toEqual('documentation. Arguments: arg1, arg2, arg3')
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' withdoc2')
+        editor.insertText('  withdoc2')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -64,7 +101,7 @@ describe 'Robot Framework keywords autocompletions', ->
           expect(suggestions[0]?.description).toEqual('documentation. Arguments: arg1, arg2, arg3')
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' withoutdoc')
+        editor.insertText('  withoutdoc')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(0)
@@ -73,28 +110,28 @@ describe 'Robot Framework keywords autocompletions', ->
     it 'shows arguments in suggestions', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' witharg')
+        editor.insertText('  witharg')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(0)
           expect(suggestions[0]?.displayText).toEqual('With arguments')
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' withoutarg')
+        editor.insertText('  withoutarg')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(0)
           expect(suggestions[0]?.displayText).toEqual('Without arguments')
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' withdefarg')
+        editor.insertText('  withdefarg')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(0)
           expect(suggestions[0]?.displayText).toEqual('With default value arguments')
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' withemb')
+        editor.insertText('  withemb')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(0)
@@ -107,21 +144,21 @@ describe 'Robot Framework keywords autocompletions', ->
       , 'Provider should finish loading', 500
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' HttpLibrary.HTTP.d')
+        editor.insertText('  HttpLibrary.HTTP.d')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(0)
           expect(suggestions[0]?.displayText).toEqual('DELETE')
     it 'shows suggestions from current editor first', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
-      editor.insertText(' run')
+      editor.insertText('  run')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(2)
           expect(suggestions[0]?.displayText).toEqual('Run Program')
     it 'does not show keywords private to other files', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
-      editor.insertText(' privatek')
+      editor.insertText('  privatek')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(0)
@@ -130,7 +167,7 @@ describe 'Robot Framework keywords autocompletions', ->
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' privatek')
+        editor.insertText('  privatek')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -138,21 +175,21 @@ describe 'Robot Framework keywords autocompletions', ->
     it 'matches beginning of word', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' dp')
+        editor.insertText('  dp')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(1)
           expect(suggestions[0]?.displayText).toEqual('Dot.punctuation keyword')
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' dot')
+        editor.insertText('  dot')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(1)
           expect(suggestions[0]?.displayText).toEqual('Dot.punctuation keyword')
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' punct')
+        editor.insertText('  punct')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -162,7 +199,7 @@ describe 'Robot Framework keywords autocompletions', ->
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' callme')
+        editor.insertText('  callme')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -170,7 +207,7 @@ describe 'Robot Framework keywords autocompletions', ->
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' CALLME')
+        editor.insertText('  CALLME')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -178,7 +215,38 @@ describe 'Robot Framework keywords autocompletions', ->
     it 'suggests nothing for empty prefix', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('   ')
+        editor.insertText('    ')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(0)
+    it 'supports multi-word suggestions', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      runs ->
+        editor.insertText('  with def val arg')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('With default value arguments')
+      runs ->
+        editor.insertText('  with args    with def val arg')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('With default value arguments')
+      runs ->
+        editor.insertText('  withdef valarg')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('With default value arguments')
+      runs ->
+        editor.insertText('  w d v a')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('With default value arguments')
+      runs ->
+        editor.insertText('  there should be no keyword')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(0)
@@ -188,7 +256,7 @@ describe 'Robot Framework keywords autocompletions', ->
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' fileprefix.')
+        editor.insertText('  fileprefix.')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(2)
@@ -197,7 +265,7 @@ describe 'Robot Framework keywords autocompletions', ->
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' builtin.callme')
+        editor.insertText('  builtin.callme')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -205,7 +273,7 @@ describe 'Robot Framework keywords autocompletions', ->
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' builtin.')
+        editor.insertText('  builtin.')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(1)
@@ -213,7 +281,7 @@ describe 'Robot Framework keywords autocompletions', ->
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' builtin')
+        editor.insertText('  builtin')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -226,7 +294,7 @@ describe 'Robot Framework keywords autocompletions', ->
       , 'Provider should finish loading', 500
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' builtin.callme')
+        editor.insertText('  builtin.callme')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -239,7 +307,7 @@ describe 'Robot Framework keywords autocompletions', ->
       , 'Provider should finish loading', 500
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' builtin.callme')
+        editor.insertText('  builtin.callme')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -249,7 +317,7 @@ describe 'Robot Framework keywords autocompletions', ->
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' BUILTIN.CALLME')
+        editor.insertText('  BUILTIN.CALLME')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -263,7 +331,7 @@ describe 'Robot Framework keywords autocompletions', ->
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' UnknownLibrary.callmethod')
+        editor.insertText('  UnknownLibrary.callmethod')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -272,7 +340,7 @@ describe 'Robot Framework keywords autocompletions', ->
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' builtin.callme')
+        editor.insertText('  builtin.callme')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -280,7 +348,7 @@ describe 'Robot Framework keywords autocompletions', ->
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' builtin.')
+        editor.insertText('  builtin.')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(1)
@@ -288,7 +356,7 @@ describe 'Robot Framework keywords autocompletions', ->
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' builtin')
+        editor.insertText('  builtin')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -298,7 +366,7 @@ describe 'Robot Framework keywords autocompletions', ->
     it 'suggest library names', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' built')
+        editor.insertText('  built')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -306,14 +374,14 @@ describe 'Robot Framework keywords autocompletions', ->
     it 'support mixed case for library name suggestions', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' BUILT')
+        editor.insertText('  BUILT')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0].displayText).toEqual('BuiltIn')
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' bUilTi')
+        editor.insertText('  bUilTi')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -328,7 +396,7 @@ describe 'Robot Framework keywords autocompletions', ->
       , 'Provider should finish loading', 500
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' runprog')
+        editor.insertText('  runprog')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -340,7 +408,7 @@ describe 'Robot Framework keywords autocompletions', ->
       , 'Provider should finish loading', 500
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' runprog')
+        editor.insertText('  runprog')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -353,7 +421,7 @@ describe 'Robot Framework keywords autocompletions', ->
       , 'Provider should finish loading', 500
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' runprog')
+        editor.insertText('  runprog')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(1)
@@ -365,52 +433,52 @@ describe 'Robot Framework keywords autocompletions', ->
       , 'Provider should finish loading', 500
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' runprog')
+        editor.insertText('  runprog')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(0)
-    it 'react on standardLibrary configuration changes', ->
+    it 'react on buitin standard library configuration changes', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' callm')
+        editor.insertText('  subtra')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(3)
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  datetim')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(1)
-            expect(suggestions[0].displayText).toEqual('Call Method')
+            expect(suggestions[0].displayText).toEqual('DateTime')
       runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' built')
-        waitsForPromise ->
-          getCompletions(editor, provider).then (suggestions) ->
-            expect(suggestions.length).toEqual(1)
-            expect(suggestions[0].displayText).toEqual('BuiltIn')
-      runs ->
-        atom.config.set("#{CFG_KEY}.standardLibrary.BuiltIn", false)
+        atom.config.set("#{CFG_KEY}.standardLibrary.DateTime", false)
       waitsFor ->
         return !provider.loading
       , 'Provider should finish loading', 500
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' callm')
+        editor.insertText('  subtra')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(0)
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' built')
+        editor.insertText('  datetim')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(0)
-    it 'react on externalLibrary configuration changes', ->
+    it 'react on builtin external library configuration changes', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' dowfi')
+        editor.insertText('  dowfi')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
+            debugger
             expect(suggestions.length).toEqual(0)
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' ftp')
+        editor.insertText('  ftp')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toBeGreaterThan(0)
@@ -422,14 +490,14 @@ describe 'Robot Framework keywords autocompletions', ->
       , 'Provider should finish loading', 500
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' dowfi')
+        editor.insertText('  dowfi')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(1)
             expect(suggestions[0].displayText).toEqual('Download File')
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' ftpli')
+        editor.insertText('  ftpli')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(1)
@@ -437,7 +505,7 @@ describe 'Robot Framework keywords autocompletions', ->
     it 'react on processLibdocFiles configuration changes', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' autocompletelibdoc')
+        editor.insertText('  autocompletelibdoc')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(1)
@@ -449,14 +517,14 @@ describe 'Robot Framework keywords autocompletions', ->
       , 'Provider should finish loading', 500
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' autocompletelibdoc')
+        editor.insertText('  autocompletelibdoc')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(0)
     it 'react on maxFileSize configuration changes', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' limitfilesize')
+        editor.insertText('  limitfilesize')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(1)
@@ -468,14 +536,14 @@ describe 'Robot Framework keywords autocompletions', ->
       , 'Provider should finish loading', 500
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' limitfilesize')
+        editor.insertText('  limitfilesize')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(0)
     it 'react on showLibrarySuggestions configuration changes', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' built')
+        editor.insertText('  built')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(1)
@@ -487,7 +555,7 @@ describe 'Robot Framework keywords autocompletions', ->
       , 'Provider should finish loading', 500
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText(' built')
+        editor.insertText('  built')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(0)
