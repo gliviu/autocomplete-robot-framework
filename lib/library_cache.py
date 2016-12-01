@@ -79,7 +79,11 @@ def store_libraries(libraries, cache_dir):
         result[library_name] = {'name': library_name, 'status': 'pending', 'message': 'To be imported'}
     if not _is_robot_framework_available():
         for library_name in libraries:
-            result[library_name] = {'name': library_name, 'status': 'error', 'message': 'Robot framework not installed or not accessible from PYTHONPATH %s' % sys.path}
+            result[library_name] = {
+                'name': library_name,
+                'status': 'error',
+                'message': 'Robot framework not installed or not accessible from PYTHONPATH %s' % sys.path
+                }
         return result
     if not os.path.exists(cache_dir):
         os.mkdir(cache_dir)
@@ -87,14 +91,26 @@ def store_libraries(libraries, cache_dir):
         try:
             module = _get_module(library_name)
             if not module:
-                result[library_name] = {'name': library_name, 'status': 'error', 'message': "Could not find '%s' or not accessible from PYTHONPATH - %s" % (library_name, sys.path)}
+                result[library_name] = {
+                    'name': library_name,
+                    'status': 'error',
+                    'message': "Could not find '%s' or not accessible from PYTHONPATH - %s" % (library_name, sys.path)
+                    }
                 continue
             cache = _cached(library_name, module, cache_dir)
             if not cache.cached:
                 xml_libdoc_path = _generate_libdoc_xml(library_name, cache_dir)
-                result[library_name] = {'name': library_name, 'status': 'success', 'xmlLibdocPath': xml_libdoc_path}
+                result[library_name] = {
+                    'name': library_name,
+                    'status': 'success',
+                    'xmlLibdocPath': xml_libdoc_path
+                    }
             else:
-                result[library_name] = {'name': library_name, 'status': 'success', 'xmlLibdocPath': cache.xml_libdoc_path}
+                result[library_name] = {
+                    'name': library_name,
+                    'status': 'success',
+                    'xmlLibdocPath': cache.xml_libdoc_path
+                    }
         except Exception as exc:
             error = "Unexpected error: %s, %s" % (exc, traceback.format_exc())
             result[library_name] = {'name': library_name, 'status': 'error', 'message': error}
