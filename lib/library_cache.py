@@ -73,18 +73,10 @@ def _generate_libdoc_xml(library_name, cache_dir):
     return library_path
 
 
-def store_libraries(libraries, cache_dir):
+def _store_libraries(libraries, cache_dir):
     result = {}
     for library_name in libraries:
         result[library_name] = {'name': library_name, 'status': 'pending', 'message': 'To be imported'}
-    if not _is_robot_framework_available():
-        for library_name in libraries:
-            result[library_name] = {
-                'name': library_name,
-                'status': 'error',
-                'message': 'Robot framework not installed or not accessible from PYTHONPATH %s' % sys.path
-                }
-        return result
     if not os.path.exists(cache_dir):
         os.mkdir(cache_dir)
     for library_name in libraries:
@@ -94,7 +86,7 @@ def store_libraries(libraries, cache_dir):
                 result[library_name] = {
                     'name': library_name,
                     'status': 'error',
-                    'message': "Could not find '%s' or not accessible from PYTHONPATH - %s" % (library_name, sys.path)
+                    'message': "Could not find '%s' or not accessible from PYTHONPATH" % (library_name)
                     }
                 continue
             cache = _cached(library_name, module, cache_dir)
@@ -118,6 +110,15 @@ def store_libraries(libraries, cache_dir):
 
 def _main():
     if len(sys.argv) != 3:
+        print "Wrong arguments. Required two arguments. Received %d" % len(sys.argv)
+        exit(1)
+
+    library_names = sys.argv[1].split(',')
+
+    cache_dir = sys.argv[2]
+
+    if not _is_robot_framework_available():
+        print "Robot framework is not available. Make sure it is installed or add it in PYTHONPATH" % sys.argv
         exit(1)
 
     # Redirect output so that various module initialization do not polute our Json result.
@@ -125,9 +126,7 @@ def _main():
     orig_stdout = sys.stdout
     sys.stdout = null_stream
 
-    library_names = sys.argv[1].split(',')
-    cache_dir = sys.argv[2]
-    result = store_libraries(library_names, cache_dir)
+    result = _store_libraries(library_names, cache_dir)
 
     sys.stdout = orig_stdout
     print json.dumps(result)
