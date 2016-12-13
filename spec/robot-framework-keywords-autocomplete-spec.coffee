@@ -66,7 +66,7 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0].displayText).toEqual('Append To File')
-      
+
   describe 'Keywords autocomplete', ->
     it 'suggest standard keywords', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
@@ -437,71 +437,6 @@ describe 'Robot Framework keywords autocompletions', ->
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(0)
-    it 'react on buitin standard library configuration changes', ->
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  subtra')
-        waitsForPromise ->
-          getCompletions(editor, provider).then (suggestions) ->
-            expect(suggestions.length).toEqual(3)
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  datetim')
-        waitsForPromise ->
-          getCompletions(editor, provider).then (suggestions) ->
-            expect(suggestions.length).toEqual(1)
-            expect(suggestions[0].displayText).toEqual('DateTime')
-      runs ->
-        atom.config.set("#{CFG_KEY}.standardLibrary.DateTime", false)
-      waitsFor ->
-        return !provider.loading
-      , 'Provider should finish loading', 500
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  subtra')
-        waitsForPromise ->
-          getCompletions(editor, provider).then (suggestions) ->
-            expect(suggestions.length).toEqual(0)
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  datetim')
-        waitsForPromise ->
-          getCompletions(editor, provider).then (suggestions) ->
-            expect(suggestions.length).toEqual(0)
-    it 'react on builtin external library configuration changes', ->
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  dowfi')
-        waitsForPromise ->
-          getCompletions(editor, provider).then (suggestions) ->
-            debugger
-            expect(suggestions.length).toEqual(0)
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  ftp')
-        waitsForPromise ->
-          getCompletions(editor, provider).then (suggestions) ->
-            expect(suggestions.length).toBeGreaterThan(0)
-            expect(suggestions[0].displayText).not.toEqual('FtpLibrary')
-      runs ->
-        atom.config.set("#{CFG_KEY}.externalLibrary.FtpLibrary", true)
-      waitsFor ->
-        return !provider.loading
-      , 'Provider should finish loading', 500
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  dowfi')
-        waitsForPromise ->
-          getCompletions(editor, provider).then (suggestions) ->
-            expect(suggestions.length).toEqual(1)
-            expect(suggestions[0].displayText).toEqual('Download File')
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  ftpli')
-        waitsForPromise ->
-          getCompletions(editor, provider).then (suggestions) ->
-            expect(suggestions.length).toEqual(1)
-            expect(suggestions[0].displayText).toEqual('FtpLibrary')
     it 'react on processLibdocFiles configuration changes', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])

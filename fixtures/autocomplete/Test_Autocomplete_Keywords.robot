@@ -1,3 +1,7 @@
+*** Settings ***
+Library  Test_Autocomplete_Libdoc
+Resource  FileSizeLimit
+
 *** Variables ***
 ${VARIABLE1}    value
 ${VARIABLE2}    value
@@ -30,3 +34,4 @@ Ord 1
 Ord 3
 Test keyword
 Duplicated keyword
+    
