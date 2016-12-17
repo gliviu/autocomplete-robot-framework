@@ -1,6 +1,9 @@
 *** Settings ***
 Library  Test_Autocomplete_Libdoc
+Library  TestPackage.modules.TestModule
 Resource  FileSizeLimit
+# OperatingSystem library must not be imported in this file
+# Screenshot and BuiltIn libraries should not be imported in any file
 
 *** Variables ***
 ${VARIABLE1}    value

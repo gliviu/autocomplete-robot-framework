@@ -1,4 +1,4 @@
 *** Keywords ***
-Limit File Size
+Limit File Size Keyword
 
 

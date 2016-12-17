@@ -1,5 +1,6 @@
 robotParser = require('../lib/parse-robot')
 libdocParser = require('../lib/parse-libdoc')
+common = require('../lib/common')
 fs = require 'fs'
 pathUtils = require 'path'
 PACKAGE_NAME = 'autocomplete-robot-framework'
@@ -30,42 +31,6 @@ describe 'Robot Framework keywords autocompletions', ->
     , 'Provider should finish loading', 500
     runs ->
       editor = atom.workspace.getActiveTextEditor()
-
-  describe 'Library management', ->
-    process.env.PYTHONPATH=pathUtils.join(__dirname, '../fixtures/libraries')
-    beforeEach ->
-      waitsForPromise -> atom.workspace.open('autocomplete/Test_Libraries.robot')
-      runs ->
-        editor = atom.workspace.getActiveTextEditor()
-    it 'should import modules', ->
-      editor.setCursorBufferPosition([Infinity, Infinity])
-      editor.setText('  testmod')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0].displayText).toEqual('Test Module Keyword')
-          expect(suggestions[0].description).toEqual('Test module documentation. Arguments: param1, param2')
-    it 'should import classes', ->
-      editor.setCursorBufferPosition([Infinity, Infinity])
-      editor.setText('  testclas')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0].displayText).toEqual('Test Class Keyword')
-          expect(suggestions[0].description).toEqual('Test class documentation. Arguments: param1')
-    it 'should import Robot Framework builtin libraries', ->
-      runs ->
-        atom.config.set("#{CFG_KEY}.standardLibrary.OperatingSystem", false)
-      waitsFor ->
-        return !provider.loading
-      , 'Provider should finish loading', 500
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.setText('  appefi')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0].displayText).toEqual('Append To File')
 
   describe 'Keywords autocomplete', ->
     it 'suggest standard keywords', ->
@@ -136,19 +101,6 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(0)
           expect(suggestions[0]?.displayText).toEqual('With embedded ${arg1} arguments ${arg2}')
-    it 'accept prefix containing dot', ->
-      runs ->
-        atom.config.set("#{CFG_KEY}.externalLibrary.HttpLibraryHTTP", true)
-      waitsFor ->
-        return !provider.loading
-      , 'Provider should finish loading', 500
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  HttpLibrary.HTTP.d')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toBeGreaterThan(0)
-          expect(suggestions[0]?.displayText).toEqual('DELETE')
     it 'shows suggestions from current editor first', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
       editor.insertText('  run')
@@ -251,7 +203,20 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(0)
 
-  describe 'Dot notation', ->
+  describe 'Suggestion scope scope and modifiers', ->
+    it 'accept prefix containing dot', ->
+      runs ->
+        atom.config.set("#{CFG_KEY}.externalLibrary.HttpLibraryHTTP", true)
+      waitsFor ->
+        return !provider.loading
+      , 'Provider should finish loading', 500
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  HttpLibrary.HTTP.d')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(0)
+          expect(suggestions[0]?.displayText).toEqual('DELETE')
     it 'supports dot notation', ->
       runs ->
         editor = atom.workspace.getActiveTextEditor()
@@ -362,16 +327,80 @@ describe 'Robot Framework keywords autocompletions', ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('BuiltIn')
 
-  describe 'Library name autocomplete', ->
-    it 'suggest library names', ->
+  describe 'Library management', ->
+    process.env.PYTHONPATH=pathUtils.join(__dirname, '../fixtures/libraries')
+    beforeEach ->
+      waitsForPromise -> atom.workspace.open('autocomplete/Test_Libraries.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+    it 'should import modules', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      editor.setText('  testmod')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('Test Module Keyword')
+          expect(suggestions[0].description).toEqual('Test module documentation. Arguments: param1, param2')
+    it 'should import classes', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      editor.setText('  testclas')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('Test Class Keyword')
+          expect(suggestions[0].description).toEqual('Test class documentation. Arguments: param1')
+    it 'should import Robot Framework builtin libraries', ->
+      runs ->
+        atom.config.set("#{CFG_KEY}.standardLibrary.OperatingSystem", false)
+      waitsFor ->
+        return !provider.loading
+      , 'Provider should finish loading', 500
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  built')
+        editor.setText('  appefi')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('Append To File')
+
+  describe 'Scope modifiers', ->
+    it 'default modifier limits suggestions to current imports', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      runs ->
+        editor.insertText('  k')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          suggestedUnits = new Set()
+          for suggestion in suggestions when suggestion.type is 'keyword'
+            suggestedUnits.add(suggestion.rightLabel)
+          expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit', 'BuiltIn', 'Test_Autocomplete_Keywords', 'TestPackage.modules.TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
+    it 'file modifier suggests library names that are imported in other robot files', ->
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  operatings')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('OperatingSystem')
+    # todo: implement - move fallback libraries in managed-libraries.js
+    # it 'file modifier does not not suggest library names that are not imported in any robot file', ->
+    #   runs ->
+    #     editor.setCursorBufferPosition([Infinity, Infinity])
+    #     editor.insertText('  screensho') # Builtin screenshot library
+    #   waitsForPromise ->
+    #     getCompletions(editor, provider).then (suggestions) ->
+    #       debugger
+    #       provider.printDebugInfo()
+    #       expect(suggestions.length).toEqual(0)
+    it 'file modifier suggests BuiltIn library even if it is not imported in any robot file', ->
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  builtin') # Builtin screenshot library
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0].displayText).toEqual('BuiltIn')
-    it 'support mixed case for library name suggestions', ->
+    it 'file modifier supports mixed case for library name suggestions', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText('  BUILT')
@@ -463,7 +492,7 @@ describe 'Robot Framework keywords autocompletions', ->
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(1)
-            expect(suggestions[0].displayText).toEqual('Limit File Size')
+            expect(suggestions[0].displayText).toEqual('Limit File Size Keyword')
       runs ->
         atom.config.set("#{CFG_KEY}.maxFileSize", 39)
       waitsFor ->

@@ -1,3 +1,6 @@
+*** Settings ***
+
+
 *** Variables ***
 ${VARIABLE1}    value
 ${VARIABLE2}    value
