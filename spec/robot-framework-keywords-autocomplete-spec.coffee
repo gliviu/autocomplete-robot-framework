@@ -22,6 +22,7 @@ getCompletions = (editor, provider)->
 describe 'Robot Framework keywords autocompletions', ->
   [editor, provider] = []
   beforeEach ->
+    process.env.PYTHONPATH=pathUtils.join(__dirname, '../fixtures/libraries')
     waitsForPromise -> atom.packages.activatePackage(PACKAGE_NAME)
     runs ->
       provider = atom.packages.getActivePackage(PACKAGE_NAME).mainModule.getAutocompletePlusProvider()
@@ -206,11 +207,6 @@ describe 'Robot Framework keywords autocompletions', ->
   describe 'Suggestion scope scope and modifiers', ->
     it 'accept prefix containing dot', ->
       runs ->
-        atom.config.set("#{CFG_KEY}.externalLibrary.HttpLibraryHTTP", true)
-      waitsFor ->
-        return !provider.loading
-      , 'Provider should finish loading', 500
-      runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText('  HttpLibrary.HTTP.d')
       waitsForPromise ->
@@ -328,7 +324,6 @@ describe 'Robot Framework keywords autocompletions', ->
           expect(suggestions[0]?.displayText).toEqual('BuiltIn')
 
   describe 'Library management', ->
-    process.env.PYTHONPATH=pathUtils.join(__dirname, '../fixtures/libraries')
     beforeEach ->
       waitsForPromise -> atom.workspace.open('autocomplete/Test_Libraries.robot')
       runs ->
@@ -350,11 +345,6 @@ describe 'Robot Framework keywords autocompletions', ->
           expect(suggestions[0].displayText).toEqual('Test Class Keyword')
           expect(suggestions[0].description).toEqual('Test class documentation. Arguments: param1')
     it 'should import Robot Framework builtin libraries', ->
-      runs ->
-        atom.config.set("#{CFG_KEY}.standardLibrary.OperatingSystem", false)
-      waitsFor ->
-        return !provider.loading
-      , 'Provider should finish loading', 500
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.setText('  appefi')
@@ -382,16 +372,13 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0].displayText).toEqual('OperatingSystem')
-    # todo: implement - move fallback libraries in managed-libraries.js
-    # it 'file modifier does not not suggest library names that are not imported in any robot file', ->
-    #   runs ->
-    #     editor.setCursorBufferPosition([Infinity, Infinity])
-    #     editor.insertText('  screensho') # Builtin screenshot library
-    #   waitsForPromise ->
-    #     getCompletions(editor, provider).then (suggestions) ->
-    #       debugger
-    #       provider.printDebugInfo()
-    #       expect(suggestions.length).toEqual(0)
+    it 'file modifier does not not suggest library names that are not imported in any robot file', ->
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  screensho') # Builtin screenshot library
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(0)
     it 'file modifier suggests BuiltIn library even if it is not imported in any robot file', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])

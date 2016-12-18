@@ -7,8 +7,10 @@ import json
 import traceback
 from collections import namedtuple
 
-# _cache_dir = os.path.join(tempfile.gettempdir(), 'robot-lib-cache')
-
+STANDARD_LIBRARY_NAMES = ['BuiltIn', 'Collections', 'DateTime', 'Dialogs'
+    , 'OperatingSystem', 'Process', 'Remote'
+    , 'Screenshot', 'String', 'Telnet', 'XML']
+STANDARD_LIBRARY_PACKAGE = 'robot.libraries'
 
 def _is_robot_framework_available():
     try:
@@ -81,7 +83,13 @@ def _store_libraries(libraries, cache_dir):
         os.mkdir(cache_dir)
     for library_name in libraries:
         try:
-            module = _get_module(library_name)
+            # Fix library name for standard robot libraries
+            if library_name in STANDARD_LIBRARY_NAMES:
+                full_library_name = ("%s.%s"
+                    % (STANDARD_LIBRARY_PACKAGE, library_name))
+            else:
+                full_library_name = library_name
+            module = _get_module(full_library_name)
             if not module:
                 result[library_name] = {
                     'name': library_name,
