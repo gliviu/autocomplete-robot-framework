@@ -29,6 +29,20 @@ module.exports =
       items:
         type: 'string'
       order: 5
+    globalScopeModifier:
+      title: 'Names of directories or files to be excluded from showing suggestions (comma sepparated)'
+      type: 'string'
+      default: 'glob'
+      items:
+        type: 'string'
+      order: 6
+    internalScopeModifier:
+      title: 'Names of directories or files to be excluded from showing suggestions (comma sepparated)'
+      type: 'string'
+      default: 'this'
+      items:
+        type: 'string'
+      order: 7
     debug:
       title: 'Debug'
       type: 'boolean'

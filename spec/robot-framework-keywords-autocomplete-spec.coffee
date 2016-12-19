@@ -204,8 +204,58 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(0)
 
-  describe 'Suggestion scope scope and modifiers', ->
-    it 'accept prefix containing dot', ->
+  describe 'Scope modifiers', ->
+
+  describe 'Library management', ->
+    beforeEach ->
+      waitsForPromise -> atom.workspace.open('autocomplete/Test_Libraries.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+    it 'should import modules', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      editor.setText('  testmod')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('Test Module Keyword')
+          expect(suggestions[0].description).toEqual('Test module documentation. Arguments: param1, param2')
+    it 'should import classes', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      editor.setText('  testclas1')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('Test Class Keyword 1')
+          expect(suggestions[0].description).toEqual('Test class documentation. Arguments: param1')
+    it 'should handle classes with import parameters', ->
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  testclparam')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('Test Class Keyword Params')
+    it 'should import Robot Framework builtin libraries', ->
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.setText('  appefi')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('Append To File')
+
+  describe 'Scope modifiers', ->
+    it 'default modifier limits suggestions to current imports', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      runs ->
+        editor.insertText('  k')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          suggestedUnits = new Set()
+          for suggestion in suggestions when suggestion.type is 'keyword'
+            suggestedUnits.add(suggestion.rightLabel)
+          expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit', 'BuiltIn', 'Test_Autocomplete_Keywords', 'TestPackage.modules.TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
+    it 'supports file scope modifier with libraries containing dot in their name', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText('  HttpLibrary.HTTP.d')
@@ -213,7 +263,7 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(0)
           expect(suggestions[0]?.displayText).toEqual('DELETE')
-    it 'supports dot notation', ->
+    it 'supports file scope modifier with resources', ->
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
@@ -247,123 +297,6 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('BuiltIn')
-    it 'react on removeDotNotation configuration changes', ->
-      runs ->
-        atom.config.set("#{CFG_KEY}.removeDotNotation", true)
-      waitsFor ->
-        return !provider.loading
-      , 'Provider should finish loading', 500
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  builtin.callme')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('Call Method')
-          expect(suggestions[0]?.replacementPrefix).toEqual('builtin.callme')
-      runs ->
-        atom.config.set("#{CFG_KEY}.removeDotNotation", false)
-      waitsFor ->
-        return !provider.loading
-      , 'Provider should finish loading', 500
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  builtin.callme')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('Call Method')
-          expect(suggestions[0]?.replacementPrefix).toEqual('callme')
-    it 'supports dot notation with mixed case', ->
-      runs ->
-        editor = atom.workspace.getActiveTextEditor()
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  BUILTIN.CALLME')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('Call Method')
-    it 'does not replace unknown library name when dot notation is used', ->
-      runs ->
-        atom.config.set("#{CFG_KEY}.removeDotNotation", true)
-      waitsFor ->
-        return !provider.loading
-      , 'Provider should finish loading', 500
-      runs ->
-        editor = atom.workspace.getActiveTextEditor()
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  UnknownLibrary.callmethod')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('Call Method')
-          expect(suggestions[0]?.replacementPrefix).toEqual('callmethod');
-      runs ->
-        editor = atom.workspace.getActiveTextEditor()
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  builtin.callme')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('Call Method')
-      runs ->
-        editor = atom.workspace.getActiveTextEditor()
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  builtin.')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toBeGreaterThan(1)
-          expect(suggestions[0]?.displayText).not.toEqual('BuiltIn')
-      runs ->
-        editor = atom.workspace.getActiveTextEditor()
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  builtin')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('BuiltIn')
-
-  describe 'Library management', ->
-    beforeEach ->
-      waitsForPromise -> atom.workspace.open('autocomplete/Test_Libraries.robot')
-      runs ->
-        editor = atom.workspace.getActiveTextEditor()
-    it 'should import modules', ->
-      editor.setCursorBufferPosition([Infinity, Infinity])
-      editor.setText('  testmod')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0].displayText).toEqual('Test Module Keyword')
-          expect(suggestions[0].description).toEqual('Test module documentation. Arguments: param1, param2')
-    it 'should import classes', ->
-      editor.setCursorBufferPosition([Infinity, Infinity])
-      editor.setText('  testclas')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0].displayText).toEqual('Test Class Keyword')
-          expect(suggestions[0].description).toEqual('Test class documentation. Arguments: param1')
-    it 'should import Robot Framework builtin libraries', ->
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.setText('  appefi')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0].displayText).toEqual('Append To File')
-
-  describe 'Scope modifiers', ->
-    it 'default modifier limits suggestions to current imports', ->
-      editor.setCursorBufferPosition([Infinity, Infinity])
-      runs ->
-        editor.insertText('  k')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          suggestedUnits = new Set()
-          for suggestion in suggestions when suggestion.type is 'keyword'
-            suggestedUnits.add(suggestion.rightLabel)
-          expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit', 'BuiltIn', 'Test_Autocomplete_Keywords', 'TestPackage.modules.TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
     it 'file modifier suggests library names that are imported in other robot files', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
@@ -402,6 +335,74 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0].displayText).toEqual('BuiltIn')
+    it 'supports file scope modifier with mixed case', ->
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  BUILTIN.CALLME')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('Call Method')
+    it 'supports global scope modifier', ->
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  glob.appendfil')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('Append To File')
+    it 'supports internal scope modifier', ->
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  this.k')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(5)
+          expect(suggestions[0]?.displayText).toEqual('Test keyword')
+          expect(suggestions[1]?.displayText).toEqual('priv.keyword')
+          expect(suggestions[2]?.displayText).toEqual('Priv test keyword')
+          expect(suggestions[3]?.displayText).toEqual('Duplicated keyword')
+          expect(suggestions[4]?.displayText).toEqual('Dot.punctuation keyword')
+    it 'unknown scope modifier behaves exactly as default scope modifier', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      runs ->
+        editor.insertText('  UnkwnownLibrary.k')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          suggestedUnits = new Set()
+          for suggestion in suggestions when suggestion.type is 'keyword'
+            suggestedUnits.add(suggestion.rightLabel)
+          expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit', 'BuiltIn', 'Test_Autocomplete_Keywords', 'TestPackage.modules.TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
+    it 'react on removeDotNotation configuration changes', ->
+      runs ->
+        atom.config.set("#{CFG_KEY}.removeDotNotation", true)
+      waitsFor ->
+        return !provider.loading
+      , 'Provider should finish loading', 500
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  builtin.callme')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('Call Method')
+          expect(suggestions[0]?.replacementPrefix).toEqual('builtin.callme')
+      runs ->
+        atom.config.set("#{CFG_KEY}.removeDotNotation", false)
+      waitsFor ->
+        return !provider.loading
+      , 'Provider should finish loading', 500
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  builtin.callme')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('Call Method')
+          expect(suggestions[0]?.replacementPrefix).toEqual('callme')
 
   describe 'Autocomplete configuration', ->
     it 'react on showArguments configuration changes', ->
