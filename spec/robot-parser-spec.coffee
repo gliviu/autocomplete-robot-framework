@@ -44,6 +44,23 @@ describe 'Robot parser', ->
       for section in invalidSections
         robot = robotParser.parse("*test cases*\n#{section}\nk1\n#{body}")
         expect(robot.keywords.length).toEqual 0
+    it 'correctly parses all variants of sections', ->
+      robot = robotParser.parse("*keywords*\nk1\n")
+      expect(robot.keywords[0]?.name).toEqual 'k1'
+      robot = robotParser.parse("*keyword*\nk1\n")
+      expect(robot.keywords[0]?.name).toEqual 'k1'
+      robot = robotParser.parse("*settings*\nLibrary  lib1\n")
+      expect(robot.libraries[0]?.name).toEqual 'lib1'
+      robot = robotParser.parse("*setting*\nLibrary  lib1\n")
+      expect(robot.libraries[0]?.name).toEqual 'lib1'
+      robot = robotParser.parse("*test cases*\ntc1\n")
+      expect(robot.testCases[0]?.name).toEqual 'tc1'
+      robot = robotParser.parse("*test case*\ntc1\n")
+      expect(robot.testCases[0]?.name).toEqual 'tc1'
+      robot = robotParser.parse("*testcases*\ntc1\n")
+      expect(robot.testCases[0]?.name).toEqual 'tc1'
+      robot = robotParser.parse("*testcase*\ntc1\n")
+      expect(robot.testCases[0]?.name).toEqual 'tc1'
   describe 'Keyword parsing', ->
     it 'correctly interprets line ending', ->
       delim = '\n'
@@ -107,6 +124,14 @@ describe "Robot file detection", ->
     expect(isRobot).toBe(true);
 
     content = fs.readFileSync("#{fixturePath}/detect-ok7.robot").toString()
+    isRobot = robotParser.isRobot(content)
+    expect(isRobot).toBe(true);
+
+    content = fs.readFileSync("#{fixturePath}/detect-ok8.robot").toString()
+    isRobot = robotParser.isRobot(content)
+    expect(isRobot).toBe(true);
+
+    content = fs.readFileSync("#{fixturePath}/detect-ok9.robot").toString()
     isRobot = robotParser.isRobot(content)
     expect(isRobot).toBe(true);
 

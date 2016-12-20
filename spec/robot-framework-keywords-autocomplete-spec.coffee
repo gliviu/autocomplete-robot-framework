@@ -243,6 +243,12 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0].displayText).toEqual('Append To File')
+    it 'should not suggest private keywords', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      editor.setText('  TestPackage.modules.TestModule.')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
 
   describe 'Scope modifiers', ->
     it 'default modifier limits suggestions to current imports', ->
