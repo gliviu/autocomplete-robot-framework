@@ -245,7 +245,7 @@ describe 'Robot Framework keywords autocompletions', ->
           expect(suggestions[0].displayText).toEqual('Append To File')
     it 'should not suggest private keywords', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
-      editor.setText('  TestPackage.modules.TestModule.')
+      editor.setText('  package.modules.TestModule.')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
@@ -260,7 +260,7 @@ describe 'Robot Framework keywords autocompletions', ->
           suggestedUnits = new Set()
           for suggestion in suggestions when suggestion.type is 'keyword'
             suggestedUnits.add(suggestion.rightLabel)
-          expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit', 'BuiltIn', 'Test_Autocomplete_Keywords', 'TestPackage.modules.TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
+          expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit', 'BuiltIn', 'Test_Autocomplete_Keywords', 'package.modules.TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
     it 'supports file scope modifier with libraries containing dot in their name', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
@@ -381,7 +381,7 @@ describe 'Robot Framework keywords autocompletions', ->
           suggestedUnits = new Set()
           for suggestion in suggestions when suggestion.type is 'keyword'
             suggestedUnits.add(suggestion.rightLabel)
-          expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit', 'BuiltIn', 'Test_Autocomplete_Keywords', 'TestPackage.modules.TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
+          expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit', 'BuiltIn', 'Test_Autocomplete_Keywords', 'package.modules.TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
     it 'react on removeDotNotation configuration changes', ->
       runs ->
         atom.config.set("#{CFG_KEY}.removeDotNotation", true)

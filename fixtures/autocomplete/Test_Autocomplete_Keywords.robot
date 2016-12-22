@@ -1,6 +1,6 @@
 *** Settings ***
 Library  Test_Autocomplete_Libdoc
-Library  TestPackage.modules.TestModule
+Library  package.modules.TestModule
 Library  HttpLibrary.HTTP
 Resource  FileSizeLimit
 # OperatingSystem library must not be imported in this file

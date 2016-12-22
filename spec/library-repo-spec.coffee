@@ -11,31 +11,31 @@ describe "Library repository", ->
   process.env.PYTHONPATH=pathUtils.join(__dirname, '../fixtures/libraries')
   it 'should load robot keywords from module', ->
     waitsForPromise ->
-      libRepo.importLibraries(['TestPackage.modules.TestModule'], settings)
+      libRepo.importLibraries(['package.modules.TestModule'], settings)
     runs ->
       libraries = libRepo.getLibraries()
-      library = libraries.get('TestPackage.modules.TestModule')
+      library = libraries.get('package.modules.TestModule')
       expect(library).toBeDefined()
       expect(library.status).toEqual('success')
-      expect(library.name).toEqual('TestPackage.modules.TestModule')
+      expect(library.name).toEqual('package.modules.TestModule')
   it 'should load robot keywords from class with shorthand notation', ->
     waitsForPromise ->
-      libRepo.importLibraries(['TestPackage.classes.TestClass'], settings)
+      libRepo.importLibraries(['package.classes.TestClass'], settings)
     runs ->
       libraries = libRepo.getLibraries()
-      library = libraries.get('TestPackage.classes.TestClass')
+      library = libraries.get('package.classes.TestClass')
       expect(library).toBeDefined()
       expect(library.status).toEqual('success')
-      expect(library.name).toEqual('TestPackage.classes.TestClass')
+      expect(library.name).toEqual('package.classes.TestClass')
   it 'should load robot keywords from class with long notation', ->
     waitsForPromise ->
-      libRepo.importLibraries(['TestPackage.classes.TestClass.TestClass'], settings)
+      libRepo.importLibraries(['package.classes.TestClass.TestClass'], settings)
     runs ->
       libraries = libRepo.getLibraries()
-      library = libraries.get('TestPackage.classes.TestClass.TestClass')
+      library = libraries.get('package.classes.TestClass.TestClass')
       expect(library).toBeDefined()
       expect(library.status).toEqual('success')
-      expect(library.name).toEqual('TestPackage.classes.TestClass.TestClass')
+      expect(library.name).toEqual('package.classes.TestClass.TestClass')
   it 'should load Robot Framework builtin libraries', ->
     waitsForPromise ->
       libRepo.importLibraries(['robot.libraries.OperatingSystem'], settings)
