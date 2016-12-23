@@ -204,8 +204,6 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(0)
 
-  describe 'Scope modifiers', ->
-
   describe 'Library management', ->
     beforeEach ->
       waitsForPromise -> atom.workspace.open('autocomplete/Test_Libraries.robot')
@@ -216,9 +214,12 @@ describe 'Robot Framework keywords autocompletions', ->
       editor.setText('  testmod')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0].displayText).toEqual('Test Module Keyword')
-          expect(suggestions[0].description).toEqual('Test module documentation. Arguments: param1, param2')
+          expect(suggestions.length).toEqual(2)
+          expect(suggestions[0].type).toEqual('import')
+          expect(suggestions[0].displayText).toEqual('TestModule')
+          expect(suggestions[1].type).toEqual('keyword')
+          expect(suggestions[1].displayText).toEqual('Test Module Keyword')
+          expect(suggestions[1].description).toEqual('Test module documentation. Arguments: param1, param2')
     it 'should import classes', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
       editor.setText('  testclas1')
@@ -251,138 +252,7 @@ describe 'Robot Framework keywords autocompletions', ->
           expect(suggestions.length).toEqual(1)
 
   describe 'Scope modifiers', ->
-    it 'default modifier limits suggestions to current imports', ->
-      editor.setCursorBufferPosition([Infinity, Infinity])
-      runs ->
-        editor.insertText('  k')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          suggestedUnits = new Set()
-          for suggestion in suggestions when suggestion.type is 'keyword'
-            suggestedUnits.add(suggestion.rightLabel)
-          expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit', 'BuiltIn', 'Test_Autocomplete_Keywords', 'package.modules.TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
-    it 'supports file scope modifier with libraries containing dot in their name', ->
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  HttpLibrary.HTTP.d')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toBeGreaterThan(0)
-          expect(suggestions[0]?.displayText).toEqual('DELETE')
-    it 'supports file scope modifier with resources', ->
-      runs ->
-        editor = atom.workspace.getActiveTextEditor()
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  fileprefix.')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(2)
-          expect(suggestions[0]?.displayText).toEqual('File keyword 1')
-          expect(suggestions[1]?.displayText).toEqual('File keyword 2')
-      runs ->
-        editor = atom.workspace.getActiveTextEditor()
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  builtin.callme')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('Call Method')
-      runs ->
-        editor = atom.workspace.getActiveTextEditor()
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  builtin.')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toBeGreaterThan(1)
-          expect(suggestions[0]?.displayText).not.toEqual('BuiltIn')
-      runs ->
-        editor = atom.workspace.getActiveTextEditor()
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  builtin')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('BuiltIn')
-    it 'file modifier suggests library names that are imported in other robot files', ->
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  operatings')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0].displayText).toEqual('OperatingSystem')
-    it 'file modifier does not not suggest library names that are not imported in any robot file', ->
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  screensho') # Builtin screenshot library
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(0)
-    it 'file modifier suggests BuiltIn library even if it is not imported in any robot file', ->
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  builtin') # Builtin screenshot library
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0].displayText).toEqual('BuiltIn')
-    it 'file modifier supports mixed case for library name suggestions', ->
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  BUILT')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0].displayText).toEqual('BuiltIn')
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  bUilTi')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0].displayText).toEqual('BuiltIn')
-    it 'supports file scope modifier with mixed case', ->
-      runs ->
-        editor = atom.workspace.getActiveTextEditor()
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  BUILTIN.CALLME')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('Call Method')
-    it 'supports global scope modifier', ->
-      runs ->
-        editor = atom.workspace.getActiveTextEditor()
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  glob.appendfil')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('Append To File')
-    it 'supports internal scope modifier', ->
-      runs ->
-        editor = atom.workspace.getActiveTextEditor()
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  this.k')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(5)
-          expect(suggestions[0]?.displayText).toEqual('Test keyword')
-          expect(suggestions[1]?.displayText).toEqual('priv.keyword')
-          expect(suggestions[2]?.displayText).toEqual('Priv test keyword')
-          expect(suggestions[3]?.displayText).toEqual('Duplicated keyword')
-          expect(suggestions[4]?.displayText).toEqual('Dot.punctuation keyword')
-    it 'unknown scope modifier behaves exactly as default scope modifier', ->
-      editor.setCursorBufferPosition([Infinity, Infinity])
-      runs ->
-        editor.insertText('  UnkwnownLibrary.k')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          suggestedUnits = new Set()
-          for suggestion in suggestions when suggestion.type is 'keyword'
-            suggestedUnits.add(suggestion.rightLabel)
-          expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit', 'BuiltIn', 'Test_Autocomplete_Keywords', 'package.modules.TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
-    it 'react on removeDotNotation configuration changes', ->
+    it 'reacts on removeDotNotation configuration changes', ->
       runs ->
         atom.config.set("#{CFG_KEY}.removeDotNotation", true)
       waitsFor ->
@@ -409,6 +279,246 @@ describe 'Robot Framework keywords autocompletions', ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('Call Method')
           expect(suggestions[0]?.replacementPrefix).toEqual('callme')
+    describe 'Default scope modifiers', ->
+      it 'limits suggestions to current imports', ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        runs ->
+          editor.insertText('  k')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            suggestedUnits = new Set()
+            for suggestion in suggestions when suggestion.type is 'keyword'
+              suggestedUnits.add(suggestion.rightLabel)
+            expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit', 'BuiltIn', 'Test_Autocomplete_Keywords', 'package.modules.TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
+      it 'suggests all keywords from resources having the same name', ->
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  utility')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(2)
+            expect(suggestions[0].type).toEqual('keyword')
+            expect(suggestions[0].snippet).toEqual('utility 1')
+            expect(suggestions[1].type).toEqual('keyword')
+            expect(suggestions[1].snippet).toEqual('utility 2')
+    describe 'File scope modifiers', ->
+      it 'supports file scope modifier with libraries containing dot in their name', ->
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  HttpLibrary.HTTP.d')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toBeGreaterThan(0)
+            expect(suggestions[0]?.displayText).toEqual('DELETE')
+      it 'supports file scope modifier with resources', ->
+        runs ->
+          editor = atom.workspace.getActiveTextEditor()
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  fileprefix.')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(2)
+            expect(suggestions[0]?.displayText).toEqual('File keyword 1')
+            expect(suggestions[1]?.displayText).toEqual('File keyword 2')
+        runs ->
+          editor = atom.workspace.getActiveTextEditor()
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  builtin.callme')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0]?.displayText).toEqual('Call Method')
+        runs ->
+          editor = atom.workspace.getActiveTextEditor()
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  builtin.')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toBeGreaterThan(1)
+            expect(suggestions[0]?.displayText).not.toEqual('BuiltIn')
+        runs ->
+          editor = atom.workspace.getActiveTextEditor()
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  builtin')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0]?.displayText).toEqual('BuiltIn')
+      it 'suggests all keywords from resources having the same name', ->
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  utils.')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(2)
+            expect(suggestions[0].type).toEqual('keyword')
+            expect(suggestions[0].snippet).toEqual('utility 1')
+            expect(suggestions[1].type).toEqual('keyword')
+            expect(suggestions[1].snippet).toEqual('utility 2')
+      it 'does not suggests keywords if resource/library name is incomplete', ->
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  FilePrefi.')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toBeGreaterThan(10)
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  FilePrefix2.')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toBeGreaterThan(10)
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  package.modules.TestModul.')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toBeGreaterThan(10)
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  package.modules.TestModule2.')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toBeGreaterThan(10)
+      it 'suggests library names that are imported in other robot files', ->
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  operatings')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0].displayText).toEqual('OperatingSystem')
+      it 'does not not suggest library names that are not imported in any robot file', ->
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  screensho') # Builtin screenshot library
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(0)
+      it 'suggests BuiltIn library even if it is not imported in any robot file', ->
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  builtin') # Builtin screenshot library
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0].displayText).toEqual('BuiltIn')
+      it 'supports mixed case for library name suggestions', ->
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  BUILT')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0].displayText).toEqual('BuiltIn')
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  bUilTi')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0].displayText).toEqual('BuiltIn')
+      it 'suggests libraries by their short name', ->
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  TestModule')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toBeGreaterThan(1)
+            expect(suggestions[0].type).toEqual('import')
+            expect(suggestions[0].text).toEqual('package.modules.TestModule')
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  TestClass')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toBeGreaterThan(1)
+            expect(suggestions[0].type).toEqual('import')
+            expect(suggestions[0].text).toEqual('package.classes.TestClass')
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  RobotFile')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0].type).toEqual('import')
+            expect(suggestions[0].text).toEqual('namespace.separated.RobotFile')
+      it 'suggests libraries by their full name', ->
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  package')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(3)
+            expect(suggestions[0].type).toEqual('import')
+            expect(suggestions[0].text).toEqual('package.classes.TestClass')
+            expect(suggestions[1].type).toEqual('import')
+            expect(suggestions[1].text).toEqual('package.classes.TestClassParams')
+            expect(suggestions[2].type).toEqual('import')
+            expect(suggestions[2].text).toEqual('package.modules.TestModule')
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  namespace')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0].type).toEqual('import')
+            expect(suggestions[0].text).toEqual('namespace.separated.RobotFile')
+      it 'supports file scope modifier with mixed case', ->
+        runs ->
+          editor = atom.workspace.getActiveTextEditor()
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  BUILTIN.CALLME')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0]?.displayText).toEqual('Call Method')
+    describe 'Global scope modifiers', ->
+      it 'supports global scope modifier', ->
+        runs ->
+          editor = atom.workspace.getActiveTextEditor()
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  glob.appendfil')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0]?.displayText).toEqual('Append To File')
+      it 'suggests all keywords from resources having the same name', ->
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  glob.utility')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toBeGreaterThan(2)
+            expect(suggestions[0].type).toEqual('keyword')
+            expect(suggestions[0].snippet).toEqual('utility 1')
+            expect(suggestions[1].type).toEqual('keyword')
+            expect(suggestions[1].snippet).toEqual('utility 2')
+    describe 'Internal scope modifiers', ->
+      it 'supports internal scope modifier', ->
+        runs ->
+          editor = atom.workspace.getActiveTextEditor()
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  this.k')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(5)
+            expect(suggestions[0]?.displayText).toEqual('Test keyword')
+            expect(suggestions[1]?.displayText).toEqual('priv.keyword')
+            expect(suggestions[2]?.displayText).toEqual('Priv test keyword')
+            expect(suggestions[3]?.displayText).toEqual('Duplicated keyword')
+            expect(suggestions[4]?.displayText).toEqual('Dot.punctuation keyword')
+    describe 'Unknown scope modifiers', ->
+      it 'unknown scope modifier behaves exactly as default scope modifier', ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        runs ->
+          editor.insertText('  UnkwnownLibrary.k')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            suggestedUnits = new Set()
+            for suggestion in suggestions when suggestion.type is 'keyword'
+              suggestedUnits.add(suggestion.rightLabel)
+            expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit', 'BuiltIn', 'Test_Autocomplete_Keywords', 'package.modules.TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
 
   describe 'Autocomplete configuration', ->
     it 'react on showArguments configuration changes', ->
