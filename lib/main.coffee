@@ -33,16 +33,17 @@ module.exports =
       title: 'Names of directories or files to be excluded from showing suggestions (comma sepparated)'
       type: 'string'
       default: 'glob'
-      items:
-        type: 'string'
       order: 6
     internalScopeModifier:
       title: 'Names of directories or files to be excluded from showing suggestions (comma sepparated)'
       type: 'string'
       default: 'this'
-      items:
-        type: 'string'
       order: 7
+    pythonExecutable:
+      title: 'Python executable'
+      type: 'string'
+      default: 'python'
+      order: 8
     debug:
       title: 'Debug'
       type: 'boolean'
