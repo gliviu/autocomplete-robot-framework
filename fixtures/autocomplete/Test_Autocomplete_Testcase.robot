@@ -1,4 +1,5 @@
 *** Settings ***
+Resource  a/utils.txt
 
 
 *** Variables ***

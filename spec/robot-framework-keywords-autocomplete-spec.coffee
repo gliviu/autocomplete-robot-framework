@@ -301,6 +301,17 @@ describe 'Robot Framework keywords autocompletions', ->
             expect(suggestions[0].snippet).toEqual('utility 1')
             expect(suggestions[1].type).toEqual('keyword')
             expect(suggestions[1].snippet).toEqual('utility 2')
+        waitsForPromise -> atom.workspace.open('autocomplete/test_autocomplete_testcase.robot')
+        runs ->
+          editor = atom.workspace.getActiveTextEditor()
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  utility')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0].type).toEqual('keyword')
+            expect(suggestions[0].snippet).toEqual('utility 1 text')
+
     describe 'File scope modifiers', ->
       it 'supports file scope modifier with libraries containing dot in their name', ->
         runs ->
@@ -350,11 +361,13 @@ describe 'Robot Framework keywords autocompletions', ->
           editor.insertText('  utils.')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
-            expect(suggestions.length).toEqual(2)
+            expect(suggestions.length).toEqual(3)
             expect(suggestions[0].type).toEqual('keyword')
             expect(suggestions[0].snippet).toEqual('utility 1')
             expect(suggestions[1].type).toEqual('keyword')
-            expect(suggestions[1].snippet).toEqual('utility 2')
+            expect(suggestions[1].snippet).toEqual('utility 1 text')
+            expect(suggestions[2].type).toEqual('keyword')
+            expect(suggestions[2].snippet).toEqual('utility 2')
       it 'does not suggests keywords if resource/library name is incomplete', ->
         runs ->
           editor.setCursorBufferPosition([Infinity, Infinity])
@@ -509,7 +522,7 @@ describe 'Robot Framework keywords autocompletions', ->
             expect(suggestions[3]?.displayText).toEqual('Duplicated keyword')
             expect(suggestions[4]?.displayText).toEqual('Dot.punctuation keyword')
     describe 'Unknown scope modifiers', ->
-      it 'unknown scope modifier behaves exactly as default scope modifier', ->
+      it 'behaves exactly as default scope modifier', ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         runs ->
           editor.insertText('  UnkwnownLibrary.k')
