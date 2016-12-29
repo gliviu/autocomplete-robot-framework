@@ -3,3 +3,4 @@ node_modules
 .settings
 lib/test*.js
 **.pyc
+**.class

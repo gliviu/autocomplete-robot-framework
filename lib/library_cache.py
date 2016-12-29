@@ -126,7 +126,7 @@ def _main():
     cache_dir = sys.argv[2]
 
     if not _is_robot_framework_available():
-        print "Robot framework is not available. Make sure it is installed or add it in PYTHONPATH" % sys.argv
+        print "Robot framework is not available. Make sure it is installed or add it in PYTHONPATH"
         exit(1)
 
     # Redirect output so that various module initialization do not polute our Json result.

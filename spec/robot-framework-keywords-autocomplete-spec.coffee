@@ -34,14 +34,14 @@ describe 'Robot Framework keywords autocompletions', ->
       editor = atom.workspace.getActiveTextEditor()
 
   describe 'Keywords autocomplete', ->
-    it 'suggest standard keywords', ->
+    it 'suggests standard keywords', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
       editor.insertText('  callm')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0].displayText).toEqual('Call Method')
-    it 'suggest keywords in current editor', ->
+    it 'suggests keywords in current editor', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
       editor.insertText('  runprog')
       waitsForPromise ->
@@ -244,6 +244,21 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0].displayText).toEqual('Append To File')
+    it 'should import Robot Framework builtin libraries when python environment is not available', ->
+      runs ->
+        atom.config.set("#{CFG_KEY}.pythonExecutable", 'invalid_python_executable')
+      waitsFor ->
+        return !provider.loading
+      , 'Provider should finish loading', 500
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.setText('  appefi')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('Append To File')
+          expect(suggestions[0].keyword.resource.path).toContain('fallback-libraries/OperatingSystem.xml')
+
     it 'should not suggest private keywords', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
       editor.setText('  package.modules.TestModule.')
