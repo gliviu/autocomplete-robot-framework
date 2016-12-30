@@ -17,7 +17,7 @@ MAX_KEYWORDS_SUGGESTIONS_CAP = 100
 scheduleReload = false
 
 isRobotFile = (fileContent, filePath, settings) ->
-  ext = pathUtils.extname(filePath)
+  ext = pathUtils.extname(filePath).toLowerCase()
   if ext == '.robot'
     return true
   if ext in settings.robotExtensions and robotParser.isRobot(fileContent)
@@ -25,7 +25,7 @@ isRobotFile = (fileContent, filePath, settings) ->
   return false
 
 isLibdocXmlFile = (fileContent, filePath, settings) ->
-  ext = pathUtils.extname(filePath)
+  ext = pathUtils.extname(filePath).toLowerCase()
   return ext is '.xml' and libdocParser.isLibdoc(fileContent)
 
 readdir = (path) ->
