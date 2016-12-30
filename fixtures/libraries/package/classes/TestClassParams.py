@@ -1,6 +1,6 @@
 ROBOT_LIBRARY_VERSION='1.2.4'
 
-print 'init6'
+print ('init6')
 
 class TestClassParams(object):
     def __init__(self, **params):

@@ -118,7 +118,7 @@ def _store_libraries(libraries, cache_dir):
 
 def _main():
     if len(sys.argv) != 3:
-        print "Wrong arguments. Required two arguments. Received %d" % len(sys.argv)
+        print ("Wrong arguments. Required two arguments. Received %d" % len(sys.argv))
         exit(1)
 
     library_names = sys.argv[1].split(',')
@@ -126,7 +126,7 @@ def _main():
     cache_dir = sys.argv[2]
 
     if not _is_robot_framework_available():
-        print "Robot framework is not available. Make sure it is installed or add it in PYTHONPATH"
+        print ("Robot framework is not available. Make sure it is installed or add it in PYTHONPATH")
         exit(1)
 
     # Redirect output so that various module initialization do not polute our Json result.
@@ -137,7 +137,7 @@ def _main():
     result = _store_libraries(library_names, cache_dir)
 
     sys.stdout = orig_stdout
-    print json.dumps(result)
+    print (json.dumps(result))
 
 _main()
 exit(0)

@@ -1,1 +1,1 @@
-print 'init4'
+print ('init4')
