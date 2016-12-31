@@ -8,7 +8,7 @@ module.exports =
   getAutocompleteRobotProvider: -> autocompleteRobotProvider
   config:
     processLibdocFiles:
-      title: 'Show suggestions from libdoc definition files'
+      title: 'Scan projects for libdoc xml files'
       type: 'boolean'
       default: true
       order: 2
