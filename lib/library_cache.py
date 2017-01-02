@@ -8,8 +8,8 @@ import traceback
 from collections import namedtuple
 
 STANDARD_LIBRARY_NAMES = ['BuiltIn', 'Collections', 'DateTime', 'Dialogs'
-    , 'OperatingSystem', 'Process', 'Remote'
-    , 'Screenshot', 'String', 'Telnet', 'XML']
+                          , 'OperatingSystem', 'Process', 'Remote'
+                          , 'Screenshot', 'String', 'Telnet', 'XML']
 STANDARD_LIBRARY_PACKAGE = 'robot.libraries'
 
 def _is_robot_framework_available():
@@ -86,7 +86,7 @@ def _store_libraries(libraries, cache_dir):
             # Fix library name for standard robot libraries
             if library_name in STANDARD_LIBRARY_NAMES:
                 full_library_name = ("%s.%s"
-                    % (STANDARD_LIBRARY_PACKAGE, library_name))
+                                     % (STANDARD_LIBRARY_PACKAGE, library_name))
             else:
                 full_library_name = library_name
             module = _get_module(full_library_name)
@@ -118,7 +118,7 @@ def _store_libraries(libraries, cache_dir):
 
 def _main():
     if len(sys.argv) != 3:
-        print ("Wrong arguments. Required two arguments. Received %d" % len(sys.argv))
+        print("Wrong arguments. Required two arguments. Received %d" % len(sys.argv))
         exit(1)
 
     library_names = sys.argv[1].split(',')
@@ -126,7 +126,7 @@ def _main():
     cache_dir = sys.argv[2]
 
     if not _is_robot_framework_available():
-        print ("Robot framework is not available. Make sure it is installed or add it in PYTHONPATH")
+        print("Robot framework is not available. Make sure it is installed or add it in PYTHONPATH")
         exit(1)
 
     # Redirect output so that various module initialization do not polute our Json result.
@@ -137,7 +137,7 @@ def _main():
     result = _store_libraries(library_names, cache_dir)
 
     sys.stdout = orig_stdout
-    print (json.dumps(result))
+    print(json.dumps(result))
 
 _main()
 exit(0)
