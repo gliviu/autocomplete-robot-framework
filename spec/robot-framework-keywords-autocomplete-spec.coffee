@@ -26,7 +26,7 @@ describe 'Robot Framework keywords autocompletions', ->
     waitsForPromise -> atom.packages.activatePackage(PACKAGE_NAME)
     runs ->
       provider = atom.packages.getActivePackage(PACKAGE_NAME).mainModule.getAutocompletePlusProvider()
-    waitsForPromise -> atom.workspace.open('autocomplete/test_autocomplete_keywords.robot')
+    waitsForPromise -> atom.workspace.open('autocomplete/test_autocomplete_keywords.rOBOt')
     waitsFor ->
       return !provider.loading
     , 'Provider should finish loading', 500
