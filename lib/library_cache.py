@@ -5,6 +5,7 @@ import os
 import sys
 import json
 import traceback
+import inspect
 from collections import namedtuple
 
 STANDARD_LIBRARY_NAMES = ['BuiltIn', 'Collections', 'DateTime', 'Dialogs'
@@ -103,13 +104,15 @@ def _store_libraries(libraries, cache_dir):
                 result[library_name] = {
                     'name': library_name,
                     'status': 'success',
-                    'xmlLibdocPath': xml_libdoc_path
+                    'xmlLibdocPath': xml_libdoc_path,
+                    'sourcePath': inspect.getsourcefile(module)
                     }
             else:
                 result[library_name] = {
                     'name': library_name,
                     'status': 'success',
-                    'xmlLibdocPath': cache.xml_libdoc_path
+                    'xmlLibdocPath': cache.xml_libdoc_path,
+                    'sourcePath': inspect.getsourcefile(module)
                     }
         except Exception as exc:
             error = "Unexpected error: %s, %s" % (exc, traceback.format_exc())

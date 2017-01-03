@@ -55,3 +55,9 @@ describe 'Autocomplete Robot Provider', ->
     for path in resourcePaths
       resource = provider.getResourceByPath(path)
       expect(resource).toBeDefined()
+  it 'provides library source information', ->
+    keywords = provider.getKeywordsByName('Should Match')
+    expect(keywords).toBeDefined()
+    expect(keywords.length).toEqual 1
+    keyword = keywords[0]
+    expect(keyword.resource.libraryPath).toContain '.py'
