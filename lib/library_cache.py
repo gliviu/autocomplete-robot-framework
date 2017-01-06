@@ -30,6 +30,30 @@ def _import_libdoc_module():
     except ImportError:
         raise ValueError('robot.libdocpkg could not be imported')
 
+def _get_module_source(module):
+    try:
+        sourceFile = inspect.getsourcefile(module)
+        if sourceFile is not None:
+            return sourceFile
+    except TypeError:
+        pass
+
+    try:
+        sourceFile = inspect.getfile(module)
+        if sourceFile is not None:
+            return sourceFile
+    except TypeError:
+        pass
+
+    try:
+        sourceFile = getattr(module, '__file__')
+        if sourceFile is not None:
+            return sourceFile
+    except AttributeError:
+        pass
+
+    return None
+
 def _get_module(library_name):
     namespaces = library_name.split('.')
     try:
@@ -61,7 +85,7 @@ def _cached(library_name, module, cache_dir):
     Cache = namedtuple('Cache', ['cached', 'xml_libdoc_path'])
     if not os.path.exists(library_path):
         return Cache(cached=False, xml_libdoc_path=None)
-    module_modif_time = _get_modified_time(getattr(module, '__file__'))
+    module_modif_time = _get_modified_time(_get_module_source(module))
     chache_modif_time = _get_modified_time(library_path)
     if module_modif_time > chache_modif_time:
         return Cache(cached=False, xml_libdoc_path=None)
@@ -95,7 +119,7 @@ def _store_libraries(libraries, cache_dir):
                 result[library_name] = {
                     'name': library_name,
                     'status': 'error',
-                    'message': "Could not find '%s' or not accessible from PYTHONPATH" % (library_name)
+                    'message': "Could not find '%s'" % (library_name)
                     }
                 continue
             cache = _cached(library_name, module, cache_dir)
@@ -105,14 +129,14 @@ def _store_libraries(libraries, cache_dir):
                     'name': library_name,
                     'status': 'success',
                     'xmlLibdocPath': xml_libdoc_path,
-                    'sourcePath': inspect.getsourcefile(module)
+                    'sourcePath': _get_module_source(module)
                     }
             else:
                 result[library_name] = {
                     'name': library_name,
                     'status': 'success',
                     'xmlLibdocPath': cache.xml_libdoc_path,
-                    'sourcePath': inspect.getsourcefile(module)
+                    'sourcePath': _get_module_source(module)
                     }
         except Exception as exc:
             error = "Unexpected error: %s, %s" % (exc, traceback.format_exc())
@@ -129,7 +153,7 @@ def _main():
     cache_dir = sys.argv[2]
 
     if not _is_robot_framework_available():
-        print("Robot framework is not available. Make sure it is installed or add it in PYTHONPATH")
+        print("Robot framework is not installed.")
         exit(1)
 
     # Redirect output so that various module initialization do not polute our Json result.
