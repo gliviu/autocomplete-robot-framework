@@ -1,5 +1,8 @@
 robotParser = require('../lib/parse-robot')
 libdocParser = require('../lib/parse-libdoc')
+libRepo = require('../lib/library-repo')
+libManager = require('../lib/library-manager')
+keywordsRepo = require('../lib/keywords')
 common = require('../lib/common')
 fs = require 'fs'
 pathUtils = require 'path'
@@ -23,6 +26,9 @@ describe 'Robot Framework keywords autocompletions', ->
   [editor, provider] = []
   beforeEach ->
     process.env.PYTHONPATH=pathUtils.join(__dirname, '../fixtures/libraries')
+    libRepo.reset()
+    libManager.reset()
+    keywordsRepo.reset()
     waitsForPromise -> atom.packages.activatePackage(PACKAGE_NAME)
     runs ->
       provider = atom.packages.getActivePackage(PACKAGE_NAME).mainModule.getAutocompletePlusProvider()
@@ -258,13 +264,22 @@ describe 'Robot Framework keywords autocompletions', ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0].displayText).toEqual('Append To File')
           expect(suggestions[0].keyword.resource.path).toContain('fallback-libraries/OperatingSystem.xml')
-
     it 'should not suggest private keywords', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
       editor.setText('  package.modules.TestModule.')
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
+    it 'should import libraries that are not in pythonpath and reside along with robot files', ->
+      waitsForPromise -> atom.workspace.open('autocomplete/a/utils.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  interk')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('Internal Python Kw')
 
   describe 'Scope modifiers', ->
     it 'reacts on removeDotNotation configuration changes', ->

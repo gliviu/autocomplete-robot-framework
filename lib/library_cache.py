@@ -1,5 +1,30 @@
 """ Converts robot framework keyword libraries into libdoc
-and adds them into a directory cache, invalidated by their compilation time. """
+and adds them into a directory cache, invalidated by their compilation time.
+Outputs Json string with this format:
+{
+    libraries:{
+        'library_name'{
+          name: 'library_name',
+          status: 'error/success',
+          message: 'error or warning message',
+          xmlLibdocPath: 'path of libdoc file',
+          sourcePath: 'path of python file'
+        },
+        ...
+    },
+    'environment': {
+        'pythonVersion': '',
+        'moduleSearchPath': '',
+        'pythonExecutable': '',
+        'platform': ''
+        'pythonPath': '',
+        'jythonPath': '',
+        'classPath': '',
+        'ironpythonPath': '',
+    }
+}
+
+"""
 import importlib
 import os
 import sys
@@ -101,9 +126,9 @@ def _generate_libdoc_xml(library_name, cache_dir):
 
 
 def _store_libraries(libraries, cache_dir):
-    result = {}
+    library_map = {}
     for library_name in libraries:
-        result[library_name] = {'name': library_name, 'status': 'pending', 'message': 'To be imported'}
+        library_map[library_name] = {'name': library_name, 'status': 'pending', 'message': 'To be imported'}
     if not os.path.exists(cache_dir):
         os.mkdir(cache_dir)
     for library_name in libraries:
@@ -116,7 +141,7 @@ def _store_libraries(libraries, cache_dir):
                 full_library_name = library_name
             module = _get_module(full_library_name)
             if not module:
-                result[library_name] = {
+                library_map[library_name] = {
                     'name': library_name,
                     'status': 'error',
                     'message': "Could not find '%s'" % (library_name)
@@ -125,14 +150,14 @@ def _store_libraries(libraries, cache_dir):
             cache = _cached(library_name, module, cache_dir)
             if not cache.cached:
                 xml_libdoc_path = _generate_libdoc_xml(library_name, cache_dir)
-                result[library_name] = {
+                library_map[library_name] = {
                     'name': library_name,
                     'status': 'success',
                     'xmlLibdocPath': xml_libdoc_path,
                     'sourcePath': _get_module_source(module)
                     }
             else:
-                result[library_name] = {
+                library_map[library_name] = {
                     'name': library_name,
                     'status': 'success',
                     'xmlLibdocPath': cache.xml_libdoc_path,
@@ -140,17 +165,31 @@ def _store_libraries(libraries, cache_dir):
                     }
         except Exception as exc:
             error = "Unexpected error: %s, %s" % (exc, traceback.format_exc())
-            result[library_name] = {'name': library_name, 'status': 'error', 'message': error}
-    return result
+            library_map[library_name] = {'name': library_name, 'status': 'error', 'message': error}
+    return {
+        'libraries': library_map, 
+        'environment': {
+            'pythonVersion': sys.version,
+            'pythonExecutable': sys.executable,
+            'platform': sys.platform,
+            'pythonPath':     os.getenv('PYTHONPATH', 'n/a'),
+            'jythonPath':     os.getenv('JYTHONPATH', 'n/a'),
+            'classPath':      os.getenv('CLASSPATH', 'n/a'),
+            'ironpythonPath': os.getenv('IRONPYTHONPATH', 'n/a'),
+            'moduleSearchPath': sys.path,
+        }}
 
 def _main():
-    if len(sys.argv) != 3:
-        print("Wrong arguments. Required two arguments. Received %d" % len(sys.argv))
+    required_argument_no = 4
+    if len(sys.argv) != required_argument_no:
+        print("Wrong arguments. Required %d arguments. Received %d" %(required_argument_no, len(sys.argv)))
         exit(1)
 
     library_names = sys.argv[1].split(',')
-
-    cache_dir = sys.argv[2]
+    additional_module_search_paths = sys.argv[2].split(',')
+    cache_dir = sys.argv[3]
+    
+    sys.path.extend(additional_module_search_paths)
 
     if not _is_robot_framework_available():
         print("Robot framework is not installed.")
