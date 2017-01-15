@@ -209,6 +209,46 @@ describe 'Robot Framework keywords autocompletions', ->
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(0)
+    it 'is able to disable arguments suggestions', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      runs ->
+        editor.insertText('  log')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(0)
+          expect(suggestions[0].snippet).toEqual('Log    ${1:message}')
+      runs ->
+        atom.config.set("#{CFG_KEY}.includeDefaultArguments", true)
+      waitsFor ->
+        return !provider.loading
+      , 'Provider should finish loading', 500
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  log')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(0)
+          expect(suggestions[0].snippet).toEqual('Log    ${1:message}    ${2:level=INFO}    ${3:html=False}    ${4:console=False}    ${5:repr=False}')
+    it 'is able to disable suggestions for keyword arguments with default values', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      runs ->
+        editor.insertText('  log')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(0)
+          expect(suggestions[0].snippet).toEqual('Log    ${1:message}')
+      runs ->
+        atom.config.set("#{CFG_KEY}.includeDefaultArguments", true)
+      waitsFor ->
+        return !provider.loading
+      , 'Provider should finish loading', 500
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  log')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(0)
+          expect(suggestions[0].snippet).toEqual('Log    ${1:message}    ${2:level=INFO}    ${3:html=False}    ${4:console=False}    ${5:repr=False}')
 
   describe 'Library management', ->
     beforeEach ->

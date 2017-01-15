@@ -22,28 +22,38 @@ module.exports =
       type: 'boolean'
       default: true
       order: 4
+    suggestArguments:
+      title: 'Add arguments after keyword name'
+      type: 'boolean'
+      default: true
+      order: 5
+    includeDefaultArguments:
+      title: 'Include keyword arguments with default values among sugested arguments'
+      type: 'boolean'
+      default: false
+      order: 6
     excludeDirectories:
       title: 'Names of directories or files to be excluded from showing suggestions (comma sepparated)'
       type: 'array'
       default: []
       items:
         type: 'string'
-      order: 5
+      order: 10
     globalScopeModifier:
       title: 'Names of directories or files to be excluded from showing suggestions (comma sepparated)'
       type: 'string'
       default: 'glob'
-      order: 6
+      order: 11
     internalScopeModifier:
       title: 'Names of directories or files to be excluded from showing suggestions (comma sepparated)'
       type: 'string'
       default: 'this'
-      order: 7
+      order: 12
     pythonExecutable:
       title: 'Python executable'
       type: 'string'
       default: 'python'
-      order: 8
+      order: 13
     debug:
       title: 'Debug'
       type: 'boolean'
