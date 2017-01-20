@@ -25,10 +25,14 @@ getCompletions = (editor, provider)->
 describe 'Robot Framework keywords autocompletions', ->
   [editor, provider] = []
   beforeEach ->
-    process.env.PYTHONPATH=pathUtils.join(__dirname, '../fixtures/libraries')
-    libRepo.reset()
-    libManager.reset()
-    keywordsRepo.reset()
+    waitsFor ->
+      return !libManager.loading()
+    , 'Provider should finish loading', 500
+    runs ->
+      process.env.PYTHONPATH=pathUtils.join(__dirname, '../fixtures/libraries')
+      libRepo.reset()
+      libManager.reset()
+      keywordsRepo.reset()
     waitsForPromise -> atom.packages.activatePackage(PACKAGE_NAME)
     runs ->
       provider = atom.packages.getActivePackage(PACKAGE_NAME).mainModule.getAutocompletePlusProvider()
@@ -303,7 +307,7 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0].displayText).toEqual('Append To File')
-          expect(suggestions[0].keyword.resource.path).toContain('fallback-libraries/OperatingSystem.xml')
+          expect(pathUtils.normalize(suggestions[0].keyword.resource.path)).toContain(pathUtils.normalize('fallback-libraries/OperatingSystem.xml'))
     it 'should not suggest private keywords', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
       editor.setText('  package.modules.TestModule.')
