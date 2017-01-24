@@ -82,19 +82,21 @@ def _get_module_source(module):
 def _get_module(library_name):
     namespaces = library_name.split('.')
     try:
-        return importlib.import_module(library_name)
-    except ImportError:
-        try:
-            parent = '.'.join(namespaces[0:-1])
-            if len(parent) > 0:
+        return (importlib.import_module(library_name), None)
+    except ImportError as e1:
+        parent = '.'.join(namespaces[0:-1])
+        if len(parent) > 0:
+            try:
                 module = importlib.import_module(parent)
                 class_name = namespaces[-1]
                 if hasattr(module, class_name):
-                    return module
+                    return (module, None)
                 else:
-                    return None
-        except ImportError:
-            return None
+                    return (None, str(e1))
+            except ImportError as e2:
+                return (None, str(e2))
+        else:
+            return (None, str(e1))
 
 
 def _get_modified_time(file_path):
@@ -139,12 +141,12 @@ def _store_libraries(libraries, cache_dir):
                                      % (STANDARD_LIBRARY_PACKAGE, library_name))
             else:
                 full_library_name = library_name
-            module = _get_module(full_library_name)
+            (module, error) = _get_module(full_library_name)
             if not module:
                 library_map[library_name] = {
                     'name': library_name,
                     'status': 'error',
-                    'message': "Could not find '%s'" % (library_name)
+                    'message': "Could not import '%s': '%s'" % (library_name, error)
                     }
                 continue
             cache = _cached(library_name, module, cache_dir)
