@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keywordspec generated="20151006 16:01:38" format="ROBOT" type="library" name="SwingLibrary">
-<version>1.9.5</version>
+<keywordspec generated="20160718 12:22:18" format="ROBOT" type="library" name="SwingLibrary">
+<version>1.9.6</version>
 <scope>global</scope>
 <namedargs>yes</namedargs>
 <doc>SwingLibrary is a Robot Framework test library for testing Java Swing user interfaces.
@@ -1318,7 +1318,7 @@ Example:
 <doc>Maximizes internal frame.
 
 Example:
-| Close Internal Frame  | _My Internal Frame_ |</doc>
+| Maximize Internal Frame  | _My Internal Frame_ |</doc>
 <tags>
 </tags>
 </kw>
@@ -1920,11 +1920,14 @@ Example:
 <kw name="Set Jemmy Timeout">
 <arguments>
 <arg>timeoutName</arg>
-<arg>timeoutInSeconds</arg>
+<arg>timeout</arg>
 </arguments>
 <doc>Sets the jemmy timeout used for waiting a component to appear.
 Timeout names are listed here: http://jemmy.java.net/OperatorsEnvironment.html#timeouts
 Returns the old timeout setting value.
+
+This keyword by default takes timeout value is seconds, you can however suffix it with `ms` to provide it in milliseconds.
+Return value will always be in units you used for the argument.
 
 Example:
 | Set Jemmy Timeout | DialogWaiter.WaitDialogTimeout | 3 |
@@ -1934,10 +1937,12 @@ Example:
 </kw>
 <kw name="Set Jemmy Timeouts">
 <arguments>
-<arg>timeoutInSeconds</arg>
+<arg>timeout</arg>
 </arguments>
 <doc>Sets all relevant jemmy timeouts. 
 By default they are all set to 5 seconds.
+
+This keyword by default takes timeout value is seconds, you can however suffix it with `ms` to provide it in milliseconds.
 
 List of all the timeouts this keywords sets:
 | *Timeout Name* | *Description* |

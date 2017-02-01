@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keywordspec format="ROBOT" type="library" generated="20160218 14:15:42" name="Process">
-<version>3.0</version>
+<keywordspec generated="20170201 07:02:43" type="library" name="Process" format="ROBOT">
+<version>3.0.1</version>
 <scope>global</scope>
 <namedargs>yes</namedargs>
 <doc>Robot Framework test library for running processes.

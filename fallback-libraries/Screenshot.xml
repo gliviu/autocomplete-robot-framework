@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keywordspec format="ROBOT" type="library" generated="20160218 14:15:54" name="Screenshot">
-<version>3.0</version>
+<keywordspec generated="20170201 07:02:42" type="library" name="Screenshot" format="ROBOT">
+<version>3.0.1</version>
 <scope>test suite</scope>
 <namedargs>yes</namedargs>
 <doc>Test library for taking screenshots on the machine where tests are run.

@@ -1,0 +1,1498 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keywordspec generated="20170201 07:02:42" type="library" name="FakerLibrary" format="ROBOT">
+<version></version>
+<scope>global</scope>
+<namedargs>yes</namedargs>
+<doc>    </doc>
+<init>
+<arguments>
+<arg>locale=None</arg>
+<arg>providers=None</arg>
+<arg>seed=None</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</init>
+<kw name="Add Provider">
+<arguments>
+<arg>self</arg>
+<arg>provider</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Address">
+<arguments>
+</arguments>
+<doc>:example '791 Crist Parks, Sashabury, IL 86039-9874'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Am Pm">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Binary">
+<arguments>
+<arg>length=1048576</arg>
+</arguments>
+<doc>Returns random binary blob.
+
+Default blob size is 1 Mb.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Boolean">
+<arguments>
+<arg>chance_of_getting_true=50</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Bothify">
+<arguments>
+<arg>text=## ??</arg>
+</arguments>
+<doc>Replaces all placeholders with random numbers and letters.
+
+:param text: string to be parsed
+:returns: string with all numerical and letter placeholders filled in</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Bs">
+<arguments>
+</arguments>
+<doc>:example 'integrate extensible convergence'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Building Number">
+<arguments>
+</arguments>
+<doc>:example '791'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Catch Phrase">
+<arguments>
+</arguments>
+<doc>:example 'Robust full-range hub'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Century">
+<arguments>
+</arguments>
+<doc>:example 'XVII'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Chrome">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="City">
+<arguments>
+</arguments>
+<doc>:example 'Sashabury'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="City Prefix">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="City Suffix">
+<arguments>
+</arguments>
+<doc>:example 'town'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Color Name">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Company">
+<arguments>
+</arguments>
+<doc>:example 'Acme Ltd'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Company Email">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Company Suffix">
+<arguments>
+</arguments>
+<doc>:example 'Ltd'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Country">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Country Code">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Credit Card Expire">
+<arguments>
+<arg>start=now</arg>
+<arg>end=+10y</arg>
+<arg>date_format=%m/%y</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Credit Card Full">
+<arguments>
+<arg>card_type=None</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Credit Card Number">
+<arguments>
+<arg>card_type=None</arg>
+</arguments>
+<doc>Returns a valid credit card number.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Credit Card Provider">
+<arguments>
+<arg>card_type=None</arg>
+</arguments>
+<doc>Returns the provider's name of the credit card.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Credit Card Security Code">
+<arguments>
+<arg>card_type=None</arg>
+</arguments>
+<doc>Returns a security code string.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Currency Code">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Date">
+<arguments>
+<arg>pattern=%Y-%m-%d</arg>
+</arguments>
+<doc>Get a date string between January 1, 1970 and now
+:param pattern format
+:example '2008-11-27'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Date Object">
+<arguments>
+</arguments>
+<doc>Get a date object between January 1, 1970 and now
+:example datetime.date(2016, 9, 20)</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Date Time">
+<arguments>
+<arg>tzinfo=None</arg>
+</arguments>
+<doc>Get a datetime object for a date between January 1, 1970 and now
+:param tzinfo: timezone, instance of datetime.tzinfo subclass
+:example DateTime('2005-08-16 20:39:21')
+:return datetime</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Date Time Ad">
+<arguments>
+<arg>tzinfo=None</arg>
+</arguments>
+<doc>Get a datetime object for a date between January 1, 001 and now
+:param tzinfo: timezone, instance of datetime.tzinfo subclass
+:example DateTime('1265-03-22 21:15:52')
+:return datetime</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Date Time Between">
+<arguments>
+<arg>start_date=-30y</arg>
+<arg>end_date=now</arg>
+<arg>tzinfo=None</arg>
+</arguments>
+<doc>Get a DateTime object based on a random date between two given dates.
+Accepts date strings that can be recognized by strtotime().
+
+:param start_date Defaults to 30 years ago
+:param end_date Defaults to "now"
+:param tzinfo: timezone, instance of datetime.tzinfo subclass
+:example DateTime('1999-02-02 11:42:52')
+:return DateTime</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Date Time Between Dates">
+<arguments>
+<arg>datetime_start=None</arg>
+<arg>datetime_end=None</arg>
+<arg>tzinfo=None</arg>
+</arguments>
+<doc>Takes two DateTime objects and returns a random date between the two given dates.
+Accepts DateTime objects.
+
+:param datetime_start DateTime
+:param datetime_end DateTime
+:param tzinfo: timezone, instance of datetime.tzinfo subclass
+:example DateTime('1999-02-02 11:42:52')
+:return DateTime</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Date Time This Century">
+<arguments>
+<arg>before_now=True</arg>
+<arg>after_now=False</arg>
+<arg>tzinfo=None</arg>
+</arguments>
+<doc>Gets a DateTime object for the current century.
+
+:param before_now: include days in current century before today
+:param after_now: include days in current century after today
+:param tzinfo: timezone, instance of datetime.tzinfo subclass
+:example DateTime('2012-04-04 11:02:02')
+:return DateTime</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Date Time This Decade">
+<arguments>
+<arg>before_now=True</arg>
+<arg>after_now=False</arg>
+<arg>tzinfo=None</arg>
+</arguments>
+<doc>Gets a DateTime object for the decade year.
+
+:param before_now: include days in current decade before today
+:param after_now: include days in current decade after today
+:param tzinfo: timezone, instance of datetime.tzinfo subclass
+:example DateTime('2012-04-04 11:02:02')
+:return DateTime</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Date Time This Month">
+<arguments>
+<arg>before_now=True</arg>
+<arg>after_now=False</arg>
+<arg>tzinfo=None</arg>
+</arguments>
+<doc>Gets a DateTime object for the current month.
+
+:param before_now: include days in current month before today
+:param after_now: include days in current month after today
+:param tzinfo: timezone, instance of datetime.tzinfo subclass
+:example DateTime('2012-04-04 11:02:02')
+:return DateTime</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Date Time This Year">
+<arguments>
+<arg>before_now=True</arg>
+<arg>after_now=False</arg>
+<arg>tzinfo=None</arg>
+</arguments>
+<doc>Gets a DateTime object for the current year.
+
+:param before_now: include days in current year before today
+:param after_now: include days in current year after today
+:param tzinfo: timezone, instance of datetime.tzinfo subclass
+:example DateTime('2012-04-04 11:02:02')
+:return DateTime</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Day Of Month">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Day Of Week">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Domain Name">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Domain Word">
+<arguments>
+<arg>*args</arg>
+<arg>**kwargs</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Ean">
+<arguments>
+<arg>length=13</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Ean 13">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Ean 8">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Email">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="File Extension">
+<arguments>
+<arg>category=None</arg>
+</arguments>
+<doc>:param category: audio|image|office|text|video</doc>
+<tags>
+</tags>
+</kw>
+<kw name="File Name">
+<arguments>
+<arg>category=None</arg>
+<arg>extension=None</arg>
+</arguments>
+<doc>:param category: audio|image|office|text|video
+:param extension: file extension</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Firefox">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="First Name">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="First Name Female">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="First Name Male">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Format">
+<arguments>
+<arg>self</arg>
+<arg>formatter</arg>
+<arg>*args</arg>
+<arg>**kwargs</arg>
+</arguments>
+<doc>This is a secure way to make a fake from another Provider.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Free Email">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Free Email Domain">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Generator Format Token">
+<arguments>
+<arg>self</arg>
+<arg>matches</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Geo Coordinate">
+<arguments>
+<arg>center=None</arg>
+<arg>radius=0.001</arg>
+</arguments>
+<doc>Optionally center the coord and pick a point within radius.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Formatter">
+<arguments>
+<arg>self</arg>
+<arg>formatter</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Providers">
+<arguments>
+<arg>self</arg>
+</arguments>
+<doc>Returns added providers.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Hex Color">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Image Url">
+<arguments>
+<arg>width=None</arg>
+<arg>height=None</arg>
+</arguments>
+<doc>Returns URL to placeholder image
+Example: http://placehold.it/640x480</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Init">
+<arguments>
+<arg>locale=None</arg>
+<arg>providers=None</arg>
+<arg>seed=None</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Internet Explorer">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Ipv 4">
+<arguments>
+<arg>network=False</arg>
+</arguments>
+<doc>Produce a random IPv4 address or network with a valid CIDR</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Ipv 6">
+<arguments>
+<arg>network=False</arg>
+</arguments>
+<doc>Produce a random IPv6 address or network with a valid CIDR</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Iso 8601">
+<arguments>
+<arg>tzinfo=None</arg>
+</arguments>
+<doc>:param tzinfo: timezone, instance of datetime.tzinfo subclass
+:example '2003-10-21T16:05:52+0000'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Job">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Language Code">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Last Name">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Last Name Female">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Last Name Male">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Latitude">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Lexify">
+<arguments>
+<arg>text=????</arg>
+</arguments>
+<doc>Replaces all question mark ('?') occurrences with a random letter.
+
+:param text: string to be parsed
+:returns: string with all letter placeholders filled in</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Linux Platform Token">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Linux Processor">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Locale">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Longitude">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Mac Address">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Mac Platform Token">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Mac Processor">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Md 5">
+<arguments>
+<arg>raw_output=False</arg>
+</arguments>
+<doc>Calculates the md5 hash of a given string
+:example 'cfcd208495d565ef66e7dff9f98764da'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Military Apo">
+<arguments>
+</arguments>
+<doc>:example 'PSC 5394 Box 3492</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Military Dpo">
+<arguments>
+</arguments>
+<doc>:example 'Unit 3333 Box 9342'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Military Ship">
+<arguments>
+</arguments>
+<doc>:example 'USS'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Military State">
+<arguments>
+</arguments>
+<doc>:example 'APO'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Mime Type">
+<arguments>
+<arg>category=None</arg>
+</arguments>
+<doc>:param category: application|audio|image|message|model|multipart|text|video</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Month">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Month Name">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Name">
+<arguments>
+</arguments>
+<doc>:example 'John Doe'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Name Female">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Name Male">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Null Boolean">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Numerify">
+<arguments>
+<arg>text=###</arg>
+</arguments>
+<doc>Replaces all placeholders in given text with randomized values,
+replacing: all hash sign ('#') occurrences with a random digit
+(from 0 to 9); all percentage sign ('%') occurrences with a
+random non-zero digit (from 1 to 9); all exclamation mark ('!')
+occurrences with a random digit (from 0 to 9) or an empty string;
+and all at symbol ('@') occurrences with a random non-zero digit
+(from 1 to 9) or an empty string.
+
+:param text: string to be parsed
+:returns: string with all numerical placeholders filled in</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Opera">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Paragraph">
+<arguments>
+<arg>nb_sentences=3</arg>
+<arg>variable_nb_sentences=True</arg>
+</arguments>
+<doc>Generate a single paragraph
+:example 'Sapiente sunt omnis. Ut pariatur ad autem ducimus et. Voluptas rem voluptas sint modi dolorem amet.'
+:param nb_sentences around how many sentences the paragraph should contain
+:param variable_nb_sentences set to false if you want exactly $nbSentences returned,
+    otherwise $nbSentences may vary by +/-40% with a minimum of 1
+:return string</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Paragraphs">
+<arguments>
+<arg>nb=3</arg>
+</arguments>
+<doc>Generate an array of paragraphs
+:example array($paragraph1, $paragraph2, $paragraph3)
+:param nb how many paragraphs to return
+:return array</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Parse">
+<arguments>
+<arg>self</arg>
+<arg>text</arg>
+</arguments>
+<doc>Replaces tokens (like '{{ tokenName }}' or '{{tokenName}}')
+with the result from the token method call.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Password">
+<arguments>
+<arg>length=10</arg>
+<arg>special_chars=True</arg>
+<arg>digits=True</arg>
+<arg>upper_case=True</arg>
+<arg>lower_case=True</arg>
+</arguments>
+<doc>Generates a random password.
+@param length: Integer. Length of a password
+@param special_chars: Boolean. Whether to use special characters !@#$%^&amp;*()_+
+@param digits: Boolean. Whether to use digits
+@param upper_case: Boolean. Whether to use upper letters
+@param lower_case: Boolean. Whether to use lower letters
+@return: String. Random password</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Phone Number">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Postalcode">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Postalcode Plus4">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Postcode">
+<arguments>
+</arguments>
+<doc>:example 86039-9874</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Prefix">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Prefix Female">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Prefix Male">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Profile">
+<arguments>
+<arg>fields=None</arg>
+<arg>sex=None</arg>
+</arguments>
+<doc>Generates a complete profile.
+If "fields" is not empty, only the fields in the list will be returned</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Provider">
+<arguments>
+<arg>self</arg>
+<arg>name</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Pybool">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Pydecimal">
+<arguments>
+<arg>left_digits=None</arg>
+<arg>right_digits=None</arg>
+<arg>positive=False</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Pydict">
+<arguments>
+<arg>nb_elements=10</arg>
+<arg>variable_nb_elements=True</arg>
+<arg>*value_types</arg>
+</arguments>
+<doc>Returns a dictionary.
+
+:nb_elements: number of elements for dictionary
+:variable_nb_elements: is use variable number of elements for dictionary
+:value_types: type of dictionary values</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Pyfloat">
+<arguments>
+<arg>left_digits=None</arg>
+<arg>right_digits=None</arg>
+<arg>positive=False</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Pyint">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Pyiterable">
+<arguments>
+<arg>nb_elements=10</arg>
+<arg>variable_nb_elements=True</arg>
+<arg>*value_types</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Pylist">
+<arguments>
+<arg>nb_elements=10</arg>
+<arg>variable_nb_elements=True</arg>
+<arg>*value_types</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Pyset">
+<arguments>
+<arg>nb_elements=10</arg>
+<arg>variable_nb_elements=True</arg>
+<arg>*value_types</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Pystr">
+<arguments>
+<arg>min_chars=None</arg>
+<arg>max_chars=20</arg>
+</arguments>
+<doc>Generates a random string of upper and lowercase letters.
+:type min_chars: int
+:type max_chars: int
+:return: String. Random of random length between min and max characters.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Pystruct">
+<arguments>
+<arg>count=10</arg>
+<arg>*value_types</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Pytuple">
+<arguments>
+<arg>nb_elements=10</arg>
+<arg>variable_nb_elements=True</arg>
+<arg>*value_types</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Random Digit">
+<arguments>
+</arguments>
+<doc>Returns a random digit/number
+between 0 and 9.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Random Digit Not Null">
+<arguments>
+</arguments>
+<doc>Returns a random non-zero digit/number
+between 1 and 9.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Random Digit Not Null Or Empty">
+<arguments>
+</arguments>
+<doc>Returns a random non-zero digit/number
+between 1 and 9 or and empty string.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Random Digit Or Empty">
+<arguments>
+</arguments>
+<doc>Returns a random digit/number
+between 0 and 9 or an empty string.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Random Element">
+<arguments>
+<arg>elements=('a', 'b', 'c')</arg>
+</arguments>
+<doc>Returns a random element from a passed object.
+
+If `elements` is a dictionary, the value will be used as
+a weighting element. For example::
+
+    random_element({"{{variable_1}}": 0.5, "{{variable_2}}": 0.2, "{{variable_3}}": 0.2, "{{variable_4}}": 0.1})
+
+will have the following distribution:
+    * `variable_1`: 50% probability
+    * `variable_2`: 20% probability
+    * `variable_3`: 20% probability
+    * `variable_4`: 10% probability</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Random Int">
+<arguments>
+<arg>min=0</arg>
+<arg>max=9999</arg>
+</arguments>
+<doc>Returns a random integer between two values.
+
+:param min: lower bound value (inclusive; default=0)
+:param max: upper bound value (inclusive; default=9999)
+:returns: random integer between min and max</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Random Letter">
+<arguments>
+</arguments>
+<doc>Returns a random letter (between a-z and A-Z).</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Random Number">
+<arguments>
+<arg>digits=None</arg>
+</arguments>
+<doc>Returns a random number with 1 digit (default, when digits==None)
+or a random number with 0 to given number of digits.
+
+:param digits: maximum number of digits
+:returns: random number with 0 to given number of digits</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Random Sample">
+<arguments>
+<arg>elements=('a', 'b', 'c')</arg>
+<arg>length=None</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Random Sample Unique">
+<arguments>
+<arg>elements=('a', 'b', 'c')</arg>
+<arg>length=None</arg>
+</arguments>
+<doc>Returns a `set` of random unique elements for the specified length.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Randomize Nb Elements">
+<arguments>
+<arg>number=10</arg>
+<arg>le=False</arg>
+<arg>ge=False</arg>
+</arguments>
+<doc>Returns a random value near number.
+
+:param number: value to which the result must be near
+:param le: result must be lower or equal to number
+:param ge: result must be greater or equal to number
+:returns: a random int near number</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Rgb Color">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Rgb Color List">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Rgb Css Color">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Safari">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Safe Color Name">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Safe Email">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Safe Hex Color">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Secondary Address">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Seed">
+<arguments>
+<arg>seed=None</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Sentence">
+<arguments>
+<arg>nb_words=6</arg>
+<arg>variable_nb_words=True</arg>
+</arguments>
+<doc>Generate a random sentence
+:example 'Lorem ipsum dolor sit amet.'
+:param nb_words around how many words the sentence should contain
+:param variable_nb_words set to false if you want exactly $nbWords returned,
+    otherwise $nbWords may vary by +/-40% with a minimum of 1</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Sentences">
+<arguments>
+<arg>nb=3</arg>
+</arguments>
+<doc>Generate an array of sentences
+:example array('Lorem ipsum dolor sit amet.', 'Consectetur adipisicing eli.')
+:param nb how many sentences to return
+:return list</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Formatter">
+<arguments>
+<arg>self</arg>
+<arg>name</arg>
+<arg>method</arg>
+</arguments>
+<doc>This method adds a provider method to generator.
+Override this method to add some decoration or logging stuff.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Sha 1">
+<arguments>
+<arg>raw_output=False</arg>
+</arguments>
+<doc>Calculates the sha1 hash of a given string
+:example 'b5d86317c2a144cd04d0d7c03b2b02666fafadf2'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Sha 256">
+<arguments>
+<arg>raw_output=False</arg>
+</arguments>
+<doc>Calculates the sha256 hash of a given string
+:example '85086017559ccc40638fcde2fecaf295e0de7ca51b7517b6aebeaaf75b4d4654'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Simple Profile">
+<arguments>
+<arg>sex=None</arg>
+</arguments>
+<doc>Generates a basic profile with personal informations</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Slug">
+<arguments>
+<arg>*args</arg>
+<arg>**kwargs</arg>
+</arguments>
+<doc>Django algorithm</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Ssn">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="State">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="State Abbr">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Street Address">
+<arguments>
+</arguments>
+<doc>:example '791 Crist Parks'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Street Name">
+<arguments>
+</arguments>
+<doc>:example 'Crist Parks'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Street Suffix">
+<arguments>
+</arguments>
+<doc>:example 'Avenue'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Suffix">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Suffix Female">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Suffix Male">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Text">
+<arguments>
+<arg>max_nb_chars=200</arg>
+</arguments>
+<doc>Generate a text string.
+Depending on the $maxNbChars, returns a string made of words, sentences, or paragraphs.
+:example 'Sapiente sunt omnis. Ut pariatur ad autem ducimus et. Voluptas rem voluptas sint modi dolorem amet.'
+:param max_nb_chars Maximum number of characters the text should contain (minimum 5)
+:return string</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Time">
+<arguments>
+<arg>pattern=%H:%M:%S</arg>
+</arguments>
+<doc>Get a time string (24h format by default)
+:param pattern format
+:example '15:02:34'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Time Delta">
+<arguments>
+</arguments>
+<doc>Get a timedelta object</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Time Object">
+<arguments>
+</arguments>
+<doc>Get a time object
+:example datetime.time(15, 56, 56, 772876)</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Timezone">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Tld">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Unix Time">
+<arguments>
+</arguments>
+<doc>Get a timestamp between January 1, 1970 and now
+:example 1061306726</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Uri">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Uri Extension">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Uri Page">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Uri Path">
+<arguments>
+<arg>deep=None</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Url">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="User Agent">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="User Name">
+<arguments>
+<arg>*args</arg>
+<arg>**kwargs</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Uuid 4">
+<arguments>
+</arguments>
+<doc>Generates a random UUID4 string.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Windows Platform Token">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Word">
+<arguments>
+</arguments>
+<doc>Generate a random word
+:example 'lorem'</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Words">
+<arguments>
+<arg>nb=3</arg>
+</arguments>
+<doc>Generate an array of random words
+:example array('Lorem', 'ipsum', 'dolor')
+:param nb how many words to return</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Year">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Zipcode">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Zipcode Plus4">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+</keywordspec>

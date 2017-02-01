@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keywordspec generated="20170201 07:02:42" type="library" name="DjangoLibrary" format="ROBOT">
+<version></version>
+<scope>test suite</scope>
+<namedargs>yes</namedargs>
+<doc>DjangoLibrary is a web testing library to test Django with Robot
+Framework.
+
+It uses Selenium2Library to run tests against a real browser instance.
+
+*Before running tests*
+
+Prior to running test cases using DjangoLibrary, DjangoLibrary must be
+imported (together with Selenium2Library) into your Robot test suite
+(see `importing` section), and the Selenium2Library 'Open Browser' keyword
+must be used to open a browser to the desired location.</doc>
+<init>
+<arguments>
+<arg>host=0.0.0.0</arg>
+<arg>port=8000</arg>
+<arg>path=mysite/mysite</arg>
+<arg>manage=mysite/manage.py</arg>
+<arg>settings=mysite.settings</arg>
+<arg>db=None</arg>
+</arguments>
+<doc>Django2Library can be imported with optional arguments.
+
+`host` is the hostname of your Django instance. Default value is
+'127.0.0.1'.
+
+`port` is the port number of your Django instance. Default value is
+8000.
+
+`path` is the path to your Django instance.
+
+`manage` is the path to your Django instance manage.py.
+
+`settings` is the path to your Django instance settings.py.
+
+`db` is deprecated. Please don't use it.
+
+Examples:
+| Library | Selenium2Library | timeout=15        | implicit_wait=0.5  | # Sets default timeout to 15 seconds and the default implicit_wait to 0.5 seconds. |  # noqa
+| Library | DjangoLibrary    | 127.0.0.1         | 55001              | path=mysite/mysite | manage=mysite/manage.py | settings=mysite.settings | db=mysite/db.sqlite3 | # Sets default hostname to 127.0.0.1 and the default port to 55001.                |  # noqa</doc>
+<tags>
+</tags>
+</init>
+<kw name="Autologin As">
+<arguments>
+<arg>username</arg>
+<arg>password</arg>
+</arguments>
+<doc>Autologin as Django user.
+
+DjangoLibrary comes with a Django middleware component that allows the
+autologin_as keyword to set an 'autologin' cookie that the
+middleware uses to authenticate and login the user in Django.
+
+If you want to use the autlogin_as keyword you have to add
+'DjangoLibrary.middleware.AutologinAuthenticationMiddleware' to the
+MIDDLEWARE_CLASSES right after the default AuthenticationMiddleware
+in your settings.py::
+
+    MIDDLEWARE_CLASSES = (
+        ...
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'DjangoLibrary.middleware.AutologinAuthenticationMiddleware',
+    )
+
+*Warning*
+
+Make sure that you add this middleware only to your test setup and
+NEVER to your deployment!
+
+See https://github.com/kitconcept/robotframework-djangolibrary/blob/master/DjangoLibrary/tests/test_autologin.robot  # noqa
+for examples how to use the `Autologin As` keyword.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Autologin Logout">
+<arguments>
+</arguments>
+<doc>Logout a user that has been logged in by the autologin_as keyword.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Clear Db">
+<arguments>
+</arguments>
+<doc>Clear database. This is a legacy keyword now. Use 'Manage Flush'
+instead.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Create Superuser">
+<arguments>
+<arg>username</arg>
+<arg>email</arg>
+<arg>password</arg>
+</arguments>
+<doc>Create a Django superuser in the default auth model.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Create User">
+<arguments>
+<arg>username</arg>
+<arg>email</arg>
+<arg>password</arg>
+<arg>**kwargs</arg>
+</arguments>
+<doc>Create a regular Django user in the default auth model.
+
+The `Create User` keyword allows to provide additional arguments that
+are passed directly to the Djange create_user method (e.g.
+"is_staff=True").</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Factory Boy">
+<arguments>
+<arg>factory</arg>
+<arg>**kwargs</arg>
+</arguments>
+<doc>Create content objects in the Django database with Factory Boy.
+See https://factoryboy.readthedocs.org for more details.
+
+Arguments:
+
+`factory` is a required argument and should contain the full path to
+your factory boy factory class (e.g.
+"FactoryBoy mysite.polls.factories.PollFactory").
+
+The `Factory Boy` keyword allows to provide additional arguments that
+are passed directly to the Factory Boy Factory class
+(e.g. "FactoryBoy mysite.polls.factories.PollFactory pollname='mypoll'").
+
+You can also override subfactories by using the double-underscore
+field lookup (https://docs.djangoproject.com/en/1.9/topics/db/queries/#field-lookups)  #noqa
+together with the `pk` lookup shortcut (https://docs.djangoproject.com/en/1.9/topics/db/queries/#the-pk-lookup-shortcut)
+(e.g. "Factory Boy  bookstore.factories.BookFactory ... author__pk=1")
+
+See https://github.com/kitconcept/robotframework-djangolibrary/blob/master/DjangoLibrary/tests/test_factory_boy.robot  # noqa
+for examples how to use the `Factory Boy` keyword.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Manage Flush">
+<arguments>
+</arguments>
+<doc>Clear database by running 'python manage.py flush'.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Manage Makemigrations">
+<arguments>
+</arguments>
+<doc>Create migrations by running 'python manage.py makemigrations'.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Manage Migrate">
+<arguments>
+</arguments>
+<doc>Execute migration by running 'python manage.py migrate'.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Query Set">
+<arguments>
+<arg>model</arg>
+<arg>**kwargs</arg>
+</arguments>
+<doc>Query the Django ORM.
+
+Returns a QuerySet object. See https://docs.djangoproject.com/en/1.9/topics/db/queries/#retrieving-objects for details.  # noqa
+
+Arguments:
+
+`model` is a required argument and should contain the full path to
+your Django model class (e.g. "django.contrib.auth.models.User").
+
+The `QuerySet` keyword allows to provide additional arguments that
+are passed as filter arguments
+(e.g. "django.contrib.auth.models.User  username=john").
+If no additonal argument is provided `QuerySet will just return all
+objects that exists for that model.
+
+`limit` limits the number of results,
+e.g. "django.contrib.auth.models.User  limit=10" will return 10 results
+max.
+Limit is an optional argument that maps 1:1 to the QuerySet limit
+argument. See https://docs.djangoproject.com/en/1.9/topics/db/queries/#limiting-querysets  # noqa
+for details.
+
+`offset` can be used in combination with `limit` to set an offset,
+e.g. "django.contrib.auth.models.User  offeset=5  limit=10" will return
+5 results while omitting the first 5 results.
+See https://docs.djangoproject.com/en/1.9/topics/db/queries/#limiting-querysets  # noqa
+for details.
+
+See https://github.com/kitconcept/robotframework-djangolibrary/blob/master/DjangoLibrary/tests/test_query_set.robot  # noqa
+for examples how to use the `Query Set` keyword.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Start Django">
+<arguments>
+</arguments>
+<doc>Start the Django server.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Stop Django">
+<arguments>
+</arguments>
+<doc>Stop the Django server.</doc>
+<tags>
+</tags>
+</kw>
+</keywordspec>

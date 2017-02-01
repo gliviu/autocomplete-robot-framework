@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keywordspec format="ROBOT" type="library" generated="20160218 10:33:59" name="Collections">
-<version>3.0</version>
+<keywordspec generated="20170201 07:02:42" type="library" name="Collections" format="ROBOT">
+<version>3.0.1</version>
 <scope>global</scope>
 <namedargs>yes</namedargs>
 <doc>A test library providing keywords for handling lists and dictionaries.
@@ -573,7 +573,7 @@ The original iterable is never altered.</doc>
 <arg>value</arg>
 <arg>msg=None</arg>
 </arguments>
-<doc>Fails if the ``value`` is not found from ``list``.
+<doc>Fails if the ``value`` is found from ``list``.
 
 See `List Should Contain Value` for an explanation of ``msg``.</doc>
 <tags>

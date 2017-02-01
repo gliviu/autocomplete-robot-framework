@@ -1,0 +1,561 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keywordspec generated="20170201 07:02:42" type="library" name="SudsLibrary" format="ROBOT">
+<version>0.8</version>
+<scope>global</scope>
+<namedargs>yes</namedargs>
+<doc>SudsLibrary is a library for functional testing of SOAP-based web
+services.
+
+SudsLibrary is based on [https://fedorahosted.org/suds/|Suds], a dynamic
+SOAP 1.1 client.
+
+== Case Sensitivy in SudsLibrary ==
+Many things in the world of SOAP are case-sensitive. This includes method
+names, WSDL object names and attributes, and service or port names.
+
+== Creating and Configuring a Client ==
+If necessary, use keywords `Bind Schema To Location` or `Add Doctor
+Import`. These are rarely needed. Next, `Create Soap Client` to create a Suds
+client. The output from this keyword contains useful information including
+available types and methods. Next, use other keywords to configure the
+client as necessary. `Set Location` is the most commonly needed keyword.
+
+== Working with WSDL Objects ==
+When Suds digests a WSDL, it creates dynamic types to represent the complex
+types defined by a WSDL or its imports. These types are listed in the
+output of `Create Soap Client`. WSDL objects are used as method arguments,
+attribute values of other WSDL objects, and return values. `Create Wsdl
+Object` is used to create instances of WSDL object types. To see what the
+structure of a WSDL object is, you can do this:
+| ${obj}=        | Create Wsdl Object | someObject |
+| ${obj as str}= | Convert To String  | ${obj}     |
+| Log            | ${obj as str}      |            |
+The same technique can be used to analyze a response object. It may also
+help to use a tool such as Eclipse or SoapUI to comprehend the structures.
+
+=== Getting WSDL Object Attributes ===
+Getting a WSDL object's attribute value may be done with `Get Wsdl Object
+Attribute` or extended variable syntax*. Keywords from other libraries, such
+as _BuiltIn_ and _Collections_ may be used to verify attribute values.
+Examples:
+| ${name}=        | Get Wsdl Object Attribute | ${person} | name |
+| Should Be Equal | ${person.name}            | Bob       |      |
+
+=== Setting WSDL Object Attributes ===
+Setting a WSDL object's attribute value may be done with `Set Wsdl Object
+Attribute` or extended variable syntax*. `Set Wsdl Object Attribute`
+verifies the argument is an object of the correct type and the attribute
+exists.
+| Set Wsdl Object Attribute | ${person}    | name | Tia |
+| ${person.name}=           | Set Variable | Tia  |     |
+
+* In order to use extended variable syntax, the attribute name must consist
+of only letters, numbers, and underscores.
+
+== Example Test ==
+The following simple example demonstrates verifying the return value using
+keywords in this library and in the `BuiltIn` and `Collections` libraries.
+You can run this test because it uses a public web service.
+
+| Create Soap Client         | http://www.webservicex.net/Statistics.asmx?WSDL |               |              |
+| ${dbl array}=              | Create Wsdl Object                              | ArrayOfDouble |              |
+| Append To List             | ${dbl array.double}                             | 2.0           |              |
+| Append To List             | ${dbl array.double}                             | 3.0           |              |
+| ${result}=                 | Call Soap Method                                | GetStatistics | ${dbl array} |
+| Should Be Equal As Numbers | ${result.Average}                               | 2.5           |              |
+
+The definition of type ArrayOfDouble:
+| &lt;s:complexType name="ArrayOfDouble"&gt;
+|   &lt;s:sequence&gt;
+|     &lt;s:element minOccurs="0" maxOccurs="unbounded" name="double" type="s:double"/&gt;
+|   &lt;/s:sequence&gt;
+| &lt;/s:complexType&gt;
+Note that the attribute name on the ArrayOfDouble-type that is the list of
+numbers is the singular "double". Outside of the WSDL, the structure can
+also be seen in the output of Create Wsdl Object:
+| ${dbl array} = (ArrayOfDouble){
+|   double[] = &lt;empty&gt;
+| }
+
+The relevant part of the WSDL defining the parameters to the method:
+| &lt;s:element name="GetStatistics"&gt;
+|   &lt;s:complexType&gt;
+|     &lt;s:sequence&gt;
+|       &lt;s:element minOccurs="0" maxOccurs="1" name="X" type="tns:ArrayOfDouble"/&gt;
+|     &lt;/s:sequence&gt;
+|   &lt;/s:complexType&gt;
+| &lt;/s:element&gt;
+The definition of this method appears in the output of Create Soap Client
+as:
+| GetStatistics(ArrayOfDouble X, )
+
+== Passing Explicit NULL Values ==
+If you have a service that takes NULL values for required parameters or
+you want to pass NULL for optional object attributes, you simply need to
+set the value to ${SUDS_NULL}. You need to use ${SUDS_NULL} instead of
+${None} because None is interpreted by the marshaller as not having a
+value. The soap message will contain an empty (and xsi:nil="true" if node
+defined as nillable). ${SUDS_NULL} is defined during library
+initialization, so editors like RIDE will not show it as defined.
+
+== Extending SudsLibrary ==
+There may be times where Suds/SudsLibrary does not work using the library
+keywords alone. Extending the library instead of writing a custom one will
+allow you to use the existing keywords in SudsLibrary.
+
+There are two methods useful for extending SudsLibrary:
+| _client()
+| _add_client(client, alias=None)
+The first can be used to access the current instance of
+suds.client.Client. The second can be used to put a client into the client
+cache that you have instantiated.
+
+Here is an example demonstrating how to implement a keyword that adds a
+MessagePlugin to the current Suds client (based on the [https://fedorahosted.org/suds/wiki/Documentation#MessagePlugin|Suds documentation]):
+| from robot.libraries.BuiltIn import BuiltIn
+| from suds.plugin import MessagePlugin
+|
+| class _MyPlugin(MessagePlugin):
+|     def marshalled(self, context):
+|         body = context.envelope.getChild('Body')
+|         foo = body[0]
+|         foo.set('id', '12345')
+|         foo.set('version', '2.0')
+|
+| class SudsLibraryExtensions(object):
+|     def attach_my_plugin(self):
+|         client = BuiltIn().get_library_instance("SudsLibrary")._client()
+|         # prepend so SudsLibrary's plugin is left in place
+|         plugins = client.options.plugins
+|         if any(isinstance(x, _MyPlugin) for x in plugins):
+|             return
+|         plugins.insert(0, _MyPlugin())
+|         client.set_options(plugins=plugins)</doc>
+<kw name="Add Doctor Import">
+<arguments>
+<arg>import_namespace</arg>
+<arg>location=None</arg>
+<arg>filters=None</arg>
+</arguments>
+<doc>Adds an import be used in the next client.
+
+Doctor imports are applied to the _next_ client created with
+`Create Soap Client`. Doctor imports are necessary when references are
+made in one schema to named objects defined in another schema without
+importing it. Use `location` to specify the location to download the
+schema file. `filters` should be either a comma-delimited list of
+namespaces or an iterable (e.g. a list).
+
+The following example would import the SOAP encoding schema into only
+the namespace http://some/namespace/A if it is not already imported:
+| Add Doctor Import | http://schemas.xmlsoap.org/soap/encoding/ | filters=http://some/namespace/A |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Apply Security Timestamp">
+<arguments>
+<arg>duration=None</arg>
+</arguments>
+<doc>Applies a Timestamp element to future requests valid for the given `duration`.
+
+The SOAP header will contain a Timestamp element as specified in the
+WS-Security extension. The Created and Expires values are updated
+every time a request is made. If `duration` is None, the Expires
+element will be absent.
+
+`duration` must be given in Robot Framework's time format (e.g.
+'1 minute', '2 min 3 s', '4.5').
+
+Example:
+| Apply Security Timestamp | 5 min |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Apply Username Token">
+<arguments>
+<arg>username</arg>
+<arg>password=None</arg>
+<arg>setcreated=False</arg>
+<arg>setnonce=False</arg>
+<arg>digest=False</arg>
+</arguments>
+<doc>Applies a UsernameToken element to future requests.
+
+The SOAP header will contain a UsernameToken element as specified in
+Username Token Profile 1.1 that complies with Basic Security Profile
+1.1. The Created and Nonce values, if enabled, are generated
+automatically and updated every time a request is made. If `digest` is
+True, a digest derived from the password is sent.
+
+Example:
+| Apply Username Token | ying | myPa$$word |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Bind Schema To Location">
+<arguments>
+<arg>namespace</arg>
+<arg>location</arg>
+</arguments>
+<doc>Sets the `location` for the given `namespace` of a schema.
+
+This is for when an import statement specifies a schema but not its
+location. If the schemaLocation is present and incorrect, this will
+not override that. Bound schemas are shared amongst all instances of
+SudsLibrary. Schemas should be bound if necessary before `Add Doctor
+Import` or `Create Soap Client` where appropriate.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Call Soap Method">
+<arguments>
+<arg>name</arg>
+<arg>*args</arg>
+</arguments>
+<doc>Calls the SOAP method with the given `name` and `args`.
+
+Returns a Python object graph or SOAP envelope as a XML string
+depending on the client options.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Call Soap Method Expecting Fault">
+<arguments>
+<arg>name</arg>
+<arg>*args</arg>
+</arguments>
+<doc>Calls the SOAP method expecting the server to raise a fault.
+
+Fails if the server does not raise a fault.  Returns a Python object
+graph or SOAP envelope as a XML string depending on the client
+options.
+
+A fault has the following attributes:
+
+| faultcode   | required |
+| faultstring | required |
+| faultactor  | optional |
+| detail      | optional |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Create Raw Soap Message">
+<arguments>
+<arg>message</arg>
+</arguments>
+<doc>Returns an object that can used in lieu of SOAP method arguments.
+
+`message` should be an entire SOAP message as a string. The object
+returned can be used in lieu of *args for `Call Soap Method`, `Call
+Soap Method Expecting Fault`, and `Specific Soap Call`.
+
+Example:
+
+| ${message}=      | Create Raw Soap Message | &lt;SOAP-ENV:Envelope ...&lt;/ns2:Body&gt;&lt;/SOAP-ENV:Envelope&gt; |
+| Call Soap Method | addContact              | ${message}                                            |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Create Soap Client">
+<arguments>
+<arg>url_or_path</arg>
+<arg>alias=None</arg>
+<arg>autoblend=False</arg>
+<arg>timeout=90 seconds</arg>
+</arguments>
+<doc>Loads a WSDL from the given URL/path and creates a Suds SOAP client.
+
+Returns the index of this client instance which can be used later to
+switch back to it. See `Switch Soap Client` for example.
+
+Optional alias is an alias for the client instance and it can be used
+for switching between clients (just as index can be used). See `Switch
+Soap Client` for more details.
+
+Autoblend ensures that the schema(s) defined within the WSDL import
+each other.
+
+`timeout` sets the timeout for SOAP requests and must be given in
+Robot Framework's time format (e.g. '1 minute', '2 min 3 s', '4.5').
+
+Examples:
+| Create Soap Client | http://localhost:8080/ws/Billing.asmx?WSDL |
+| Create Soap Client | ${CURDIR}/../wsdls/tracking.wsdl |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Create Wsdl Object">
+<arguments>
+<arg>type</arg>
+<arg>*name_value_pairs</arg>
+</arguments>
+<doc>Creates a WSDL object of the specified `type`.
+
+Requested `type` must be defined in the WSDL, in an import specified
+by the WSDL, or with `Add Doctor Import`. `type` is case sensitive.
+
+Example:
+| ${contact}=               | Create Wsdl Object | Contact |              |
+| Set Wsdl Object Attribute | ${contact}         | Name    | Kelly Newman |
+Attribute values can be set by passing the attribute name and value in
+pairs. This is equivalent to the two lines above:
+| ${contact}=               | Create Wsdl Object | Contact | Name         | Kelly Newman |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Last Received">
+<arguments>
+</arguments>
+<doc>Gets the XML last received.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Last Sent">
+<arguments>
+</arguments>
+<doc>Gets the message text last sent.
+
+Unless a plugin is used to modify the message, it will always be a XML
+document.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Wsdl Object Attribute">
+<arguments>
+<arg>object</arg>
+<arg>name</arg>
+</arguments>
+<doc>Gets the attribute of a WSDL object.
+
+Extendend variable syntax may be used to access attributes; however,
+some WSDL objects may have attribute names that are illegal in Python,
+necessitating this keyword.
+
+Example:
+| ${sale record}= | Call Soap Method          | getLastSale    |       |
+| ${price}=       | Get Wsdl Object Attribute | ${sale record} | Price |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Headers">
+<arguments>
+<arg>*dict_or_key_value_pairs</arg>
+</arguments>
+<doc>Sets _extra_ http headers to send in future requests.
+
+For HTTP headers; not to be confused with the SOAP header element.
+
+Example:
+| Set Headers | X-Requested-With  | autogen          | # using key-value pairs |
+or using a dictionary:
+| ${headers}= | Create Dictionary | X-Requested-With | autogen                 |
+| Set Headers | ${headers}        |                  | # using a dictionary    |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Http Authentication">
+<arguments>
+<arg>username</arg>
+<arg>password</arg>
+<arg>type=STANDARD</arg>
+</arguments>
+<doc>Sets http authentication type and credentials.
+
+Available types are STANDARD, ALWAYS_SEND, and NTLM. Type STANDARD
+will only send credentials to the server upon request (HTTP/1.0 401
+Authorization Required) by the server only. Type ALWAYS_SEND will
+cause an Authorization header to be sent in every request. Type NTLM
+requires the python-ntlm package to be installed, which is not
+packaged with Suds or SudsLibrary.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Location">
+<arguments>
+<arg>url</arg>
+<arg>service=None</arg>
+<arg>names=None</arg>
+</arguments>
+<doc>Sets location to use in future requests.
+
+This is for when the location(s) specified in the WSDL are not correct.
+`service` is the name or index of the service to change and ignored
+unless there is more than one service. `names` should be either a
+comma-delimited list of methods names or an iterable (e.g. a list). If
+no methods names are given, then sets the location for all methods of
+the service(s).
+
+Example:
+| Set Location | http://localhost:8080/myWS |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Port">
+<arguments>
+<arg>port</arg>
+</arguments>
+<doc>Sets the `port` to use in future requests.
+
+`port` should be the name or the index of the port as it appears in the WSDL.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Proxies">
+<arguments>
+<arg>*protocol_url_pairs</arg>
+</arguments>
+<doc>Sets the http proxy settings.
+
+| Set Proxy | http | localhost:5000 | https | 10.0.4.23:80 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Return Xml">
+<arguments>
+<arg>return_xml</arg>
+</arguments>
+<doc>Sets whether to return XML in future requests.
+
+The default value is _False_. If `return_xml` is _True_, then return
+the SOAP envelope as a string in future requests. Otherwise, return a
+Python object graph. `Get Last Received` returns the XML received
+regardless of this setting.
+
+See also `Call Soap Method`, `Call Soap Method Expecting Fault`, and
+`Specific Soap Call`.
+
+Example:
+| ${old value}= | Set Return Xml | True |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Service">
+<arguments>
+<arg>service</arg>
+</arguments>
+<doc>Sets the `service` to use in future requests.
+
+`service` should be the name or the index of the service as it appears in the WSDL.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Soap Headers">
+<arguments>
+<arg>*headers</arg>
+</arguments>
+<doc>Sets SOAP headers to send in future requests.
+
+Example:
+| ${auth header}=           | Create Wsdl Object | AuthHeader           |          |
+| Set Wsdl Object Attribute | ${auth header}     | UserID               | gcarlson |
+| Set Wsdl Object Attribute | ${auth header}     | Password             | heyOh    |
+| Set Soap Headers          | ${auth header}     | # using WSDL object  |          |
+or using a dictionary:
+| ${auth dict}=             | Create Dictionary  | UserName             | gcarlson  | Password | heyOh |
+| Set Soap Headers          | ${auth dict}       | # using a dictionary |           |          |       |
+
+For setting WS-Security elements in the SOAP header, see
+`Apply Username Token` and `Apply Security Timestamp`.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Soap Logging">
+<arguments>
+<arg>log</arg>
+<arg>prettyxml=None</arg>
+<arg>indent=None</arg>
+</arguments>
+<doc>Sets whether to log the request and response for the current client.
+
+By default, the message sent and received is logged at level INFO,
+pretty-formatted with an indent of 2 spaces per level. Setting `log`
+to false will disable logging, reducing the size of the log. Boolean
+option `prettyxml` controls whether the XML is pretty-formatted.
+`indent` should be the number of spaces to indent per level. Leaving
+`prettyxml` or `indent` at the default value of None will preserve the
+previous settings. Returns the current value of log.
+
+Examples:
+| ${old log value} | Set Soap Logging | False    |   |
+| Call Soap Method | lengthyResponse  |          |   |
+| Set Soap Logging | True             | True     | 4 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Soap Timeout">
+<arguments>
+<arg>timeout</arg>
+</arguments>
+<doc>Sets the timeout for SOAP requests.
+
+`timeout` must be given in Robot Framework's time format (e.g.
+'1 minute', '2 min 3 s', '4.5'). The default timeout is 90 seconds.
+
+Example:
+| Set Soap Timeout | 3 min |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Wsdl Object Attribute">
+<arguments>
+<arg>object</arg>
+<arg>name</arg>
+<arg>value</arg>
+</arguments>
+<doc>Sets the attribute of a WSDL object.
+
+Example:
+| ${order search request}=  | Create Wsdl Object      | OrderSearchRequest |      |
+| Set Wsdl Object Attribute | ${order search request} | id                 | 4065 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Specific Soap Call">
+<arguments>
+<arg>service</arg>
+<arg>port</arg>
+<arg>name</arg>
+<arg>*args</arg>
+</arguments>
+<doc>Calls the SOAP method overriding client settings.
+
+If there is only one service specified then `service` is ignored.
+`service` and `port` can be either by name or index. If only `port` or
+`service` need to be specified, leave the other one ${None} or
+${EMPTY}. The index is the order of appearence in the WSDL starting
+with 0.
+
+Returns a Python object graph or SOAP envelope as a XML string
+depending on the client options.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Switch Soap Client">
+<arguments>
+<arg>index_or_alias</arg>
+</arguments>
+<doc>Switches between clients using index or alias.
+
+Index is returned from `Create Soap Client` and alias can be given to
+it.
+
+Example:
+| Create Soap Client  | http://localhost:8080/Billing?wsdl   | Billing   |
+| Create Soap Client  | http://localhost:8080/Marketing?wsdl | Marketing |
+| Call Soap Method    | sendSpam                             |           |
+| Switch Soap Client  | Billing                              | # alias   |
+| Call Soap Method    | sendInvoices                         |           |
+| Switch Soap Client  | 2                                    | # index   |
+
+Above example expects that there was no other clients created when
+creating the first one because it used index '1' when switching to it
+later. If you aren't sure about that you can store the index into
+a variable as below.
+
+| ${id} =            | Create Soap Client  | ... |
+| # Do something ... |                     |     |
+| Switch Soap Client      | ${id}          |     |</doc>
+<tags>
+</tags>
+</kw>
+</keywordspec>

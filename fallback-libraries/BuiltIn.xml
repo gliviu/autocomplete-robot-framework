@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keywordspec format="ROBOT" type="library" generated="20160218 10:35:26" name="BuiltIn">
-<version>3.0</version>
+<keywordspec generated="20170201 07:02:41" type="library" name="BuiltIn" format="ROBOT">
+<version>3.0.1</version>
 <scope>global</scope>
 <namedargs>yes</namedargs>
 <doc>An always available standard library with often needed keywords.
@@ -469,32 +469,39 @@ want to create byte strings.</doc>
 <arguments>
 <arg>*items</arg>
 </arguments>
-<doc>Creates and returns a dictionary based on given items.
+<doc>Creates and returns a dictionary based on the given ``items``.
 
-Items are given using ``key=value`` syntax same way as ``&amp;{dictionary}``
-variables are created in the Variable table. Both keys and values
-can contain variables, and possible equal sign in key can be escaped
-with a backslash like ``escaped\=key=value``. It is also possible to
-get items from existing dictionaries by simply using them like
-``&amp;{dict}``.
+Items are typically given using the ``key=value`` syntax same way as
+``&amp;{dictionary}`` variables are created in the Variable table. Both
+keys and values can contain variables, and possible equal sign in key
+can be escaped with a backslash like ``escaped\=key=value``. It is
+also possible to get items from existing dictionaries by simply using
+them like ``&amp;{dict}``.
+
+Alternatively items can be specified so that keys and values are given
+separately. This and the ``key=value`` syntax can even be combined,
+but separately given items must be first.
 
 If same key is used multiple times, the last value has precedence.
 The returned dictionary is ordered, and values with strings as keys
-can also be accessed using convenient dot-access syntax like
+can also be accessed using a convenient dot-access syntax like
 ``${dict.key}``.
 
 Examples:
-| &amp;{dict} = | Create Dictionary | key=value | foo=bar |
+| &amp;{dict} = | Create Dictionary | key=value | foo=bar | | | # key=value syntax |
 | Should Be True | ${dict} == {'key': 'value', 'foo': 'bar'} |
-| &amp;{dict} = | Create Dictionary | ${1}=${2} | &amp;{dict} | foo=new |
+| &amp;{dict2} = | Create Dictionary | key | value | foo | bar | # separate key and value |
+| Should Be Equal | ${dict} | ${dict2} |
+| &amp;{dict} = | Create Dictionary | ${1}=${2} | &amp;{dict} | foo=new | | # using variables |
 | Should Be True | ${dict} == {1: 2, 'key': 'value', 'foo': 'new'} |
-| Should Be Equal | ${dict.key} | value |
+| Should Be Equal | ${dict.key} | value | | | | # dot-access |
 
 This keyword was changed in Robot Framework 2.9 in many ways:
 - Moved from ``Collections`` library to ``BuiltIn``.
 - Support also non-string keys in ``key=value`` syntax.
-- Deprecated old syntax to give keys and values separately.
-- Returned dictionary is ordered and dot-accessible.</doc>
+- Returned dictionary is ordered and dot-accessible.
+- Old syntax to give keys and values separately was deprecated, but
+  deprecation was later removed in RF 3.0.1.</doc>
 <tags>
 </tags>
 </kw>
@@ -2116,6 +2123,7 @@ default error message can be overridden with the ``msg`` argument.</doc>
 <arg>second</arg>
 <arg>msg=None</arg>
 <arg>values=True</arg>
+<arg>ignore_case=False</arg>
 </arguments>
 <doc>Fails if the given objects are unequal.
 
@@ -2123,17 +2131,24 @@ Optional ``msg`` and ``values`` arguments specify how to construct
 the error message if this keyword fails:
 
 - If ``msg`` is not given, the error message is ``&lt;first&gt; != &lt;second&gt;``.
-- If ``msg`` is given and ``values`` gets a true value, the error
-  message is ``&lt;msg&gt;: &lt;first&gt; != &lt;second&gt;``.
+- If ``msg`` is given and ``values`` gets a true value (default),
+  the error message is ``&lt;msg&gt;: &lt;first&gt; != &lt;second&gt;``.
 - If ``msg`` is given and ``values`` gets a false value, the error
-  message is simply ``&lt;msg&gt;``.
+  message is simply ``&lt;msg&gt;``. See `Boolean arguments` for more details
+  about using false values.
 
-``values`` is true by default, but can be turned to false by using,
-for example, string ``false`` or ``no values``. See `Boolean arguments`
-section for more details.
+If ``ignore_case`` is given a true value (see `Boolean arguments`) and
+arguments are strings, it indicates that comparison should be
+case-insensitive. New option in Robot Framework 3.0.1.
 
 If both arguments are multiline strings, the comparison is done using
-`multiline string comparisons`.</doc>
+`multiline string comparisons`.
+
+Examples:
+| Should Be Equal | ${x} | expected |
+| Should Be Equal | ${x} | expected | Custom error message |
+| Should Be Equal | ${x} | expected | Custom message | values=False |
+| Should Be Equal | ${x} | expected | ignore_case=True |</doc>
 <tags>
 </tags>
 </kw>
@@ -2202,11 +2217,16 @@ the default error message with ``msg`` and ``values``.</doc>
 <arg>second</arg>
 <arg>msg=None</arg>
 <arg>values=True</arg>
+<arg>ignore_case=False</arg>
 </arguments>
 <doc>Fails if objects are unequal after converting them to strings.
 
 See `Should Be Equal` for an explanation on how to override the default
 error message with ``msg`` and ``values``.
+
+If ``ignore_case`` is given a true value (see `Boolean arguments`), it
+indicates that comparison should be case-insensitive. New option in
+Robot Framework 3.0.1.
 
 If both arguments are multiline strings, the comparison is done using
 `multiline string comparisons`.</doc>
@@ -2263,16 +2283,56 @@ several useful attributes:
 <arg>item</arg>
 <arg>msg=None</arg>
 <arg>values=True</arg>
+<arg>ignore_case=False</arg>
 </arguments>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.
 
 Works with strings, lists, and anything that supports Python's ``in``
-operator. See `Should Be Equal` for an explanation on how to override
-the default error message with ``msg`` and ``values``.
+operator.
+
+See `Should Be Equal` for an explanation on how to override the default
+error message with arguments ``msg`` and ``values``.
+
+If ``ignore_case`` is given a true value (see `Boolean arguments`) and
+compared items are strings, it indicates that comparison should be
+case-insensitive. If the ``container`` is a list-like object, string
+items in it are compared case-insensitively. New option in Robot
+Framework 3.0.1.
 
 Examples:
 | Should Contain | ${output}    | PASS  |
-| Should Contain | ${some list} | value |</doc>
+| Should Contain | ${some list} | value | msg=Failure! | values=False |
+| Should Contain | ${some list} | value | case_insensitive=True |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Should Contain Any">
+<arguments>
+<arg>container</arg>
+<arg>*items</arg>
+<arg>**configuration</arg>
+</arguments>
+<doc>Fails if ``container`` does not contain any of the ``*items``.
+
+Works with strings, lists, and anything that supports Python's ``in``
+operator.
+
+Supports additional configuration parameters ``msg``, ``values``
+and ``ignore_case``, which have exactly the same semantics as arguments
+with same names have with `Should Contain`. These arguments must
+always be given using ``name=value`` syntax after all ``items``.
+
+Note that possible equal signs in ``items`` must be escaped with
+a backslash (e.g. ``foo\=bar``) to avoid them to be passed in
+as ``**configuration``.
+
+Examples:
+| Should Contain Any | ${string} | substring 1 | substring 2 |
+| Should Contain Any | ${list}   | item 1 | item 2 | item 3 |
+| Should Contain Any | ${list}   | item 1 | item 2 | item 3 | ignore_case=True |
+| Should Contain Any | ${list}   | @{items} | msg=Custom message | values=False |
+
+New in Robot Framework 3.0.1.</doc>
 <tags>
 </tags>
 </kw>
@@ -2282,6 +2342,7 @@ Examples:
 <arg>item2</arg>
 <arg>count</arg>
 <arg>msg=None</arg>
+<arg>ignore_case=False</arg>
 </arguments>
 <doc>Fails if ``item1`` does not contain ``item2`` ``count`` times.
 
@@ -2289,9 +2350,15 @@ Works with strings, lists and all objects that `Get Count` works
 with. The default error message can be overridden with ``msg`` and
 the actual count is always logged.
 
+If ``ignore_case`` is given a true value (see `Boolean arguments`) and
+compared items are strings, it indicates that comparison should be
+case-insensitive. If the ``item1`` is a list-like object, string
+items in it are compared case-insensitively. New option in Robot
+Framework 3.0.1.
+
 Examples:
-| Should Contain X Times | ${output}    | hello  | 2 |
-| Should Contain X Times | ${some list} | value  | 3 |</doc>
+| Should Contain X Times | ${output}    | hello | 2 |
+| Should Contain X Times | ${some list} | value | 3 | ignore_case=True |</doc>
 <tags>
 </tags>
 </kw>
@@ -2301,11 +2368,13 @@ Examples:
 <arg>str2</arg>
 <arg>msg=None</arg>
 <arg>values=True</arg>
+<arg>ignore_case=False</arg>
 </arguments>
 <doc>Fails if the string ``str1`` does not end with the string ``str2``.
 
 See `Should Be Equal` for an explanation on how to override the default
-error message with ``msg`` and ``values``.</doc>
+error message with ``msg`` and ``values``, as well as for semantics
+of the ``ignore_case`` option.</doc>
 <tags>
 </tags>
 </kw>
@@ -2315,6 +2384,7 @@ error message with ``msg`` and ``values``.</doc>
 <arg>pattern</arg>
 <arg>msg=None</arg>
 <arg>values=True</arg>
+<arg>ignore_case=False</arg>
 </arguments>
 <doc>Fails unless the given ``string`` matches the given ``pattern``.
 
@@ -2323,7 +2393,8 @@ always case-sensitive. In the pattern, ``*`` matches to anything and
 ``?`` matches to any single character.
 
 See `Should Be Equal` for an explanation on how to override the default
-error message with ``msg`` and ``values``.</doc>
+error message with ``msg`` and ``values``, as well as for semantics
+of the ``ignore_case`` option.</doc>
 <tags>
 </tags>
 </kw>
@@ -2402,11 +2473,16 @@ default error message can be overridden with the ``msg`` argument.</doc>
 <arg>second</arg>
 <arg>msg=None</arg>
 <arg>values=True</arg>
+<arg>ignore_case=False</arg>
 </arguments>
 <doc>Fails if the given objects are equal.
 
 See `Should Be Equal` for an explanation on how to override the default
-error message with ``msg`` and ``values``.</doc>
+error message with ``msg`` and ``values``.
+
+If ``ignore_case`` is given a true value (see `Boolean arguments`) and
+both arguments are strings, it indicates that comparison should be
+case-insensitive. New option in Robot Framework 3.0.1.</doc>
 <tags>
 </tags>
 </kw>
@@ -2456,8 +2532,13 @@ error message with ``msg`` and ``values``.</doc>
 <arg>second</arg>
 <arg>msg=None</arg>
 <arg>values=True</arg>
+<arg>ignore_case=False</arg>
 </arguments>
 <doc>Fails if objects are equal after converting them to strings.
+
+If ``ignore_case`` is given a true value (see `Boolean arguments`), it
+indicates that comparison should be case-insensitive. New option in
+Robot Framework 3.0.1.
 
 See `Should Be Equal` for an explanation on how to override the default
 error message with ``msg`` and ``values``.</doc>
@@ -2482,16 +2563,50 @@ and how ``msg`` can be used to override the default error message.</doc>
 <arg>item</arg>
 <arg>msg=None</arg>
 <arg>values=True</arg>
+<arg>ignore_case=False</arg>
 </arguments>
 <doc>Fails if ``container`` contains ``item`` one or more times.
 
 Works with strings, lists, and anything that supports Python's ``in``
-operator. See `Should Be Equal` for an explanation on how to override
-the default error message with ``msg`` and ``values``.
+operator.
+
+See `Should Be Equal` for an explanation on how to override the default
+error message with arguments ``msg`` and ``values``. ``ignore_case``
+has exactly the same semantics as with `Should Contain`.
 
 Examples:
-| Should Not Contain | ${output}    | FAILED |
-| Should Not Contain | ${some list} | value  |</doc>
+| Should Not Contain | ${some list} | value  |
+| Should Not Contain | ${output}    | FAILED | ignore_case=True |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Should Not Contain Any">
+<arguments>
+<arg>container</arg>
+<arg>*items</arg>
+<arg>**configuration</arg>
+</arguments>
+<doc>Fails if ``container`` contains one or more of the ``*items``.
+
+Works with strings, lists, and anything that supports Python's ``in``
+operator.
+
+Supports additional configuration parameters ``msg``, ``values``
+and ``ignore_case``, which have exactly the same semantics as arguments
+with same names have with `Should Contain`. These arguments must
+always be given using ``name=value`` syntax after all ``items``.
+
+Note that possible equal signs in ``items`` must be escaped with
+a backslash (e.g. ``foo\=bar``) to avoid them to be passed in
+as ``**configuration``.
+
+Examples:
+| Should Not Contain Any | ${string} | substring 1 | substring 2 |
+| Should Not Contain Any | ${list}   | item 1 | item 2 | item 3 |
+| Should Not Contain Any | ${list}   | item 1 | item 2 | item 3 | ignore_case=True |
+| Should Not Contain Any | ${list}   | @{items} | msg=Custom message | values=False |
+
+New in Robot Framework 3.0.1.</doc>
 <tags>
 </tags>
 </kw>
@@ -2501,11 +2616,13 @@ Examples:
 <arg>str2</arg>
 <arg>msg=None</arg>
 <arg>values=True</arg>
+<arg>ignore_case=False</arg>
 </arguments>
 <doc>Fails if the string ``str1`` ends with the string ``str2``.
 
 See `Should Be Equal` for an explanation on how to override the default
-error message with ``msg`` and ``values``.</doc>
+error message with ``msg`` and ``values``, as well as for semantics
+of the ``ignore_case`` option.</doc>
 <tags>
 </tags>
 </kw>
@@ -2515,6 +2632,7 @@ error message with ``msg`` and ``values``.</doc>
 <arg>pattern</arg>
 <arg>msg=None</arg>
 <arg>values=True</arg>
+<arg>ignore_case=False</arg>
 </arguments>
 <doc>Fails if the given ``string`` matches the given ``pattern``.
 
@@ -2523,7 +2641,8 @@ always case-sensitive. In the pattern ``*`` matches to anything and
 ``?`` matches to any single character.
 
 See `Should Be Equal` for an explanation on how to override the default
-error message with ``msg`` and ``values``.</doc>
+error message with ``msg`` and ``values``, as well as for semantics
+of the ``ignore_case`` option.</doc>
 <tags>
 </tags>
 </kw>
@@ -2546,11 +2665,13 @@ See `Should Match Regexp` for more information about arguments.</doc>
 <arg>str2</arg>
 <arg>msg=None</arg>
 <arg>values=True</arg>
+<arg>ignore_case=False</arg>
 </arguments>
 <doc>Fails if the string ``str1`` starts with the string ``str2``.
 
 See `Should Be Equal` for an explanation on how to override the default
-error message with ``msg`` and ``values``.</doc>
+error message with ``msg`` and ``values``, as well as for semantics
+of the ``ignore_case`` option.</doc>
 <tags>
 </tags>
 </kw>
@@ -2560,11 +2681,13 @@ error message with ``msg`` and ``values``.</doc>
 <arg>str2</arg>
 <arg>msg=None</arg>
 <arg>values=True</arg>
+<arg>ignore_case=False</arg>
 </arguments>
 <doc>Fails if the string ``str1`` does not start with the string ``str2``.
 
 See `Should Be Equal` for an explanation on how to override the default
-error message with ``msg`` and ``values``.</doc>
+error message with ``msg`` and ``values``, as well as for semantics
+of the ``ignore_case`` option.</doc>
 <tags>
 </tags>
 </kw>

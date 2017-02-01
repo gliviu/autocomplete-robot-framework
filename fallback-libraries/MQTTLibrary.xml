@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keywordspec generated="20170201 07:02:41" type="library" name="MQTTLibrary" format="ROBOT">
+<version>0.5.0</version>
+<scope>global</scope>
+<namedargs>yes</namedargs>
+<doc>A keyword library for Robot Framework. It provides keywords for
+performing various operations on an MQTT broker. See http://mqtt.org/
+for more details on MQTT specification.
+
+This library uses eclipse project's paho client. For more information
+on underlying methods and documentation, see:
+    http://eclipse.org/paho/clients/python/docs/</doc>
+<init>
+<arguments>
+<arg>loop_timeout=5 seconds</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</init>
+<kw name="Connect">
+<arguments>
+<arg>broker</arg>
+<arg>port=1883</arg>
+<arg>client_id=</arg>
+<arg>clean_session=True</arg>
+</arguments>
+<doc>Connect to an MQTT broker. This is a pre-requisite step for publish
+and subscribe keywords.
+
+`broker` MQTT broker host
+
+`port` broker port (default 1883)
+
+`client_id` if not specified, a random id is generated
+
+`clean_session` specifies the clean session flag for the connection
+
+Examples:
+
+Connect to a broker with default port and client id
+| Connect | 127.0.0.1 |
+
+Connect to a broker by specifying the port and client id explicitly
+| Connect | 127.0.0.1 | 1883 | test.client |
+
+Connect to a broker with clean session flag set to false
+| Connect | 127.0.0.1 | clean_session=${false} |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Disconnect">
+<arguments>
+</arguments>
+<doc>Disconnect from MQTT Broker.
+
+Example:
+| Disconnect |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Publish">
+<arguments>
+<arg>topic</arg>
+<arg>message=None</arg>
+<arg>qos=0</arg>
+<arg>retain=False</arg>
+</arguments>
+<doc>Publish a message to a topic with specified qos and retained flag.
+It is required that a connection has been established using `Connect`
+keyword before using this keyword.
+
+`topic` topic to which the message will be published
+
+`message` message payload to publish
+
+`qos` qos of the message
+
+`retain` retained flag
+
+Examples:
+
+| Publish | test/test | test message | 1 | ${false} |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Publish Multiple">
+<arguments>
+<arg>msgs</arg>
+<arg>hostname=localhost</arg>
+<arg>port=1883</arg>
+<arg>client_id=</arg>
+<arg>keepalive=60</arg>
+<arg>will=None</arg>
+<arg>auth=None</arg>
+<arg>tls=None</arg>
+<arg>protocol=3</arg>
+</arguments>
+<doc>Publish multiple messages and disconnect. This keyword uses the
+[http://eclipse.org/paho/clients/python/docs/#multiple|multiple]
+function of publish module.
+
+`msgs` a list of messages to publish. Each message is either a dict
+        or a tuple. If a dict, it must be of the form:
+        msg = {'topic':"&lt;topic&gt;", 'payload':"&lt;payload&gt;", 'qos':&lt;qos&gt;,
+                'retain':&lt;retain&gt;}
+        Only the topic must be present. Default values will be used
+        for any missing arguments. If a tuple, then it must be of the
+        form:
+        ("&lt;topic&gt;", "&lt;payload&gt;", qos, retain)
+
+        See `publish single` for the description of hostname, port,
+        client_id, keepalive, will, auth, tls, protocol.
+
+Example:
+
+| ${msg1} | Create Dictionary | topic=${topic} | payload=message 1 |
+| ${msg2} | Create Dictionary | topic=${topic} | payload=message 2 |
+| ${msg3} | Create Dictionary | topic=${topic} | payload=message 3 |
+| @{msgs} | Create List | ${msg1} | ${msg2} | ${msg3} |
+| Publish Multiple | msgs=${msgs} | hostname=127.0.0.1 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Publish Single">
+<arguments>
+<arg>topic</arg>
+<arg>payload=None</arg>
+<arg>qos=0</arg>
+<arg>retain=False</arg>
+<arg>hostname=localhost</arg>
+<arg>port=1883</arg>
+<arg>client_id=</arg>
+<arg>keepalive=60</arg>
+<arg>will=None</arg>
+<arg>auth=None</arg>
+<arg>tls=None</arg>
+<arg>protocol=3</arg>
+</arguments>
+<doc>Publish a single message and disconnect. This keyword uses the
+[http://eclipse.org/paho/clients/python/docs/#single|single]
+function of publish module.
+
+`topic` topic to which the message will be published
+
+`payload` message payload to publish (default None)
+
+`qos` qos of the message (default 0)
+
+`retain` retain flag (True or False, default False)
+
+`hostname` MQTT broker host (default localhost)
+
+`port` broker port (default 1883)
+
+`client_id` if not specified, a random id is generated
+
+`keepalive` keepalive timeout value for client
+
+`will` a dict containing will parameters for client:
+    will = {'topic': "&lt;topic&gt;", 'payload':"&lt;payload"&gt;, 'qos':&lt;qos&gt;,
+        'retain':&lt;retain&gt;}
+
+`auth` a dict containing authentication parameters for the client:
+    auth = {'username':"&lt;username&gt;", 'password':"&lt;password&gt;"}
+
+`tls` a dict containing TLS configuration parameters for the client:
+    dict = {'ca_certs':"&lt;ca_certs&gt;", 'certfile':"&lt;certfile&gt;",
+        'keyfile':"&lt;keyfile&gt;", 'tls_version':"&lt;tls_version&gt;",
+        'ciphers':"&lt;ciphers"&gt;}
+
+`protocol` MQTT protocol version (MQTTv31 or MQTTv311)
+
+Example:
+
+Publish a message on specified topic and disconnect:
+| Publish Single | topic=t/mqtt | payload=test | hostname=127.0.0.1 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Set Username And Password">
+<arguments>
+<arg>username</arg>
+<arg>password=None</arg>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Subscribe">
+<arguments>
+<arg>topic</arg>
+<arg>qos</arg>
+<arg>timeout=1</arg>
+<arg>limit=1</arg>
+</arguments>
+<doc>Subscribe to a topic and return a list of message payloads received
+    within the specified time.
+
+`topic` topic to subscribe to
+
+`qos` quality of service for the subscription
+
+`timeout` duration of subscription
+
+`limit` the max number of payloads that will be returned. Specify 0
+    for no limit
+
+Examples:
+
+Subscribe and get a list of all messages received within 5 seconds
+| ${messages}= | Subscribe | test/test | qos=1 | timeout=5 | limit=0 |
+
+Subscribe and get 1st message received within 60 seconds
+| @{messages}= | Subscribe | test/test | qos=1 | timeout=60 | limit=1 |
+| Length should be | ${messages} | 1 |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Subscribe And Validate">
+<arguments>
+<arg>topic</arg>
+<arg>qos</arg>
+<arg>payload</arg>
+<arg>timeout=1</arg>
+</arguments>
+<doc>Subscribe to a topic and validate that the specified payload is
+received within timeout. It is required that a connection has been
+established using `Connect` keyword. The payload can be specified as
+a python regular expression. If the specified payload is not received
+within timeout, an AssertionError is thrown.
+
+`topic` topic to subscribe to
+
+`qos` quality of service for the subscription
+
+`payload` payload (message) that is expected to arrive
+
+`timeout` time to wait for the payload to arrive
+
+Examples:
+
+| Subscribe And Validate | test/test | 1 | test message |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Unsubscribe">
+<arguments>
+<arg>topic</arg>
+</arguments>
+<doc>Unsubscribe the client from the specified topic.
+
+`topic` topic to unsubscribe from
+
+Example:
+| Unsubscribe | test/mqtt_test |</doc>
+<tags>
+</tags>
+</kw>
+</keywordspec>

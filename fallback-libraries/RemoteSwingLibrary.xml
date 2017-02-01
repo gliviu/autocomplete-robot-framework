@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keywordspec generated="20160413 16:24:18" type="library" name="RemoteSwingLibrary" format="ROBOT">
-<version>2.1.2</version>
+<keywordspec generated="20160805 15:42:53" type="library" name="RemoteSwingLibrary" format="ROBOT">
+<version></version>
 <scope>global</scope>
 <namedargs>yes</namedargs>
 <doc>Robot Framework library leveraging Java-agents to run [https://github.com/robotframework/SwingLibrary|SwingLibrary]
@@ -52,27 +52,17 @@
     </doc>
 <init>
 <arguments>
-<arg>port=None</arg>
-<arg>aphost=127.0.0.1</arg>
-<arg>apport=None</arg>
+<arg>port=0</arg>
 <arg>debug=False</arg>
-<arg>close_security_dialogs=False</arg>
-<arg>_RemoteSwingLibrary__reload=False</arg>
 </arguments>
 <doc>
         *port*: optional port for the server receiving connections from remote agents
 
-        *apport*: optional port for server receiving connections of remote agent.
-        Should be used if you want to reconnect to same application between robot runs.
-
-        *aphost*: opptional network address of application we want to connect into
-
         *debug*: optional flag that will start agent in mode with more logging for troubleshooting (set to TRUE to enable)
 
-        *close_security_dialogs*: optional flag for automatic security dialogs closing (set to TRUE to enable)
-
-        NOTE! with special value 'TEST' starts a test application for documentation generation
-        purposes `python -m robot.libdoc RemoteSwingLibrary::TEST RemoteSwingLibrary.html`</doc>
+        NOTE! RemoteSwingLibrary is a so called Global Scope library. This means when it is imported once it will be
+        available until end of robot run. Parameters used in imports from others suites will be ignored.
+        If you need to change import options between suites, please use *Reinitiate* keyword.</doc>
 <tags>
 </tags>
 </init>
@@ -87,7 +77,9 @@ Does not clear earlier selections.
 
 Example:
 | Select Table Cell | _myTable_ | _0_ | _2_       | # Selects cell from first row and third column |
-| Select Table Cell | _myTable_ | _1_ | _Keyword_ | # Selects cell from second row and column with header 'Keyword' |</doc>
+| Select Table Cell | _myTable_ | _1_ | _Keyword_ | # Selects cell from second row and column with header 
+Keyword
+ |</doc>
 <tags>
 </tags>
 </kw>
@@ -117,7 +109,9 @@ Example:
 <arguments>
 <arg>alias</arg>
 <arg>timeout=60</arg>
-<arg>name_contains=None</arg>
+<arg>name_contains=</arg>
+<arg>remote_port=0</arg>
+<arg>remote_host=127.0.0.1</arg>
 </arguments>
 <doc>Detects new RemoteSwingLibrary Java-agents in applications that are started without
         using the Start Application -keyword. The given alias is stored to identify the
@@ -410,7 +404,9 @@ Note! Some keys have more convinient case insensitive aliases that can be used: 
 Examples:
 | Click On Table Cell | _myTable_ | _0_ | _2_ | # Double clicks with mouse button 2 on the cell in the first row and third column... |
 | ... | _2_ | _RIGHT BUTTON_ | _ALT_ | # ... while holding down the ALT key |
-| Click On Table Cell | _myTable_ | _1_ | _Header_ | # Single click on the cell in the second row and column with header 'Header'... |
+| Click On Table Cell | _myTable_ | _1_ | _Header_ | # Single click on the cell in the second row and column with header 
+Header
+... |
 | ... | _1_ | _BUTTON1_MASK_ | _CTRL_MASK_ | _SHIFT_MASK_ | # ... while holding down the CTRL and SHIFT keys |</doc>
 <tags>
 </tags>
@@ -443,7 +439,9 @@ Default click count is one:
 Column can be identified either by index or by column title. Indexes start at 0
 Examples:
 | Click Table Header | myTable | 2 | # Click the third column |
-| Click Table Header | myTable | amount | # Click the column that has title 'amount' |</doc>
+| Click Table Header | myTable | amount | # Click the column that has title 
+amount
+ |</doc>
 <tags>
 </tags>
 </kw>
@@ -460,12 +458,16 @@ Examples:
 </arguments>
 <doc>Closes a dialog.
 
-*N.B.* Regular expression can be used to close the dialog by prefixing the identifier with 'regexp='.
+*N.B.* Regular expression can be used to close the dialog by prefixing the identifier with 
+regexp=
+.
 Please see more about regexp usage at `Select Dialog` keyword.
 
 Example:
 | Close Dialog | _About_ |
-| Close Dialog  | _regexp=^A.*_ | Closes a dialog starting with 'A' |</doc>
+| Close Dialog  | _regexp=^A.*_ | Closes a dialog starting with 
+A
+ |</doc>
 <tags>
 </tags>
 </kw>
@@ -487,7 +489,9 @@ Example:
 </arguments>
 <doc>Closes a window.
 
-*N.B.* Regular expression can be used to close the window by prefixing the identifier with 'regexp='.
+*N.B.* Regular expression can be used to close the window by prefixing the identifier with 
+regexp=
+.
 Please learn more about java reqular expressions at http://java.sun.com/docs/books/tutorial/essential/regex/ 
  and patterns http://java.sun.com/javase/7/docs/api/java/util/regex/Pattern.html 
 
@@ -591,18 +595,6 @@ Example:
 <tags>
 </tags>
 </kw>
-<kw name="Connect To Application">
-<arguments>
-<arg>alias</arg>
-<arg>timeout=60</arg>
-<arg>name_contains=None</arg>
-</arguments>
-<doc>Connects to application that was started in earlier RobotFramework run.
-        *apport* import option needs to be set to use this keyword.
-        Application that we want to connect into needs to be started by Start Application keyword when using same *apport* value.</doc>
-<tags>
-</tags>
-</kw>
 <kw name="De Iconify Internal Frame">
 <arguments>
 <arg>identifier</arg>
@@ -703,7 +695,11 @@ This is useful when we want to operate on cells which location can change.
 Example:
 | ${row}= | Find Table Row | _myTable_ | _Some Value_ |
 | Select From Table Cell Popup Menu | _myTable_ | _${row}_ | _2_ | _Activate_ |
-| ${row}= | Find Table Row | _myTable_ | _Some Value_ | _Some Column_ | # Searches the _'Some Value'_ from the specified  _'Some Column'_  |</doc>
+| ${row}= | Find Table Row | _myTable_ | _Some Value_ | _Some Column_ | # Searches the _
+Some Value
+_ from the specified  _
+Some Column
+_  |</doc>
 <tags>
 </tags>
 </kw>
@@ -811,7 +807,8 @@ Example:
 <arguments>
 <arg>index</arg>
 </arguments>
-<doc>Selects an item from the menu of the window that was opened first and returns it's name.
+<doc>Selects an item from the menu of the window that was opened first and returns it
+s name.
 
 Example:
 | ${mainMenuItemName}= | Get Main Menu Item Name | _0_                   |
@@ -897,7 +894,8 @@ Example:
 <arg>identifier</arg>
 <arg>source=auto</arg>
 </arguments>
-<doc>Returns selected cell's value from a table.
+<doc>Returns selected cell
+s value from a table.
 
 Optional parameter _source_ allows to override text extraction strategy. Available values are _auto_ (default, will try to get text from cell component first and then from table model) and _model_ (will only try to get text from table model).
 
@@ -911,7 +909,8 @@ Example:
 <arguments>
 <arg>identifier</arg>
 </arguments>
-<doc>Returns the item that's currently selected in the list.
+<doc>Returns the item that
+s currently selected in the list.
 
 Example:
 | ${listItem}=    | Get Selected Value From List | _myList_      |
@@ -977,7 +976,8 @@ Example:
 <arg>columnIdentifier</arg>
 <arg>source=auto</arg>
 </arguments>
-<doc>Returns cell's value from a table.
+<doc>Returns cell
+s value from a table.
 
 Starting from SwingLibrary 1.1.4, value from cell rendered with check box is string true/false.
 Optional parameter _source_ allows to override text extraction strategy. Available values are _auto_ (default, will try to get text from cell component first and then from table model) and _model_ (will only try to get text from table model).
@@ -1017,7 +1017,8 @@ Example:
 <arguments>
 <arg>identifier</arg>
 </arguments>
-<doc>Returns table's header names.
+<doc>Returns table
+s header names.
 
 Example:
 | @{headers}= | Get Table Headers | _myTable_ |</doc>
@@ -1079,7 +1080,8 @@ Example:
 <arguments>
 <arg>identifier</arg>
 </arguments>
-<doc>Returns the component's tooltip text.
+<doc>Returns the component
+s tooltip text.
 
 Example:
 | ${tooltip}= | Get Tooltip Text | _saveButton_ |
@@ -1196,7 +1198,8 @@ Example:
 <arguments>
 <arg>identifier</arg>
 </arguments>
-<doc>Fails if the internal frame doesn't exist in the current context.
+<doc>Fails if the internal frame doesn
+t exist in the current context.
 
 Example:
 | Internal Frame Should Exist | _My Internal Frame_ |</doc>
@@ -1280,7 +1283,8 @@ Example:
 </arguments>
 <doc>Prints components (their types and their internal names) from the selected context.
 
-By default returns the component names without formatting used in the printout. If given an argument, the return value will have the same formatting as the printout. The internal name is set with component's setName method: http://java.sun.com/j2se/1.4.2/docs/api/java/awt/Component.html#setName(java.lang.String).
+By default returns the component names without formatting used in the printout. If given an argument, the return value will have the same formatting as the printout. The internal name is set with component
+s setName method: http://java.sun.com/j2se/1.4.2/docs/api/java/awt/Component.html#setName(java.lang.String).
 See keywords, `Select Window`, `Select Dialog` and `Select Context` for details about context.
 
 Example:
@@ -1348,7 +1352,8 @@ Example:
 <arguments>
 <arg>menuPath</arg>
 </arguments>
-<doc>Fails if menu item doesn't exist in the window that was opened first.
+<doc>Fails if menu item doesn
+t exist in the window that was opened first.
 Shortcut for:
 | Select Window    | _0_ |
 | Menu Item Should Exist | _Tools|Testing|MyTestTool_ |
@@ -1429,7 +1434,8 @@ Example:
 <arguments>
 <arg>menuPath</arg>
 </arguments>
-<doc>Fails if menu item doesn't exist.
+<doc>Fails if menu item doesn
+t exist.
 
 Example:
 | Menu Item Should Exist | _Tools|Testing|Test Tool_ |</doc>
@@ -1558,6 +1564,16 @@ Example:
 <tags>
 </tags>
 </kw>
+<kw name="Reinitiate">
+<arguments>
+<arg>port=0</arg>
+<arg>debug=False</arg>
+</arguments>
+<doc>
+        Restarts RemoteSwingLibrary with new import parameters.</doc>
+<tags>
+</tags>
+</kw>
 <kw name="Right Click On Component">
 <arguments>
 <arg>identifier</arg>
@@ -1574,7 +1590,8 @@ Example:
 <arg>*arguments</arg>
 </arguments>
 <doc>Executes the given keyword with the given arguments in a separate thread.
-Useful if the given keyword starts a process that stays running (e.g. opens a dialog) and doesn't return.
+Useful if the given keyword starts a process that stays running (e.g. opens a dialog) and doesn
+t return.
 Known limitations:
 - The return value of the keyword being run is ignored.
 - Exceptions thrown by the keyword are ignored, which implies that this keyword should not be used
@@ -1612,8 +1629,12 @@ Example:
 Context has to be a window, dialog, internal frame or panel. Requires that a parent context has been selected beforehand using `Select Window` or `Select Dialog`.
 
 Example:
-| Select Window  | _Main Window_ | # Selects the 'parent context' |
-| Select Context | _myPanel_     | # Sets _'myPanel'_ as current context |</doc>
+| Select Window  | _Main Window_ | # Selects the 
+parent context
+ |
+| Select Context | _myPanel_     | # Sets _
+myPanel
+_ as current context |</doc>
 <tags>
 </tags>
 </kw>
@@ -1623,13 +1644,17 @@ Example:
 </arguments>
 <doc>Selects a dialog as current context and sets focus to it.
 
-*N.B.* Regular expression can be used to select the dialog by prefixing the identifier with 'regexp='.
+*N.B.* Regular expression can be used to select the dialog by prefixing the identifier with 
+regexp=
+.
 Please learn more about java reqular expressions at http://java.sun.com/docs/books/tutorial/essential/regex/ 
  and patterns http://java.sun.com/javase/7/docs/api/java/util/regex/Pattern.html 
 
 Example:
 | Select Dialog  | _About_ |
-| Select Dialog  | _regexp=^A.*_ | Selects a dialog starting with 'A' |</doc>
+| Select Dialog  | _regexp=^A.*_ | Selects a dialog starting with 
+A
+ |</doc>
 <tags>
 </tags>
 </kw>
@@ -1647,9 +1672,15 @@ The item selection is verified by default and can be disabled using the optional
 *N.B.* If the combobox changes its items on selection, disable the verification and optionally check the selection using the keyword `Get Selected Item From Combo Box`.
 
 Example:
-| Select From Combo Box | _myComboBox_ | _myItem_ | # Selects _'myItem'_ from combobox |
+| Select From Combo Box | _myComboBox_ | _myItem_ | # Selects _
+myItem
+_ from combobox |
 | Select From Combo Box | _myComboBox_ | _0_      | # Selects the first item from combobox |
-| Select From Combo Box | _myComboBox_ | _myItem_ | _don't verify_ | # Selects _'myItem'_ from combobox and doesn't verify that myItem is selected |</doc>
+| Select From Combo Box | _myComboBox_ | _myItem_ | _don
+t verify_ | # Selects _
+myItem
+_ from combobox and doesn
+t verify that myItem is selected |</doc>
 <tags>
 </tags>
 </kw>
@@ -1672,7 +1703,9 @@ Example:
 <doc>Selects an item from the list.
 
 Examples:
-| Select From List | _myList_ | _myItem_ | # selects 'myItem'                   |
+| Select From List | _myList_ | _myItem_ | # selects 
+myItem
+                   |
 | Select From List | _myList_ | _0_      | # selects the first item in the list |
 
 | Select From List | _myList_ | _myItem_ | _2_ | # doubleclicks on item |
@@ -1756,7 +1789,9 @@ Example:
 </arguments>
 <doc>Invokes a menu action on all the selected tree nodes.
 Does not wait for a result.
-Separator for items is '|'.
+Separator for items is 
+|
+.
 
 Examples:
 | Select Tree Node | _myTree_ | _Root|Folder1_ |
@@ -1773,7 +1808,9 @@ Examples:
 <arg>menuPath</arg>
 </arguments>
 <doc>Selects an item from a table cell popup.
-Separator for items is '|'.
+Separator for items is 
+|
+.
 
 Example:
 | Select From Table Cell Popup Menu | _myTable_ | _1_ | _3_ | _Cell Actions|Clear Cell Value_ |</doc>
@@ -1786,7 +1823,9 @@ Example:
 <arg>menuPath</arg>
 </arguments>
 <doc>Selects an item from a table cell popup on the table cells that are selected.
-Separator for items is '|'.
+Separator for items is 
+|
+.
 
 Example:
 | Select From Table Cell Popup Menu On Selected Cells | _myTable_ | _Cell Actions|Clear Cell Value_ |</doc>
@@ -1799,7 +1838,8 @@ Example:
 <arg>nodeIdentifier</arg>
 <arg>menuPath</arg>
 </arguments>
-<doc>Selects an item from the tree node's popup menu.
+<doc>Selects an item from the tree node
+s popup menu.
 
 Example:
 | Select From Tree Node Popup Menu | _myTree_ | _Root|Folder_ | _New Folder_ |</doc>
@@ -1812,9 +1852,13 @@ Example:
 <arg>nodeIdentifier</arg>
 <arg>menuPath</arg>
 </arguments>
-<doc>Selects an item from the tree node's popup menu and does not wait for a result.
-Needed if the action starts a process that stays running (e.g. opens a dialog) and the above keyword doesn't return.
-Separator for items is '|'.
+<doc>Selects an item from the tree node
+s popup menu and does not wait for a result.
+Needed if the action starts a process that stays running (e.g. opens a dialog) and the above keyword doesn
+t return.
+Separator for items is 
+|
+.
 
 Example:
 | Select From Tree Node Popup Menu In Separate Thread | _myTree_ | _Root|Folder_ | _New Folder_ |</doc>
@@ -1890,7 +1934,9 @@ Example:
 
 Example:
 | Select Table Cell | _myTable_ | _0_ | _2_       | # Selects cell from first row and third column |
-| Select Table Cell | _myTable_ | _1_ | _Keyword_ | # Selects cell from second row and column with header 'Keyword' |</doc>
+| Select Table Cell | _myTable_ | _1_ | _Keyword_ | # Selects cell from second row and column with header 
+Keyword
+ |</doc>
 <tags>
 </tags>
 </kw>
@@ -1933,7 +1979,9 @@ Any number of node identifiers can be provided to select multiple nodes at once:
 </arguments>
 <doc>Selects a window as current context and sets focus to it.
 
-*N.B.* Regular expression can be used to select the window by prefixing the identifier with 'regexp='.
+*N.B.* Regular expression can be used to select the window by prefixing the identifier with 
+regexp=
+.
 Please learn more about java reqular expressions at http://java.sun.com/docs/books/tutorial/essential/regex/ 
  and patterns http://java.sun.com/javase/7/docs/api/java/util/regex/Pattern.html 
 
@@ -1976,6 +2024,8 @@ Example with table:
 </kw>
 <kw name="Set Java Tool Options">
 <arguments>
+<arg>close_security_dialogs=True</arg>
+<arg>remote_port=0</arg>
 </arguments>
 <doc>Sets the JAVA_TOOL_OPTIONS to include RemoteSwingLibrary Agent and
         the _JAVA_OPTIONS to set a temporary policy granting all permissions.
@@ -2009,11 +2059,14 @@ Example:
 <kw name="Set Jemmy Timeout">
 <arguments>
 <arg>timeoutName</arg>
-<arg>timeoutInSeconds</arg>
+<arg>timeout</arg>
 </arguments>
 <doc>Sets the jemmy timeout used for waiting a component to appear.
 Timeout names are listed here: http://jemmy.java.net/OperatorsEnvironment.html#timeouts
 Returns the old timeout setting value.
+
+This keyword by default takes timeout value is seconds, you can however suffix it with `ms` to provide it in milliseconds.
+Return value will always be in units you used for the argument.
 
 Example:
 | Set Jemmy Timeout | DialogWaiter.WaitDialogTimeout | 3 |
@@ -2023,10 +2076,12 @@ Example:
 </kw>
 <kw name="Set Jemmy Timeouts">
 <arguments>
-<arg>timeoutInSeconds</arg>
+<arg>timeout</arg>
 </arguments>
 <doc>Sets all relevant jemmy timeouts. 
 By default they are all set to 5 seconds.
+
+This keyword by default takes timeout value is seconds, you can however suffix it with `ms` to provide it in milliseconds.
 
 List of all the timeouts this keywords sets:
 | *Timeout Name* | *Description* |
@@ -2159,7 +2214,9 @@ Example:
 <arg>alias</arg>
 <arg>command</arg>
 <arg>timeout=60</arg>
-<arg>name_contains=None</arg>
+<arg>name_contains=</arg>
+<arg>close_security_dialogs=False</arg>
+<arg>remote_port=0</arg>
 </arguments>
 <doc>Starts the process in the `command` parameter  on the host operating system.
         The given alias is stored to identify the started application in RemoteSwingLibrary.
@@ -2168,15 +2225,6 @@ Example:
         name_contains is a text that must be part of the name of the java process that we are connecting to.
         name_contains helps in situations where multiple java-processes are started.
         To see the name of the connecting java agents run tests with --loglevel DEBUG.</doc>
-<tags>
-</tags>
-</kw>
-<kw name="Stop Remote Server">
-<arguments>
-</arguments>
-<doc>Stops the remote server.
-
-The server may be configured so that users cannot stop it.</doc>
 <tags>
 </tags>
 </kw>
@@ -2206,7 +2254,9 @@ The server may be configured so that users cannot stop it.</doc>
 <arg>menuPath</arg>
 </arguments>
 <doc>Fails if the given table cell popup menu is enabled.
-Separator for items is '|'.
+Separator for items is 
+|
+.
 
 Example:
 | Table Cell Popup Menu Should Be Disabled | _myTable_ | _1_ | _3_ | _Cell Actions|Clear Cell Value_ |</doc>
@@ -2221,7 +2271,9 @@ Example:
 <arg>menuPath</arg>
 </arguments>
 <doc>Fails if the given table cell popup menu is disabled.
-Separator for items is '|'.
+Separator for items is 
+|
+.
 
 Example:
 | Table Cell Popup Menu Should Be Enabled | _myTable_ | _1_ | _3_ | _Cell Actions|Clear Cell Value_ |</doc>
@@ -2438,7 +2490,8 @@ Example:
 <arg>identifier</arg>
 <arg>nodeIdentifier</arg>
 </arguments>
-<doc>Fails if the node doesn't have child nodes.
+<doc>Fails if the node doesn
+t have child nodes.
 You might want to set the waiting timeout with the keyword `Set Jemmy Timeout`
 
 Example:

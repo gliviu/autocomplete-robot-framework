@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keywordspec generated="20170201 07:02:42" type="library" name="DiffLibrary" format="ROBOT">
+<version></version>
+<scope>global</scope>
+<namedargs>yes</namedargs>
+<doc>Documentation for test library ``DiffLibrary``.</doc>
+<kw name="Diff Files">
+<arguments>
+<arg>file1</arg>
+<arg>file2</arg>
+<arg>fail=True</arg>
+</arguments>
+<doc>Diff two text files
+
+``file1``: absolute path to the first first file
+
+``file2``: absolute path to the first second file
+
+``fail``:  If there are differences it will throw an exception and
+test will fail defaults to True, if False test's will continue</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Diff Outputs">
+<arguments>
+<arg>text1</arg>
+<arg>text2</arg>
+<arg>fail=True</arg>
+</arguments>
+<doc>Diff between target and source texts
+
+``text1``: Target output
+
+``text2``: Source output
+
+``fail``:  If there are differences it will throw an exception and
+test will fail defaults to True, if False test's will continue</doc>
+<tags>
+</tags>
+</kw>
+</keywordspec>

@@ -1,28 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keywordspec generated="20170201 07:02:42" type="library" name="Selenium2Library" format="ROBOT">
-<version>1.8.0</version>
+<keywordspec generated="20170201 07:02:42" type="library" name="ExtendedSelenium2Library" format="ROBOT">
+<version>0.9.1</version>
 <scope>global</scope>
 <namedargs>yes</namedargs>
-<doc>Selenium2Library is a web testing library for Robot Framework.
+<doc>ExtendedSelenium2Library is a [http://goo.gl/boVQia|Selenium2 (WebDriver)]
+web testing library with [https://goo.gl/Kzz8Y3|AngularJS] support and
+custom improvement for [http://goo.gl/lES6WM|Robot Framework].
 
-It uses the Selenium 2 (WebDriver) libraries internally to control a web browser.
-See http://seleniumhq.org/docs/03_webdriver.html for more information on Selenium 2
-and WebDriver.
+ExtendedSelenium2Library strives to make the transition from
+[https://goo.gl/1VXDSI|Selenium2Library] as seamless as possible.
+It uses [http://goo.gl/boVQia|Selenium2 (WebDriver)] libraries
+and [https://goo.gl/Kzz8Y3|AngularJS] synchronization internally to control a web browser
+and ensure all the keywords stay in sync with [https://goo.gl/Kzz8Y3|AngularJS] process.
 
-Selenium2Library runs tests in a real browser instance. It should work in
+See `Wait Until Angular Ready` keyword for a list of all other keywords that is already
+calling `Wait Until Angular Ready` from within.
+See [http://goo.gl/boVQia|Selenium2 and WebDriver] for more information.
+
+ExtendedSelenium2Library runs tests in a real browser instance. It should work in
 most modern browsers and can be used with both Python and Jython interpreters.
+
+Non-inherited Keywords:
+| `Element Attribute Should Contain`                 |
+| `Element Attribute Should Not Contain`             |
+| `Execute Async Javascript With Replaced Variables` |
+| `Execute Javascript With Replaced Variables`       |
+| `Fast Wait Until Page Contains`                    |
+| `Get Browser Logs`                                 |
+| `Get Screen Size`                                  |
+| `Is Element Visible`                               |
+| `Register Page Ready Keyword`                      |
+| `Remove Page Ready Keyword`                        |
+| `Scroll Element Into View`                         |
+| `Wait For Async Condition`                         |
+| `Wait For Condition With Replaced Variables`       |
+| `Wait Until Angular Ready`                         |
+| `Wait Until Element Contains Attribute`            |
+| `Wait Until Element Does Not Contain Attribute`    |
+| `Wait Until Location Contains`                     |
+| `Wait Until Location Does Not Contain`             |
+| `Warn Any Javascript Errors`                       |
+
+AngularJS Locators Support:
+| *AngularJS Strategy* | *Example*                                         | *Description*                                        |
+| model                | Click Element   `|` model=model_name              | Matches by AngularJS model name                      |
+| binding              | Click Element   `|` binding=binding_name          | Matches by AngularJS binding name                    |
+| partial binding      | Click Element   `|` partial binding=binding_name  | Matches by partial AngularJS binding name            |
+| button               | Click Element   `|` button=My Button              | Matches button elements by their button text         |
+| partial button       | Click Element   `|` partial button=y But          | Matches button elements by their partial button text |
+| options              | Get WebElements `|` options=options_descriptor    | Matches by AngularJS options descriptor              |
 
 = Before running tests =
 
-Prior to running test cases using Selenium2Library, Selenium2Library must be
+Prior to running test cases using ExtendedSelenium2Library, ExtendedSelenium2Library must be
 imported into your Robot test suite (see `importing` section), and the
 `Open Browser` keyword must be used to open a browser to the desired location.
 
 
-*--- Note important change starting with Version 1.7.0 release ---*
+
+*--- Note important change starting with version 0.4.9 release ---*
 = Locating or specifying elements =
 
-All keywords in Selenium2Library that need to find an element on the page
+All keywords in ExtendedSelenium2Library that need to find an element on the page
 take an argument, either a `locator` or now a `webelement`. `locator`
 is a string that describes how to locate an element using a syntax
 specifying different location strategies. `webelement` is a variable that
@@ -37,7 +76,7 @@ using just the `id` as a `locator`. For example:
 
 | Click Element    my_element
 
-It is also possible to specify the approach Selenium2Library should take
+It is also possible to specify the approach ExtendedSelenium2Library should take
 to find an element by specifying a lookup strategy with a locator
 prefix. Supported strategies are:
 
@@ -64,7 +103,7 @@ This can be fixed by changing the locator to:
 
 *Using webelements*
 ------------------
-Starting with version 1.7 of the Selenium2Library, one can pass an argument
+Starting with version 0.4.9 of the ExtendedSelenium2Library, one can pass an argument
 that contains a WebElement instead of a string locator. To get a WebElement,
 use the new `Get WebElements` keyword.  For example:
 
@@ -118,40 +157,46 @@ For more information about the time syntax see:
 http://robotframework.googlecode.com/svn/trunk/doc/userguide/RobotFrameworkUserGuide.html#time-format.</doc>
 <init>
 <arguments>
-<arg>timeout=5.0</arg>
-<arg>implicit_wait=0.0</arg>
-<arg>run_on_failure=Capture Page Screenshot</arg>
-<arg>screenshot_root_directory=None</arg>
+<arg>implicit_wait=15.0</arg>
+<arg>**kwargs</arg>
 </arguments>
-<doc>Selenium2Library can be imported with optional arguments.
+<doc>ExtendedSelenium2Library can be imported with optional arguments.
 
-`timeout` is the default timeout used to wait for all waiting actions.
-It can be later set with `Set Selenium Timeout`.
-
-'implicit_wait' is the implicit timeout that Selenium waits when
-looking for elements.
-It can be later set with `Set Selenium Implicit Wait`.
-See `WebDriver: Advanced Usage`__ section of the SeleniumHQ documentation
-for more information about WebDriver's implicit wait functionality.
-
-__ http://seleniumhq.org/docs/04_webdriver_advanced.html#explicit-and-implicit-waits
-
-`run_on_failure` specifies the name of a keyword (from any available
-libraries) to execute when a Selenium2Library keyword fails. By default
-`Capture Page Screenshot` will be used to take a screenshot of the current page.
-Using the value "Nothing" will disable this feature altogether. See
-`Register Keyword To Run On Failure` keyword for more information about this
-functionality.
-
-`screenshot_root_directory` specifies the default root directory that screenshots should be
-stored in. If not provided the default directory will be where robotframework places its logfile.
+Arguments:
+- ``timeout``: The maximum value to wait for all waiting actions. (Default 5.0)
+               It can be set later with `Set Selenium Timeout`.
+               See `introduction` for more information about ``timeout``.
+- ``implicit_wait``: The maximum implicit timeout value to wait when looking
+                     for elements. (Default 15.0)
+                     It can be later set with `Set Selenium Implicit Wait`.
+                     See [http://goo.gl/8ePMo6|WebDriver: Advanced Usage]
+                     section of the SeleniumHQ documentation for more information about
+                     WebDriver's implicit wait functionality.
+- ``run_on_failure``: The name of a keyword (from any available libraries) to execute
+                      when a ExtendedSelenium2Library keyword fails. By default
+                      `Capture Page Screenshot` will be used to take a screenshot of
+                      the current page.
+                      Using the value "Nothing" will disable this feature altogether.
+                      See `Register Keyword To Run On Failure` keyword for
+                      more information about this functionality.
+- ``screenshot_root_directory``: The default root directory that screenshots should be
+                                 stored in. If not provided, the default directory will be
+                                 where [http://goo.gl/lES6WM|Robot Framework] places its
+                                 logfile.
+- ``block_until_page_ready``: A boolean flag to block the execution until
+                              the page is ready. (Default True)
+- ``browser_breath_delay``: The delay value in seconds to give the browser enough time to
+                            complete current execution. (Default 0.05)
+- ``ensure_jq``: A boolean flag to ensure jQuery library is loaded on the page.
+                 ``sizzle`` locator strategy will depend on this flag. (Default True)
+- ``poll_frequency``: The delay value in seconds to retry the next step. (Default 0.2)
 
 Examples:
-| Library `|` Selenium2Library `|` 15                                            | # Sets default timeout to 15 seconds                                       |
-| Library `|` Selenium2Library `|` 0 `|` 5                                       | # Sets default timeout to 0 seconds and default implicit_wait to 5 seconds |
-| Library `|` Selenium2Library `|` 5 `|` run_on_failure=Log Source               | # Sets default timeout to 5 seconds and runs `Log Source` on failure       |
-| Library `|` Selenium2Library `|` implicit_wait=5 `|` run_on_failure=Log Source | # Sets default implicit_wait to 5 seconds and runs `Log Source` on failure |
-| Library `|` Selenium2Library `|` timeout=10      `|` run_on_failure=Nothing    | # Sets default timeout to 10 seconds and does nothing on failure           |</doc>
+| Library `|` ExtendedSelenium2Library `|` 15                                            | # Sets default timeout to 15 seconds                                       |
+| Library `|` ExtendedSelenium2Library `|` 0 `|` 5                                       | # Sets default timeout to 0 seconds and default implicit_wait to 5 seconds |
+| Library `|` ExtendedSelenium2Library `|` 5 `|` run_on_failure=Log Source               | # Sets default timeout to 5 seconds and runs `Log Source` on failure       |
+| Library `|` ExtendedSelenium2Library `|` implicit_wait=5 `|` run_on_failure=Log Source | # Sets default implicit_wait to 5 seconds and runs `Log Source` on failure |
+| Library `|` ExtendedSelenium2Library `|` timeout=10      `|` run_on_failure=Nothing    | # Sets default timeout to 10 seconds and does nothing on failure           |</doc>
 <tags>
 </tags>
 </init>
@@ -361,22 +406,38 @@ See `introduction` for details about locating elements.</doc>
 <kw name="Click Button">
 <arguments>
 <arg>locator</arg>
+<arg>skip_ready=False</arg>
 </arguments>
-<doc>Clicks a button identified by `locator`.
+<doc>Clicks a button identified by ``locator``.
 
-Key attributes for buttons are `id`, `name` and `value`. See
-`introduction` for details about locating elements.</doc>
+Arguments:
+- ``locator``: The locator to find requested button. Key attributes for
+               arbitrary buttons are ``id``, ``name``, and ``value``.
+               See `introduction` for details about locating elements.
+- ``skip_ready``: A boolean flag to skip the wait for page ready. (Default False)
+
+Examples:
+| Click Button | css=button.class |
+| Click Button | css=button.class | True |</doc>
 <tags>
 </tags>
 </kw>
 <kw name="Click Element">
 <arguments>
 <arg>locator</arg>
+<arg>skip_ready=False</arg>
 </arguments>
-<doc>Click element identified by `locator`.
+<doc>Clicks an element identified by ``locator``.
 
-Key attributes for arbitrary elements are `id` and `name`. See
-`introduction` for details about locating elements.</doc>
+Arguments:
+- ``locator``: The locator to find requested element. Key attributes for
+               arbitrary elements are ``id`` and ``name``. See `introduction` for
+               details about locating elements.
+- ``skip_ready``: A boolean flag to skip the wait for page ready. (Default False)
+
+Examples:
+| Click Element | css=div.class |
+| Click Element | css=div.class | True |</doc>
 <tags>
 </tags>
 </kw>
@@ -385,35 +446,61 @@ Key attributes for arbitrary elements are `id` and `name`. See
 <arg>locator</arg>
 <arg>xoffset</arg>
 <arg>yoffset</arg>
+<arg>skip_ready=False</arg>
 </arguments>
-<doc>Click element identified by `locator` at x/y coordinates of the element.
-Cursor is moved and the center of the element and x/y coordinates are
-calculted from that point.
+<doc>Clicks an element identified by ``locator`` at x/y coordinates of the element.
+Cursor is moved at the center of the element and x/y coordinates are
+calculated from that point.
 
-Key attributes for arbitrary elements are `id` and `name`. See
-`introduction` for details about locating elements.</doc>
+Arguments:
+- ``locator``: The locator to find requested element. Key attributes for
+               arbitrary elements are ``id`` and ``name``. See `introduction` for
+               details about locating elements.
+- ``xoffset``: The x offset value from the center of the element.
+- ``yoffset``: The y offset value from the center of the element.
+- ``skip_ready``: A boolean flag to skip the wait for page ready. (Default False)
+
+Examples:
+| Click Element At Coordinates | css=div.class | 0 | 0 |
+| Click Element At Coordinates | css=div.class | 0 | 0 | True |</doc>
 <tags>
 </tags>
 </kw>
 <kw name="Click Image">
 <arguments>
 <arg>locator</arg>
+<arg>skip_ready=False</arg>
 </arguments>
-<doc>Clicks an image found by `locator`.
+<doc>Clicks an image identified by ``locator``.
 
-Key attributes for images are `id`, `src` and `alt`. See
-`introduction` for details about locating elements.</doc>
+Arguments:
+- ``locator``: The locator to find requested image. Key attributes for
+               arbitrary images are ``id`` and ``name``. See `introduction` for
+               details about locating elements.
+- ``skip_ready``: A boolean flag to skip the wait for page ready. (Default False)
+
+Examples:
+| Click Image | css=img.class |
+| Click Image | css=img.class | True |</doc>
 <tags>
 </tags>
 </kw>
 <kw name="Click Link">
 <arguments>
 <arg>locator</arg>
+<arg>skip_ready=False</arg>
 </arguments>
-<doc>Clicks a link identified by locator.
+<doc>Clicks a link identified by ``locator``.
 
-Key attributes for links are `id`, `name`, `href` and link text. See
-`introduction` for details about locating elements.</doc>
+Arguments:
+- ``locator``: The locator to find requested link. Key attributes for
+               arbitrary links are ``id`` and ``name``. See `introduction` for
+               details about locating elements.
+- ``skip_ready``: A boolean flag to skip the wait for page ready. (Default False)
+
+Examples:
+| Click Link | css=a.class |
+| Click Link | css=a.class | True |</doc>
 <tags>
 </tags>
 </kw>
@@ -565,11 +652,19 @@ dismissed by this keyword or another like `Get Alert Message`.</doc>
 <kw name="Double Click Element">
 <arguments>
 <arg>locator</arg>
+<arg>skip_ready=False</arg>
 </arguments>
-<doc>Double click element identified by `locator`.
+<doc>Double clicks an element identified by ``locator``.
 
-Key attributes for arbitrary elements are `id` and `name`. See
-`introduction` for details about locating elements.</doc>
+Arguments:
+- ``locator``: The locator to find requested element. Key attributes for
+               arbitrary elements are ``id`` and ``name``. See `introduction` for
+               details about locating elements.
+- ``skip_ready``: A boolean flag to skip the wait for page ready. (Default False)
+
+Examples:
+| Double Click Element | css=div.class |
+| Double Click Element | css=div.class | True |</doc>
 <tags>
 </tags>
 </kw>
@@ -604,6 +699,47 @@ negative or positive number specify the offset.
 
 Examples:
 | Drag And Drop By Offset | myElem | 50 | -35 | # Move myElem 50px right and 35px down. |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Element Attribute Should Contain">
+<arguments>
+<arg>attribute_locator</arg>
+<arg>expected</arg>
+<arg>message=</arg>
+</arguments>
+<doc>Verifies element attribute identified by ``attribute_locator`` contains ``expected``.
+
+Arguments:
+- ``attribute_locator``: The locator to find requested element attribute. It consists of
+                         element locator followed by an @ sign and attribute name,
+                         for example "element_id@class".
+- ``expected``: The expected element attribute value.
+- ``message``: The value that would be use to override the default error message.
+
+Examples:
+| Element Attribute Should Contain | css=div.class@class | value |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Element Attribute Should Not Contain">
+<arguments>
+<arg>attribute_locator</arg>
+<arg>unexpected</arg>
+<arg>message=</arg>
+</arguments>
+<doc>Verifies element attribute identified by ``attribute_locator``
+does not contain ``unexpected``.
+
+Arguments:
+- ``attribute_locator``: The locator to find requested element attribute. It consists of
+                         element locator followed by an @ sign and attribute name,
+                         for example "element_id@class".
+- ``unexpected``: The unexpected element attribute value.
+- ``message``: The value that would be use to override the default error message.
+
+Examples:
+| Element Attribute Should Not Contain | css=div.class@class | value |</doc>
 <tags>
 </tags>
 </kw>
@@ -740,6 +876,46 @@ Examples:
 <tags>
 </tags>
 </kw>
+<kw name="Execute Async Javascript With Replaced Variables">
+<arguments>
+<arg>*code</arg>
+</arguments>
+<doc>Replace variables and executes asynchronous the given JavaScript ``code``.
+
+Similar to `Execute Javascript` keyword except that the scripts executed with
+this keyword must explicitly signal when they are finished by invoking the
+provided callback. This callback is always injected into the executed
+function as the last argument.
+
+Scripts must complete within the script timeout or this keyword will
+fail. See the `Timeouts` section for more information.
+
+Arguments:
+- ``code``: It may contain multiple lines of JavaScript code and may be divided into
+            multiple cells in the test data. In that case, the parts are
+            catenated together without adding spaces.
+
+            If ``code`` is an absolute path to an existing file, the JavaScript
+            to execute will be read from that file. Forward slashes work as
+            a path separator on all operating systems.
+
+            The JavaScript executes in the context of the currently selected
+            frame or window as the body of an anonymous function. Use _window_ to
+            refer to the window of your application and _document_ to refer to the
+            document object of the current frame or window, e.g.
+            _document.getElementById('foo')_.
+
+Examples:
+| Execute Async JavaScript With Replaced Variables | var callback = arguments[arguments.length - 1] | window.setTimeout(callback, 2000) |
+| Execute Async JavaScript With Replaced Variables | ${CURDIR}/async_js_to_execute.js               |                                   |
+| ${retval} =              | Execute Async JavaScript With Replaced Variables                       |                                   |
+| ...                      | var callback = arguments[arguments.length - 1]                         |                                   |
+| ...                      | function answer(){callback("text");}                                   |                                   |
+| ...                      | window.setTimeout(answer, 2000)                                        |                                   |
+| Should Be Equal          | ${retval}                                                              | text                              |</doc>
+<tags>
+</tags>
+</kw>
 <kw name="Execute Javascript">
 <arguments>
 <arg>*code</arg>
@@ -769,6 +945,71 @@ Examples:
 | Execute JavaScript | ${CURDIR}/js_to_execute.js            |               |
 | ${sum}=            | Execute JavaScript                    | return 1 + 1; |
 | Should Be Equal    | ${sum}                                | ${2}          |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Execute Javascript With Replaced Variables">
+<arguments>
+<arg>*code</arg>
+</arguments>
+<doc>Replace variables and executes the given JavaScript ``code``.
+
+This keyword returns None unless there is a return statement in the
+JavaScript. Return values are converted to the appropriate type in
+Python, including WebElements.
+
+Arguments:
+- ``code``: It may contain multiple lines of JavaScript code and may be divided into
+            multiple cells in the test data. In that case, the parts are
+            catenated together without adding spaces.
+
+            If ``code`` is an absolute path to an existing file, the JavaScript
+            to execute will be read from that file. Forward slashes work as
+            a path separator on all operating systems.
+
+            The JavaScript executes in the context of the currently selected
+            frame or window as the body of an anonymous function. Use _window_ to
+            refer to the window of your application and _document_ to refer to the
+            document object of the current frame or window, e.g.
+            _document.getElementById('foo')_.
+
+Examples:
+| Execute JavaScript With Replaced Variables | window.my_js_function('arg1', '${arg2}')   |               |
+| Execute JavaScript With Replaced Variables | ${CURDIR}/js_to_execute.js                 |               |
+| ${sum} =                                   | Execute JavaScript With Replaced Variables | return 1 + 1; |
+| Should Be Equal                            | ${sum}                                     | ${2}          |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Fast Wait Until Page Contains">
+<arguments>
+<arg>text</arg>
+<arg>excludes=None</arg>
+<arg>timeout=None</arg>
+<arg>error=None</arg>
+</arguments>
+<doc>Waits until ``text`` appears on current page.
+
+Fails if any item in the ``excludes`` list appears in the current page.
+
+Fails if ``timeout`` expires before the ``text`` appears.
+See introduction for more information about timeout and its default value.
+
+Arguments:
+- ``text``: The expected value.
+- ``excludes``: An exclusion list to be use to speed up the wait. (Default None)
+- ``timeout``: The maximum value to wait for ``text`` to appears.
+               See `introduction` for more information about ``timeout`` and
+               its default value.
+- ``error``: The value that would be use to override the default error message.
+
+See also `Wait Until Page Contains Element`, `Wait For Condition`,
+`Wait Until Element Is Visible` and BuiltIn keyword `Wait Until Keyword Succeeds`.
+
+Examples:
+| Fast Wait Until Page Contains | text         |
+| @{excludes} =                 | Create List  | a | b | c   |
+| Fast Wait Until Page Contains | text         | ${excludes} |</doc>
 <tags>
 </tags>
 </kw>
@@ -814,6 +1055,19 @@ dismissed by this keyword or another like `Get Alert Message`.</doc>
 <doc>Returns a list containing ids of all links found in current page.
 
 If a link has no id, an empty string will be in the list instead.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Browser Logs">
+<arguments>
+</arguments>
+<doc>Returns the Javascript console logs from the browser. (Non Internet Explorer only).
+
+Please see [https://goo.gl/S7yvqR|Logging Preferences JSON object] to set
+how verbose the logging should be. (Default 'SEVERE')
+
+Examples:
+| Get Browser Logs |</doc>
 <tags>
 </tags>
 </kw>
@@ -903,6 +1157,16 @@ Incorrect:
 
 If you wish to assert the number of matching elements, use
 `Xpath Should Match X Times`.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Screen Size">
+<arguments>
+</arguments>
+<doc>Returns current screen size as `width` and `height`.
+
+Examples:
+| ${width} | ${height} = | Get Screen Size |</doc>
 <tags>
 </tags>
 </kw>
@@ -1161,6 +1425,22 @@ See `introduction` for details about locating elements.</doc>
 <tags>
 </tags>
 </kw>
+<kw name="Is Element Visible">
+<arguments>
+<arg>locator</arg>
+</arguments>
+<doc>Returns element visibility identified by ``locator``.
+
+Arguments:
+- ``locator``: The locator to find requested element. Key attributes for
+               arbitrary elements are ``id`` and ``name``. See `introduction` for
+               details about locating elements.
+
+Examples:
+| Is Element Visible | css=div.class |</doc>
+<tags>
+</tags>
+</kw>
 <kw name="List Selection Should Be">
 <arguments>
 <arg>locator</arg>
@@ -1338,6 +1618,7 @@ Key attributes for arbitrary elements are `id` and `name`. See
 <arg>remote_url=False</arg>
 <arg>desired_capabilities=None</arg>
 <arg>ff_profile_dir=None</arg>
+<arg>skip_ready=False</arg>
 </arguments>
 <doc>Opens a new browser instance to given URL.
 
@@ -1753,6 +2034,20 @@ or newer and it does not work on IronPython at all.</doc>
 <tags>
 </tags>
 </kw>
+<kw name="Register Page Ready Keyword">
+<arguments>
+<arg>keyword_name</arg>
+</arguments>
+<doc>Adds a keyword to be run at the end of the wait until page ready keyword.
+
+Arguments:
+- ``keyword_name``: Adds existing keyword name to be run when the page is ready.
+
+Examples:
+| Register Page Ready Keyword | My Keyword |</doc>
+<tags>
+</tags>
+</kw>
 <kw name="Reload Page">
 <arguments>
 </arguments>
@@ -1771,14 +2066,49 @@ See `Add Location Strategy` for details about adding a custom location strategy.
 <tags>
 </tags>
 </kw>
+<kw name="Remove Page Ready Keyword">
+<arguments>
+<arg>keyword_name</arg>
+</arguments>
+<doc>Removes a keyword to be run at the end of the wait until page ready keyword.
+
+Arguments:
+- ``keyword_name``: Removes existing keyword name from running when the page is ready.
+
+Examples:
+| Remove Page Ready Keyword | My Keyword |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Scroll Element Into View">
+<arguments>
+<arg>locator</arg>
+</arguments>
+<doc>Scrolls an element from given ``locator`` into view.
+
+Arguments:
+- ``locator``: The locator to find requested element. Key attributes for
+               arbitrary elements are ``id`` and ``name``. See `introduction` for
+               details about locating elements.
+
+Examples:
+| Scroll Element Into View | css=div.class |</doc>
+<tags>
+</tags>
+</kw>
 <kw name="Select All From List">
 <arguments>
 <arg>locator</arg>
 </arguments>
-<doc>Selects all values from multi-select list identified by `id`.
+<doc>Selects all values from multi-select list identified by ``locator``.
 
-Key attributes for lists are `id` and `name`. See `introduction` for
-details about locating elements.</doc>
+Arguments:
+- ``locator``: The locator to find requested select list. Key attributes for
+               select lists are ``id`` and ``name``. See `introduction` for
+               details about locating elements.
+
+Examples:
+| Select All From List | css=select.class |</doc>
 <tags>
 </tags>
 </kw>
@@ -1786,11 +2116,16 @@ details about locating elements.</doc>
 <arguments>
 <arg>locator</arg>
 </arguments>
-<doc>Selects checkbox identified by `locator`.
+<doc>Selects checkbox identified by ``locator``.
+Does nothing if checkbox is already selected.
 
-Does nothing if checkbox is already selected. Key attributes for
-checkboxes are `id` and `name`. See `introduction` for details about
-locating elements.</doc>
+Arguments:
+- ``locator``: The locator to find requested checkbox. Key attributes for
+               arbitrary checkboxes are ``id``, and ``name``.
+               See `introduction` for details about locating elements.
+
+Examples:
+| Select Checkbox | css=input[type="checkbox"] |</doc>
 <tags>
 </tags>
 </kw>
@@ -1810,24 +2145,30 @@ details about locating elements.</doc>
 <arg>locator</arg>
 <arg>*items</arg>
 </arguments>
-<doc>Selects `*items` from list identified by `locator`
+<doc>Selects ``*items`` from list identified by ``locator``
 
 If more than one value is given for a single-selection list, the last
 value will be selected. If the target list is a multi-selection list,
-and `*items` is an empty list, all values of the list will be selected.
+and ``*items`` is an empty list, all values of the list will be selected.
 
-*items try to select by value then by label.
-
-It's faster to use 'by index/value/label' functions.
+It's faster to use 'by index/value/label' keywords.
 
 An exception is raised for a single-selection list if the last
 value does not exist in the list and a warning for all other non-
 existing items. For a multi-selection list, an exception is raised
 for any and all non-existing values.
 
-Select list keywords work on both lists and combo boxes. Key attributes for
-select lists are `id` and `name`. See `introduction` for details about
-locating elements.</doc>
+Select list keywords work on both lists and combo boxes.
+
+Arguments:
+- ``locator``: The locator to find requested select list. Key attributes for
+               select lists are ``id`` and ``name``. See `introduction` for
+               details about locating elements.
+- ``*items``: A list of items where it will be use to try to select
+              by value then by label.
+
+Examples:
+| Select From List | css=select.class | item |</doc>
 <tags>
 </tags>
 </kw>
@@ -1836,11 +2177,17 @@ locating elements.</doc>
 <arg>locator</arg>
 <arg>*indexes</arg>
 </arguments>
-<doc>Selects `*indexes` from list identified by `locator`
+<doc>Selects ``*indexes`` from list identified by ``locator``.
+Select list keywords work on both lists and combo boxes.
 
-Select list keywords work on both lists and combo boxes. Key attributes for
-select lists are `id` and `name`. See `introduction` for details about
-locating elements.</doc>
+Arguments:
+- ``locator``: The locator to find requested select list. Key attributes for
+               select lists are ``id`` and ``name``. See `introduction` for
+               details about locating elements.
+- ``*indexes``: A list of indexes to be selected.
+
+Examples:
+| Select From List By Index | css=select.class | index |</doc>
 <tags>
 </tags>
 </kw>
@@ -1849,11 +2196,17 @@ locating elements.</doc>
 <arg>locator</arg>
 <arg>*labels</arg>
 </arguments>
-<doc>Selects `*labels` from list identified by `locator`
+<doc>Selects ``*labels`` from list identified by ``locator``.
+Select list keywords work on both lists and combo boxes.
 
-Select list keywords work on both lists and combo boxes. Key attributes for
-select lists are `id` and `name`. See `introduction` for details about
-locating elements.</doc>
+Arguments:
+- ``locator``: The locator to find requested select list. Key attributes for
+               select lists are ``id`` and ``name``. See `introduction` for
+               details about locating elements.
+- ``*labels``: A list of labels to be selected.
+
+Examples:
+| Select From List By Label | css=select.class | label |</doc>
 <tags>
 </tags>
 </kw>
@@ -1862,11 +2215,17 @@ locating elements.</doc>
 <arg>locator</arg>
 <arg>*values</arg>
 </arguments>
-<doc>Selects `*values` from list identified by `locator`
+<doc>Selects ``*values`` from list identified by ``locator``.
+Select list keywords work on both lists and combo boxes.
 
-Select list keywords work on both lists and combo boxes. Key attributes for
-select lists are `id` and `name`. See `introduction` for details about
-locating elements.</doc>
+Arguments:
+- ``locator``: The locator to find requested select list. Key attributes for
+               select lists are ``id`` and ``name``. See `introduction` for
+               details about locating elements.
+- ``*values``: A list of values to be selected.
+
+Examples:
+| Select From List By Value | css=select.class | value |</doc>
 <tags>
 </tags>
 </kw>
@@ -1875,18 +2234,19 @@ locating elements.</doc>
 <arg>group_name</arg>
 <arg>value</arg>
 </arguments>
-<doc>Sets selection of radio button group identified by `group_name` to `value`.
-
-The radio button to be selected is located by two arguments:
-- `group_name` is used as the name of the radio input
-- `value` is used for the value attribute or for the id attribute
-
-The XPath used to locate the correct radio button then looks like this:
+<doc>Sets selection of radio button group identified by ``group_name`` to ``value``.
+The XPath used to locate the correct radio button and it looks like this:
 //input[@type='radio' and @name='group_name' and (@value='value' or @id='value')]
 
+Arguments:
+- ``group_name``: The name of the radio input
+- ``value``: The value attribute or the id attribute
+
 Examples:
-| Select Radio Button | size | XL | # Matches HTML like &lt;input type="radio" name="size" value="XL"&gt;XL&lt;/input&gt; |
-| Select Radio Button | size | sizeXL | # Matches HTML like &lt;input type="radio" name="size" value="XL" id="sizeXL"&gt;XL&lt;/input&gt; |</doc>
+| # Matches HTML like &lt;input type="radio" name="size" value="XL"&gt;XL&lt;/input&gt; |
+| Select Radio Button | size | XL |
+| # Matches HTML like &lt;input type="radio" name="size" value="XL" id="sizeXL"&gt;XL&lt;/input&gt; |
+| Select Radio Button | size | sizeXL |</doc>
 <tags>
 </tags>
 </kw>
@@ -2063,12 +2423,20 @@ See `introduction` for details about locating elements.</doc>
 <kw name="Submit Form">
 <arguments>
 <arg>locator=None</arg>
+<arg>skip_ready=False</arg>
 </arguments>
 <doc>Submits a form identified by `locator`.
 
-If `locator` is empty, first form in the page will be submitted.
-Key attributes for forms are `id` and `name`. See `introduction` for
-details about locating elements.</doc>
+Arguments:
+- ``locator``: The locator to find requested form. If ``locator`` is empty,
+               first form in the page will be submitted. Key attributes for
+               arbitrary forms are ``id``, and ``name``.
+               See `introduction` for details about locating elements.
+- ``skip_ready``: A boolean flag to skip the wait for page ready. (Default False)
+
+Examples:
+| Submit Form | css=form.class |
+| Submit Form | css=form.class | True |</doc>
 <tags>
 </tags>
 </kw>
@@ -2374,6 +2742,33 @@ locating elements.</doc>
 <tags>
 </tags>
 </kw>
+<kw name="Wait For Async Condition">
+<arguments>
+<arg>condition</arg>
+<arg>timeout=None</arg>
+<arg>error=None</arg>
+</arguments>
+<doc>Waits until the given asynchronous ``condition`` is true or ``timeout`` expires.
+
+Arguments:
+- ``condition``: The ``condition`` can be arbitrary JavaScript expression but
+                 must explicitly signal when they are finished by invoking
+                 the provided callback at the end. See `Execute Async Javascript`
+                 for information about executing asynchronous JavaScript.
+- ``timeout``: The maximum value to wait for ``condition`` to come back true.
+               See `introduction` for more information about ``timeout`` and
+               its default value.
+- ``error``: The value that would be use to override the default error message.
+
+See also `Wait For Condition`, `Wait Until Page Contains`, `Wait Until Page Contains
+Element`, `Wait Until Element Is Visible` and
+BuiltIn keyword `Wait Until Keyword Succeeds`.
+
+Examples:
+| Wait For Async Condition | arguments[arguments.length-1](true) | 15s |</doc>
+<tags>
+</tags>
+</kw>
 <kw name="Wait For Condition">
 <arguments>
 <arg>condition</arg>
@@ -2398,6 +2793,82 @@ Element`, `Wait Until Element Is Visible` and BuiltIn keyword
 <tags>
 </tags>
 </kw>
+<kw name="Wait For Condition With Replaced Variables">
+<arguments>
+<arg>condition</arg>
+<arg>timeout=None</arg>
+<arg>error=None</arg>
+</arguments>
+<doc>Replace variables and waits until the given ``condition`` is true or
+``timeout`` expires.
+
+Arguments:
+- ``condition``: The ``condition`` can be arbitrary JavaScript expression but must contain
+                 a return statement (with the value to be returned) at the end.
+                 If ``condition`` is an absolute path to an existing file, the JavaScript
+                 to execute will be read from that file. Forward slashes work as
+                 a path separator on all operating systems.
+                 See `Execute JavaScript With Replaced Variables` for information about
+                 accessing the actual contents of the window through JavaScript.
+- ``timeout``: The maximum value to wait for ``condition`` to come back true.
+               See `introduction` for more information about ``timeout`` and
+               its default value.
+- ``error``: The value that would be use to override the default error message.
+
+See also `Wait For Condition`, `Wait Until Page Contains`, `Wait Until Page Contains
+Element`, `Wait Until Element Is Visible` and
+BuiltIn keyword `Wait Until Keyword Succeeds`.
+
+Examples:
+| Wait For Condition With Replaced Variables | arguments[arguments.length-1](true) | 15s |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Wait Until Angular Ready">
+<arguments>
+<arg>timeout=None</arg>
+<arg>error=None</arg>
+</arguments>
+<doc>Waits until [https://goo.gl/Kzz8Y3|AngularJS] is ready to process the next request or
+``timeout`` expires.
+
+You generally *do not* need to call this keyword directly,
+below is the list of keywords which already call this keyword internally:
+
+| `Click Button`                 |
+| `Click Element`                |
+| `Click Element At Coordinates` |
+| `Click Image`                  |
+| `Click Link`                   |
+| `Double Click Element`         |
+| `Input Password`               |
+| `Input Text`                   |
+| `Open Browser`                 |
+| `Select All From List`         |
+| `Select Checkbox`              |
+| `Select From List`             |
+| `Select From List By Index`    |
+| `Select From List By Label`    |
+| `Select From List By Value`    |
+| `Select Radio Button`          |
+| `Submit Form`                  |
+
+Arguments:
+- ``timeout``: The maximum value to wait for [https://goo.gl/Kzz8Y3|AngularJS]
+               to be ready to process the next request.
+               See `introduction` for more information about ``timeout`` and
+               its default value.
+- ``error``: The value that would be use to override the default error message.
+
+See also `Wait For Condition`, `Wait Until Page Contains`,
+`Wait Until Page Contains Element`, `Wait Until Element Is Visible`
+and BuiltIn keyword `Wait Until Keyword Succeeds`.
+
+Examples:
+| Wait Until Angular Ready | 15s |</doc>
+<tags>
+</tags>
+</kw>
 <kw name="Wait Until Element Contains">
 <arguments>
 <arg>locator</arg>
@@ -2419,6 +2890,37 @@ Keyword Succeeds`.</doc>
 <tags>
 </tags>
 </kw>
+<kw name="Wait Until Element Contains Attribute">
+<arguments>
+<arg>attribute_locator</arg>
+<arg>expected</arg>
+<arg>timeout=None</arg>
+<arg>error=None</arg>
+</arguments>
+<doc>Waits until element attribute identified by ``attribute_locator``
+contains ``expected``.
+Fails if ``timeout`` expires before the ``expected`` element attribute
+presents on the page.
+
+Arguments:
+- ``attribute_locator``: The locator to find requested element attribute. It consists of
+                         element locator followed by an @ sign and attribute name,
+                         for example "element_id@class".
+- ``expected``: The expected element attribute value.
+- ``timeout``: The maximum value to wait for element attribute to contains ``expected``.
+               See `introduction` for more information about ``timeout`` and
+               its default value.
+- ``error``: The value that would be use to override the default error message.
+
+See also `Wait Until Element Does Not Contain Attribute`, `Wait Until Page Contains`,
+`Wait Until Page Contains Element`, `Wait For Condition`,
+`Wait Until Element Is Visible` and BuiltIn keyword `Wait Until Keyword Succeeds`.
+
+Examples:
+| Wait Until Element Contains Attribute | css=div.class@class | value |</doc>
+<tags>
+</tags>
+</kw>
 <kw name="Wait Until Element Does Not Contain">
 <arguments>
 <arg>locator</arg>
@@ -2437,6 +2939,37 @@ default value.
 See also `Wait Until Page Contains`, `Wait Until Page Contains Element`, `Wait For Condition`,
 `Wait Until Element Is Visible` and BuiltIn keyword `Wait Until
 Keyword Succeeds`.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Wait Until Element Does Not Contain Attribute">
+<arguments>
+<arg>attribute_locator</arg>
+<arg>unexpected</arg>
+<arg>timeout=None</arg>
+<arg>error=None</arg>
+</arguments>
+<doc>Waits until element attribute identified by ``attribute_locator``
+does not contain ``unexpected``.
+Fails if ``timeout`` expires before the ``unexpected`` element attribute
+goes away from the page.
+
+Arguments:
+- ``attribute_locator``: The locator to find requested element attribute. It consists of
+                         element locator followed by an @ sign and attribute name,
+                         for example "element_id@class".
+- ``unexpected``: The unexpected element attribute value.
+- ``timeout``: The maximum value to wait for ``unexpected`` element attribute to go away.
+               See `introduction` for more information about ``timeout`` and
+               its default value.
+- ``error``: The value that would be use to override the default error message.
+
+See also `Wait Until Element Contains Attribute`, `Wait Until Page Contains`,
+`Wait Until Page Contains Element`, `Wait For Condition`,
+`Wait Until Element Is Visible` and BuiltIn keyword `Wait Until Keyword Succeeds`.
+
+Examples:
+| Wait Until Element Does Not Contain Attribute | css=div.class@class | value |</doc>
 <tags>
 </tags>
 </kw>
@@ -2497,6 +3030,56 @@ default value.
 See also `Wait Until Page Contains`, `Wait Until Page Contains 
 Element`, `Wait For Condition` and BuiltIn keyword `Wait Until Keyword
 Succeeds`.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Wait Until Location Contains">
+<arguments>
+<arg>expected</arg>
+<arg>timeout=None</arg>
+<arg>error=None</arg>
+</arguments>
+<doc>Waits until current URL contains ``expected``.
+Fails if ``timeout`` expires before the ``expected`` URL presents on the page.
+
+Arguments:
+- ``expected``: The expected URL value.
+- ``timeout``: The maximum value to wait for URL to contains ``expected``.
+               See `introduction` for more information about ``timeout`` and
+               its default value.
+- ``error``: The value that would be use to override the default error message.
+
+See also `Wait Until Location Does Not Contain`, `Wait Until Page Contains`,
+`Wait Until Page Contains Element`, `Wait For Condition`,
+`Wait Until Element Is Visible` and BuiltIn keyword `Wait Until Keyword Succeeds`.
+
+Examples:
+| Wait Until Location Contains | www | 15s |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Wait Until Location Does Not Contain">
+<arguments>
+<arg>unexpected</arg>
+<arg>timeout=None</arg>
+<arg>error=None</arg>
+</arguments>
+<doc>Waits until current URL does not contain ``unexpected``.
+Fails if ``timeout`` expires before the ``unexpected`` URL goes away from the page.
+
+Arguments:
+- ``unexpected``: The unexpected URL value.
+- ``timeout``: The maximum value to wait for ``unexpected`` URL to go away.
+               See `introduction` for more information about ``timeout`` and
+               its default value.
+- ``error``: The value that would be use to override the default error message.
+
+See also `Wait Until Location Contains`, `Wait Until Page Contains`,
+`Wait Until Page Contains Element`, `Wait For Condition`,
+`Wait Until Element Is Visible` and BuiltIn keyword `Wait Until Keyword Succeeds`.
+
+Examples:
+| Wait Until Location Does Not Contain | www | 15s |</doc>
 <tags>
 </tags>
 </kw>
@@ -2577,6 +3160,25 @@ default value.
 See also `Wait Until Page Contains`, `Wait For Condition`,
 `Wait Until Element Is Visible` and BuiltIn keyword `Wait Until
 Keyword Succeeds`.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Warn Any Javascript Errors">
+<arguments>
+<arg>excludes=None</arg>
+<arg>label=</arg>
+</arguments>
+<doc>Log any JavaScript errors in the page as warning in the test report.
+
+Arguments:
+- ``excludes``: An exclusion list to be use to filter out error messages. (Default None)
+- ``label``: Label the JavaScript errors for easy reading. (Default '')
+
+Examples:
+| Warn Any Javascript Errors |              |              |
+| @{excludes} =              | Create List  | a | b | c    |
+| Warn Any Javascript Errors | ${None}      | MY_LABEL     |
+| Warn Any Javascript Errors | ${excludes}  | ${TEST NAME} |</doc>
 <tags>
 </tags>
 </kw>

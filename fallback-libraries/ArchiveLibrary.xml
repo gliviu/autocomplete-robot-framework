@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keywordspec generated="20170201 07:02:42" type="library" name="ArchiveLibrary" format="ROBOT">
+<version></version>
+<scope>global</scope>
+<namedargs>yes</namedargs>
+<doc>ArchiveLibrary is a Robot Framework keyword library to 
+handle ZIP and possibly other archive formats.</doc>
+<kw name="Archive Should Contain File">
+<arguments>
+<arg>zfile</arg>
+<arg>filename</arg>
+</arguments>
+<doc>Check if a file exists in the ZIP file without extracting it
+
+`zfile` the path to the ZIP file
+
+`filename` name of the file to search for in `zfile`</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Create Tar From Files In Directory">
+<arguments>
+<arg>directory</arg>
+<arg>filename</arg>
+</arguments>
+<doc>Take all files in a directory and create a tar package from them
+
+`directory` Path to the directory that holds our files
+
+`filename` Path to our destination TAR package.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Create Zip From Files In Directory">
+<arguments>
+<arg>directory</arg>
+<arg>filename</arg>
+</arguments>
+<doc>Take all files in a directory and create a zip package from them
+
+`directory` Path to the directory that holds our files
+
+`filename` Path to our destination ZIP package.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Extract Tar File">
+<arguments>
+<arg>tfile</arg>
+<arg>dest=None</arg>
+</arguments>
+<doc>Extract a TAR file
+
+`tfile` the path to the TAR file
+
+`dest` optional destination folder. It will be created if It doesn't exist.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Extract Zip File">
+<arguments>
+<arg>zfile</arg>
+<arg>dest=None</arg>
+</arguments>
+<doc>Extract a ZIP file
+
+`zfile` the path to the ZIP file
+
+`dest` optional destination folder. It will be created if It doesn't exist.</doc>
+<tags>
+</tags>
+</kw>
+</keywordspec>

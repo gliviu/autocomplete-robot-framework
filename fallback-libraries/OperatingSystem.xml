@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keywordspec format="ROBOT" type="library" generated="20160218 10:32:10" name="OperatingSystem">
-<version>3.0</version>
+<keywordspec generated="20170201 07:02:42" type="library" name="OperatingSystem" format="ROBOT">
+<version>3.0.1</version>
 <scope>global</scope>
 <namedargs>yes</namedargs>
 <doc>A test library providing keywords for OS related tasks.
@@ -141,7 +141,7 @@ New in Robot Framework 2.8.4.</doc>
 <arg>content</arg>
 <arg>encoding=UTF-8</arg>
 </arguments>
-<doc>Appends the given contend to the specified file.
+<doc>Appends the given content to the specified file.
 
 If the file does not exists, this keyword works exactly the same
 way as `Create File`.</doc>
@@ -262,8 +262,8 @@ with higher ordinal is an error.
 
 Byte strings, and possible other types, are written to the file as is.
 
-If the directory where to create file does not exist it, and possible
-intermediate missing directories, are created.
+If the directory for the file does not exist, it is created, along
+with missing intermediate directories.
 
 Examples:
 | Create Binary File | ${dir}/example.png | ${image content}     |
@@ -297,8 +297,8 @@ a directory.</doc>
 </arguments>
 <doc>Creates a file with the given content and encoding.
 
-If the directory where to create file does not exist it, and possible
-intermediate missing directories, are created.
+If the directory for the file does not exist, it is created, along
+with missing intermediate directories.
 
 See `Get File` for more information about possible ``encoding`` values,
 including special values ``SYSTEM`` and ``CONSOLE``.
