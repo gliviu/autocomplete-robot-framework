@@ -84,6 +84,7 @@ Resource
 
 
 ## Changelog
+* v2.2.2 - Add support for unicode characters
 * v2.1.0
 	* Allow multi-word suggestions
 * v2.0.0

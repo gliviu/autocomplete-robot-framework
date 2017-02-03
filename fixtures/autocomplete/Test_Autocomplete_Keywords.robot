@@ -30,3 +30,6 @@ Ord 1
 Ord 3
 Test keyword
 Duplicated keyword
+The é char is here
+    [Arguments]    ${é1}  ${é2}
+    

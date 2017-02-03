@@ -213,6 +213,18 @@ describe 'Robot Framework keywords autocompletions', ->
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(0)
+    it 'supports unicode characters in keyword names and arguments', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      runs ->
+        editor.insertText('  thé')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('The é char is here')
+          suggestion = suggestions[0]
+          expect(suggestion.keyword.arguments.length).toEqual(2)
+          expect(suggestion.keyword.arguments[0]).toEqual('é1')
+          expect(suggestion.keyword.arguments[1]).toEqual('é2')
 
   describe 'Dot notation', ->
     it 'supports dot notation', ->
