@@ -104,7 +104,8 @@ describe 'Robot Framework keywords autocompletions', ->
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(0)
-          expect(suggestions[0]?.displayText).toEqual('With default value arguments')
+          expect(suggestions[0].displayText).toEqual('With default value arguments')
+          expect(suggestions[0].description).toEqual(' Arguments: arg1=default value ${VARIABLE1}, arg2, arg3, arg4, arg5=default value, arg6=${VARIABLE1} and ${VARIABLE2}')
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText('  withemb')
@@ -261,10 +262,7 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0].displayText).toEqual('The é char is here')
-          suggestion = suggestions[0]
-          expect(suggestion.keyword.arguments.length).toEqual(2)
-          expect(suggestion.keyword.arguments[0]).toEqual('é1')
-          expect(suggestion.keyword.arguments[1]).toEqual('é2')
+          expect(suggestions[0].description).toEqual(' Arguments: é1=é1 val, é2=${é3} val')
 
   describe 'Library management', ->
     beforeEach ->
