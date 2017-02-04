@@ -253,6 +253,18 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(0)
           expect(suggestions[0].snippet).toEqual('Log    ${1:message}    ${2:level=INFO}    ${3:html=False}    ${4:console=False}    ${5:repr=False}')
+    it 'supports unicode characters in keyword names and arguments', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      runs ->
+        editor.insertText('  thé')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].displayText).toEqual('The é char is here')
+          suggestion = suggestions[0]
+          expect(suggestion.keyword.arguments.length).toEqual(2)
+          expect(suggestion.keyword.arguments[0]).toEqual('é1')
+          expect(suggestion.keyword.arguments[1]).toEqual('é2')
 
   describe 'Library management', ->
     beforeEach ->
