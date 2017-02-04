@@ -575,7 +575,7 @@ describe 'Robot Framework keywords autocompletions', ->
         runs ->
           editor = atom.workspace.getActiveTextEditor()
           editor.setCursorBufferPosition([Infinity, Infinity])
-          editor.insertText('  glob.appendfil')
+          editor.insertText('  .appendfil')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(1)
@@ -583,7 +583,7 @@ describe 'Robot Framework keywords autocompletions', ->
       it 'suggests all keywords from resources having the same name', ->
         runs ->
           editor.setCursorBufferPosition([Infinity, Infinity])
-          editor.insertText('  glob.utility')
+          editor.insertText('  .utility')
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toBeGreaterThan(2)
