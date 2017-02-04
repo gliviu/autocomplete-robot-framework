@@ -1,7 +1,7 @@
 {
   "name": "autocomplete-robot-framework",
   "main": "./lib/main",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Robot Framework autocomplete for Atom",
   "keywords": [
     "autocomplete",
