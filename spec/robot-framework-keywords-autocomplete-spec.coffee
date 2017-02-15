@@ -336,33 +336,6 @@ describe 'Robot Framework keywords autocompletions', ->
           expect(suggestions[0].displayText).toEqual('Internal Python Kw')
 
   describe 'Scope modifiers', ->
-    it 'reacts on removeDotNotation configuration changes', ->
-      runs ->
-        atom.config.set("#{CFG_KEY}.removeDotNotation", true)
-      waitsFor ->
-        return !provider.loading
-      , 'Provider should finish loading', 500
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  builtin.callme')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('Call Method')
-          expect(suggestions[0]?.replacementPrefix).toEqual('builtin.callme')
-      runs ->
-        atom.config.set("#{CFG_KEY}.removeDotNotation", false)
-      waitsFor ->
-        return !provider.loading
-      , 'Provider should finish loading', 500
-      runs ->
-        editor.setCursorBufferPosition([Infinity, Infinity])
-        editor.insertText('  builtin.callme')
-      waitsForPromise ->
-        getCompletions(editor, provider).then (suggestions) ->
-          expect(suggestions.length).toEqual(1)
-          expect(suggestions[0]?.displayText).toEqual('Call Method')
-          expect(suggestions[0]?.replacementPrefix).toEqual('callme')
     describe 'Default scope modifiers', ->
       it 'limits suggestions to current imports', ->
         editor.setCursorBufferPosition([Infinity, Infinity])
@@ -395,7 +368,6 @@ describe 'Robot Framework keywords autocompletions', ->
             expect(suggestions.length).toEqual(1)
             expect(suggestions[0].type).toEqual('keyword')
             expect(suggestions[0].snippet).toEqual('utility 1 text')
-
     describe 'File scope modifiers', ->
       it 'supports file scope modifier with libraries containing dot in their name', ->
         runs ->
@@ -570,6 +542,33 @@ describe 'Robot Framework keywords autocompletions', ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(1)
             expect(suggestions[0]?.displayText).toEqual('Call Method')
+      it 'reacts on removeDotNotation configuration changes', ->
+        runs ->
+          atom.config.set("#{CFG_KEY}.removeDotNotation", true)
+        waitsFor ->
+          return !provider.loading
+        , 'Provider should finish loading', 500
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  builtin.callme')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0]?.displayText).toEqual('Call Method')
+            expect(suggestions[0]?.replacementPrefix).toEqual('builtin.callme')
+        runs ->
+          atom.config.set("#{CFG_KEY}.removeDotNotation", false)
+        waitsFor ->
+          return !provider.loading
+        , 'Provider should finish loading', 500
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  builtin.callme')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0]?.displayText).toEqual('Call Method')
+            expect(suggestions[0]?.replacementPrefix).toEqual('callme')
     describe 'Global scope modifiers', ->
       it 'supports global scope modifier', ->
         runs ->
@@ -606,7 +605,7 @@ describe 'Robot Framework keywords autocompletions', ->
             expect(suggestions[3]?.displayText).toEqual('Duplicated keyword')
             expect(suggestions[4]?.displayText).toEqual('Dot.punctuation keyword')
     describe 'Unknown scope modifiers', ->
-      it 'behaves exactly as default scope modifier', ->
+      it 'has same suggestions as default scope modifier', ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         runs ->
           editor.insertText('  UnkwnownLibrary.k')
@@ -616,6 +615,41 @@ describe 'Robot Framework keywords autocompletions', ->
             for suggestion in suggestions when suggestion.type is 'keyword'
               suggestedUnits.add(suggestion.rightLabel)
             expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit', 'BuiltIn', 'Test_Autocomplete_Keywords', 'package.modules.TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
+      it 'reacts on removeDotNotation configuration changes', ->
+        runs ->
+          atom.config.set("#{CFG_KEY}.removeDotNotation", true)
+        waitsFor ->
+          return !provider.loading
+        , 'Provider should finish loading', 500
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  UnknownLibrary.callme')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0]?.displayText).toEqual('Call Method')
+            expect(suggestions[0]?.replacementPrefix).toEqual('UnknownLibrary.callme')
+        runs ->
+          atom.config.set("#{CFG_KEY}.removeDotNotation", false)
+        waitsFor ->
+          return !provider.loading
+        , 'Provider should finish loading', 500
+        runs ->
+          editor.setCursorBufferPosition([Infinity, Infinity])
+          editor.insertText('  UnknownLibrary.callme')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0]?.displayText).toEqual('Call Method')
+            expect(suggestions[0]?.replacementPrefix).toEqual('callme')
+    describe 'Invalid scope modifiers', ->
+      it 'suggests nothing', ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        runs ->
+          editor.insertText('  this is an invalid modifier.')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(0)
 
   describe 'Autocomplete configuration', ->
     it 'react on showArguments configuration changes', ->
