@@ -13,8 +13,8 @@ apm install autocomplete-robot-framework
 
 ## Usage
 Opening a robot file will scan the parent project for keywords that will later be available as suggestions.
-Works only for files that are included in an Atom project. Opening an independent robot resource won't provide any suggestions.
-Space separated **.robot** and **.txt** files are supported.
+
+Works only for files that are included in an Atom project. Opening an independent robot resource won't provide any suggestions. Space separated **.robot** and **.txt** files are supported.
 
 ## Suggestions
 Keywords may be suggested by partial keyword name separated or not by spaces, or even acronyms.
@@ -38,6 +38,7 @@ my                 # Suggest MyKeywords
 ```
 
 Note that library names are suggested as long as they are successfully imported. See below.
+
 Using 'WITH NAME' on a library is not taken in consideration at this time.
 
 ## Scopes
@@ -64,6 +65,7 @@ For this mechanism to work following requirements should be met.
 * Robotframework 3.0 is installed according to [instructions](https://github.com/robotframework/robotframework/blob/master/INSTALL.rst)
 
 At this time libraries with mandatory parameters in constructor are not supported.
+
 Libraries identified by path do not work - 'Library    path/PythonLibrary.py'
 
 To help troubleshoot wrong imports and python environment problems take a look at [Status panel](#status).
