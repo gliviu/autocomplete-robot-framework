@@ -4,7 +4,6 @@ An [autocomplete-plus](https://github.com/atom/autocomplete-plus) provider for [
 
 ![Demo](https://raw.githubusercontent.com/gliviu/autocomplete-robot-framework/master/anim.gif)
 
-**Check out [hyperclick-robot-framework](https://atom.io/packages/hyperclick-robot-framework) that uses new  [robot provider API](#api) to  enable 'go to definition' functionality**
 
 ## Install
 ```shell
@@ -13,44 +12,88 @@ apm install autocomplete-robot-framework
 ```
 
 ## Usage
-Add your robot project folder in Atom then open a robot file and the whole project will be scanned for keywords.
-Space separated **.robot** and **.txt** files are supported. Libdoc xml files should work as well.
-
-Official [libraries](http://robotframework.org/#test-libraries) are included for convenience.
-*  Standard - BuiltIn, Collections, DateTime, Dialogs, OperatingSystem, Process, Screenshot, String, Telnet, XML
-*  External - FtpLibrary, HttpLibrary.HTTP, MongoDBLibrary, Rammbock, RemoteSwingLibrary, RequestsLibrary, Selenium2Library, SeleniumLibrary, SSHLibrary, SwingLibrary
-External libraries suggestions are disabled by default. They can be toggled in package settings.
-
-If you have your own xml libdoc library, add it together with the other robot files to have it parsed for keywords.
+Opening a robot file will scan the parent project for keywords that will later be available as suggestions.
+Works only for files that are included in an Atom project. Opening an independent robot resource won't provide any suggestions.
+Space separated **.robot** and **.txt** files are supported.
 
 ## Suggestions
-Suggestion scoring is powered by [fuzzaldrin-plus](https://github.com/jeancroy/fuzzaldrin-plus). It is able to find keywords by partial keyword name separated or not by spaces, or even acronyms.
-It is also possible to limit keywords to a certain library or resource as in sample below.
+Keywords may be suggested by partial keyword name separated or not by spaces, or even acronyms.
 
 ```text
-Library    Collections
+run if             # suggests 'Run Keyword If'
+sheq               # suggests 'Should Be Equal'
+cfl                # acronyms also work and suggest 'Continue For Loop', ...
+```
+Sugestions are not limited to keywords. Library or resource names are suggested by prefixing their name.
+
+```text
+Library    OperatingSystem
+Library    robot.libraries.DateTime
 Resource   path/MyKeywords.robot
 
-run if # suggests 'Run Keyword If', 'Run Keyword And Return If', ...
-sheq   # suggests 'Should Be Equal', 'Should Not Be Equal', ...
-cfl    # acronyms also work and suggest 'Continue For Loop', ...
-
-Collections.       # Shows all keywords from Collections
-Collections.list   # Same as above but limits the scope
-MyKeywords.        # Same rules apply for resources as well
+oper               # Suggests OperatingSystem
+date               # Suggests robot.libraries.DateTime
+robot              # Also suggests robot.libraries.DateTime
+my                 # Suggest MyKeywords
 ```
 
+Note that library names are suggested as long as they are successfully imported. See below.
+Using 'WITH NAME' on a library is not taken in consideration at this time.
 
+## Scopes
+By default suggestions are limited to imported libraries and resources.
+Scope modifiers allow us to override the default scope and search for keywords beyond current imports.
+* this. -  suggests keywords from current file only
+* . -  searches all  available keywords
+* libraryOrResourceName. - limits suggestions to one source
+
+```text
+Collections.       # Suggests all keywords from Collections
+Collections.copy   # As above but limits suggestions
+MyKeywords.        # Same rules apply for resources as well
+this.              # Show only local keywords
+.append            # Search 'append' through all indexed keywords
+```
+
+## Library import
+Python libraries have to be scanned for keywords just as regular robot files are.
+For this mechanism to work following requirements should be met.
+* Python environment is accessible and correctly configured
+* Supported versions: cpython 2.7, jython 2.7.0, ironpython 2.7.6
+* Python executable is correctly defined in Atom package settings (defaults to 'python')
+* Robotframework 3.0 is installed according to [instructions](https://github.com/robotframework/robotframework/blob/master/INSTALL.rst)
+
+At this time libraries with mandatory parameters in constructor are not supported.
+Libraries identified by path do not work - 'Library    path/PythonLibrary.py'
+
+To help troubleshoot wrong imports and python environment problems take a look at [Status panel](#status).
+
+## Fallback libraries
+Official Robot Framework [libraries](http://robotframework.org/#libraries) are included for convenience, just in case library import mechanism is not working for some reasons. This could be the case for example if using the RF Jar distribution without any python interpreter available.
+
+Fallback libraries are libdoc xml files generated with libdoc tool. Any such **.xml** file encountered in Atom project will be parsed for keywords together with the other **.robot** files.
+
+To create a fallback library of your own use libdoc tool and copy the result somewhere in robot project so it can be scanned. Note that name of the file must be the fully qualified library name.
+If you use the import below
+
+    *** Settings ***
+    Library    my.utilities.Arrays
+
+it would need a libdoc named my.utilities.Arrays.xml.
+
+## Status
+Status pane shows imported libraries and python environment information together with any error occurred during import process.
+
+It can be activated from **Packages->Robot Framework->Show autocomplete status**.
 
 ## Troubleshooting
-*  Works only for files that are inside an Atom project. Opening an independent Robot file won't provide any suggestions.
-*  When files are modified outside Atom, autocomplete index may become invalid. Use Command Pallete (ctrl+shift+p) and choose 'Robot Framework:Reload autocomplete data'. Restarting Atom would have the same effect.
-*  .txt files are not detected as Robot format automatically. Work around by manually choosing the grammar (open Grammar Selector ctrl-shift-L and pick Robot Framework).
+*  When files are modified outside Atom, autocomplete index may become invalid. Use **Packages->Robot Framework->Reload autocomplete data**. Restarting Atom would have the same effect.
+*  **.txt** files are not detected as Robot format automatically. Work around by manually choosing the grammar (open Grammar Selector ctrl-shift-L and pick Robot Framework).
 *  Keywords are global to all projects opened in Atom. To mitigate this use [project-viewer](https://atom.io/packages/project-viewer) package or equivalent.
-*  Should anything else go wrong, use 'Robot Framework:Print autocomplete debug info' to display internal state in developer console  - 'Window: Toggle dev tools' (ctrl-shift-i on Linux or ctrl-alt-i on Windows).
-*  More information can be shown by enabling debug mode in package configuration.
+*  Should anything else go wrong, use **Packages->Robot Framework->Print autocomplete debug info** to display internal state in developer console  - **View->Developer->Toggle dev tools**.
+*  More information can be shown by toggling Debug option in package settings.
 
-##API
+## API
 An API is available to enable cooperation with other packages by providing access to underlying keyword repository.
 * getKeywordNames()
 * getResourcePaths()
@@ -67,6 +110,7 @@ Keyword
     startColNo : 0,
     resource : {
       path : 'resource path',
+      libraryPath : 'python library source path if available',
       hasTestCases : true/false,
       hasKeywords : true/false
   }
@@ -76,16 +120,31 @@ Resource
 ```
   {
     path: 'resource path',
+    libraryPath : 'python library source path if available',
     hasTestCases: true/false,
     hasKeywords: true/false,
     keywords: [keyword1, ...]
   }
 ```
+## Testing
+```apm test```
+python/robot framework must be installed and operational. 'python' command must be available in PATH.
 
+## Links
+* [project-viewer](https://atom.io/packages/project-viewer) - allows working with distinct robot projects
+* [hyperclick-robot-framework](https://atom.io/packages/hyperclick-robot-framework) - Go to definition for keywords
+* [script](https://atom.io/packages/script) - Run robot test suites
 
 ## Changelog
-* v2.1.0
-	* Allow multi-word suggestions
+* v3.0.0
+    * Import python libraries
+    * Scope modifiers
+    * Support multiple resources with identical name
+    * Status panel
+    * Show Atom notifications for various commands
+    * Configurable keyword arguments in suggestions
+* v2.2.2 - Add support for unicode characters
+* v2.1.0 - Allow multi-word suggestions
 * v2.0.0
 	* Bug fixes
 	* Added provider API

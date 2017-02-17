@@ -33,7 +33,7 @@ module.exports =
       default: false
       order: 6
     excludeDirectories:
-      title: 'Names of directories or files to be excluded from showing suggestions (comma sepparated)'
+      title: 'Exclude robot resources (comma separated directory names). Excluded robot directories will not be parsed for keywords'
       type: 'array'
       default: []
       items:
