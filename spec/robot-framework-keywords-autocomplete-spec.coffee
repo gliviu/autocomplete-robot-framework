@@ -615,7 +615,7 @@ describe 'Robot Framework keywords autocompletions', ->
             for suggestion in suggestions when suggestion.type is 'keyword'
               suggestedUnits.add(suggestion.rightLabel)
             expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit', 'BuiltIn', 'Test_Autocomplete_Keywords', 'package.modules.TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
-      it 'reacts on removeDotNotation configuration changes', ->
+      it 'is not affected by removeDotNotation configuration changes', ->
         runs ->
           atom.config.set("#{CFG_KEY}.removeDotNotation", true)
         waitsFor ->
@@ -628,7 +628,7 @@ describe 'Robot Framework keywords autocompletions', ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(1)
             expect(suggestions[0]?.displayText).toEqual('Call Method')
-            expect(suggestions[0]?.replacementPrefix).toEqual('UnknownLibrary.callme')
+            expect(suggestions[0]?.replacementPrefix).toEqual('callme')
         runs ->
           atom.config.set("#{CFG_KEY}.removeDotNotation", false)
         waitsFor ->
