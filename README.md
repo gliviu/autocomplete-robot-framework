@@ -133,9 +133,9 @@ Resource
 python/robot framework must be installed and operational. 'python' command must be available in PATH.
 
 ## Links
-* [project-viewer](https://atom.io/packages/project-viewer) switch between distinct robot projects
-* [hyperclick-robot-framework](https://atom.io/packages/hyperclick-robot-framework) go to definition for keywords
-* [script](https://atom.io/packages/script) run robot test suites
+* [project-viewer](https://atom.io/packages/project-viewer) - allows working with distinct robot projects
+* [hyperclick-robot-framework](https://atom.io/packages/hyperclick-robot-framework) - Go to definition for keywords
+* [script](https://atom.io/packages/script) - Run robot test suites
 * [https://robotframework.slack.com/messages/atom/](https://robotframework.slack.com/messages/atom/) - discuss [atom.io](https://atom.io/) support for RF
 
 ## Changelog
