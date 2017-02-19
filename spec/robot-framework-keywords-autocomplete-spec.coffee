@@ -346,7 +346,7 @@ describe 'Robot Framework keywords autocompletions', ->
             suggestedUnits = new Set()
             for suggestion in suggestions when suggestion.type is 'keyword'
               suggestedUnits.add(suggestion.rightLabel)
-            expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit', 'BuiltIn', 'Test_Autocomplete_Keywords', 'package.modules.TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
+            expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit.robot', 'BuiltIn', 'Test_Autocomplete_Keywords.rOBOt', 'TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
       it 'suggests all keywords from resources having the same name', ->
         runs ->
           editor.setCursorBufferPosition([Infinity, Infinity])
@@ -614,7 +614,7 @@ describe 'Robot Framework keywords autocompletions', ->
             suggestedUnits = new Set()
             for suggestion in suggestions when suggestion.type is 'keyword'
               suggestedUnits.add(suggestion.rightLabel)
-            expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit', 'BuiltIn', 'Test_Autocomplete_Keywords', 'package.modules.TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
+            expect(['Test_Autocomplete_Libdoc', 'FileSizeLimit.robot', 'BuiltIn', 'Test_Autocomplete_Keywords.rOBOt', 'TestModule'].sort()).toEqual(Array.from(suggestedUnits).sort())
       it 'is not affected by removeDotNotation configuration changes', ->
         runs ->
           atom.config.set("#{CFG_KEY}.removeDotNotation", true)
