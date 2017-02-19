@@ -33,7 +33,8 @@ module.exports =
       default: false
       order: 6
     excludeDirectories:
-      title: 'Exclude robot resources (comma separated directory names). Excluded robot directories will not be parsed for keywords'
+      title: 'Exclude robot resources (comma separated). Excluded resources will not be parsed for keywords.'
+      description: 'Specify names of files or directories. Paths are not allowed. Glob expressions are supported.'
       type: 'array'
       default: []
       items:

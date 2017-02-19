@@ -691,7 +691,15 @@ describe 'Robot Framework keywords autocompletions', ->
             expect(suggestions.length).toEqual(1)
             expect(suggestions[0]?.displayText).toEqual('Run Program')
       runs ->
-        atom.config.set("#{CFG_KEY}.excludeDirectories", ['autocomplete'])
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  .utility1')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(2)
+            expect(suggestions[0]?.displayText).toEqual('utility 1')
+            expect(suggestions[1]?.displayText).toEqual('utility 1 text')
+      runs ->
+        atom.config.set("#{CFG_KEY}.excludeDirectories", ['auto*'])
       waitsFor ->
         return !provider.loading
       , 'Provider should finish loading', 500
@@ -701,6 +709,18 @@ describe 'Robot Framework keywords autocompletions', ->
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(0)
+      runs ->
+        atom.config.set("#{CFG_KEY}.excludeDirectories", ['*.robot'])
+      waitsFor ->
+        return !provider.loading
+      , 'Provider should finish loading', 500
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  .utility1')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0]?.displayText).toEqual('utility 1 text')
     it 'react on processLibdocFiles configuration changes', ->
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
