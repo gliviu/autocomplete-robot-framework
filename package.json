@@ -1,6 +1,6 @@
 {
   "name": "autocomplete-robot-framework",
-  "main": "./lib/main",
+  "main": "./lib/main.js",
   "version": "3.1.0",
   "description": "Robot Framework autocomplete for Atom",
   "keywords": [
@@ -31,8 +31,12 @@
   "dependencies": {
     "named-js-regexp": "1.3.1",
     "fuzzaldrin-plus": "^0.1.0",
-    "minimatch": "3.0.3"
+    "minimatch": "3.0.3",
+    "atom-package-deps": ">4.4.0"
   },
+  "package-deps": [
+    "language-robot-framework"
+  ],
   "scripts": {
     "test": "apm test"
   }

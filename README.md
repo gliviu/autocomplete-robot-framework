@@ -64,11 +64,13 @@ For this mechanism to work following requirements should be met.
 * Python executable is correctly defined in Atom package settings (defaults to 'python')
 * Robotframework 3.0 is installed according to [instructions](https://github.com/robotframework/robotframework/blob/master/INSTALL.rst)
 
+Be sure to have PYTHONPATH, JYTHONPATH, CLASSPATH and IRONPYTHONPATH environment properly defined.
+
 At this time libraries with mandatory parameters in constructor are not supported.
 
 Libraries identified by path do not work - 'Library    path/PythonLibrary.py'
 
-To help troubleshoot wrong imports and python environment problems take a look at [Status panel](#status).
+To help troubleshoot wrong imports and python environment problems take a look at [Status panel](#status) below.
 
 ## Fallback libraries
 Official Robot Framework [libraries](http://robotframework.org/#libraries) are included for convenience, just in case library import mechanism is not working for some reasons. This could be the case for example if using the RF Jar distribution without any python interpreter available.
@@ -139,6 +141,8 @@ python/robot framework must be installed and operational. 'python' command must 
 * [https://robotframework.slack.com/messages/atom/](https://robotframework.slack.com/messages/atom/) discuss [atom.io](https://atom.io/) support for RF
 
 ## Changelog
+* v3.2.0
+    * Auto download Atom dependencies using [package-deps](https://github.com/steelbrain/package-deps)
 * v3.0.0
     * Import python libraries
     * Scope modifiers
