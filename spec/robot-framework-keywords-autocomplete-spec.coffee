@@ -9,6 +9,8 @@ pathUtils = require 'path'
 PACKAGE_NAME = 'autocomplete-robot-framework'
 CFG_KEY = 'autocomplete-robot-framework'
 
+TIMEOUT=5000 #ms
+
 # Credits - https://raw.githubusercontent.com/atom/autocomplete-atom-api/master/spec/provider-spec.coffee
 getCompletions = (editor, provider)->
   cursor = editor.getLastCursor()
@@ -27,7 +29,7 @@ describe 'Robot Framework keywords autocompletions', ->
   beforeEach ->
     waitsFor ->
       return !libManager.loading()
-    , 'Provider should finish loading', 500
+    , 'Provider should finish loading', TIMEOUT
     runs ->
       process.env.PYTHONPATH=pathUtils.join(__dirname, '../fixtures/libraries')
       libRepo.reset()
@@ -39,7 +41,7 @@ describe 'Robot Framework keywords autocompletions', ->
     waitsForPromise -> atom.workspace.open('autocomplete/test_autocomplete_keywords.rOBOt')
     waitsFor ->
       return !provider.loading
-    , 'Provider should finish loading', 500
+    , 'Provider should finish loading', TIMEOUT
     runs ->
       editor = atom.workspace.getActiveTextEditor()
 
@@ -226,7 +228,7 @@ describe 'Robot Framework keywords autocompletions', ->
         atom.config.set("#{CFG_KEY}.includeDefaultArguments", true)
       waitsFor ->
         return !provider.loading
-      , 'Provider should finish loading', 500
+      , 'Provider should finish loading', TIMEOUT
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText('  log')
@@ -246,7 +248,7 @@ describe 'Robot Framework keywords autocompletions', ->
         atom.config.set("#{CFG_KEY}.includeDefaultArguments", true)
       waitsFor ->
         return !provider.loading
-      , 'Provider should finish loading', 500
+      , 'Provider should finish loading', TIMEOUT
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText('  log')
@@ -263,6 +265,38 @@ describe 'Robot Framework keywords autocompletions', ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0].displayText).toEqual('The é char is here')
           expect(suggestions[0].description).toEqual(' Arguments: é1=é1 val, é2=${é3} val')
+
+  describe 'Keywords autocomplete in *Settings* section', ->
+    beforeEach ->
+      console.log (editor.getText())
+      console.log (editor.getPath())
+      waitsForPromise -> atom.workspace.open('autocomplete/settings.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+    it 'autocompletes keywords in test/suite setup', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      runs ->
+        editor.insertText('\nTest Setup  runkeys')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(0)
+          expect(suggestions[0]?.displayText).toEqual('Run Keywords')
+    it 'suggests library names', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      runs ->
+        editor.insertText('\nLibrary  built')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(0)
+          expect(suggestions[0]?.displayText).toEqual('BuiltIn')
+    it 'suggests resource names', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      runs ->
+        editor.insertText('\nResource  filepref')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(0)
+          expect(suggestions[0]?.displayText).toEqual('FilePrefix')
 
   describe 'Library management', ->
     beforeEach ->
@@ -309,7 +343,7 @@ describe 'Robot Framework keywords autocompletions', ->
         atom.config.set("#{CFG_KEY}.pythonExecutable", 'invalid_python_executable')
       waitsFor ->
         return !provider.loading
-      , 'Provider should finish loading', 500
+      , 'Provider should finish loading', TIMEOUT
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.setText('  appefi')
@@ -547,7 +581,7 @@ describe 'Robot Framework keywords autocompletions', ->
           atom.config.set("#{CFG_KEY}.removeDotNotation", true)
         waitsFor ->
           return !provider.loading
-        , 'Provider should finish loading', 500
+        , 'Provider should finish loading', TIMEOUT
         runs ->
           editor.setCursorBufferPosition([Infinity, Infinity])
           editor.insertText('  builtin.callme')
@@ -560,7 +594,7 @@ describe 'Robot Framework keywords autocompletions', ->
           atom.config.set("#{CFG_KEY}.removeDotNotation", false)
         waitsFor ->
           return !provider.loading
-        , 'Provider should finish loading', 500
+        , 'Provider should finish loading', TIMEOUT
         runs ->
           editor.setCursorBufferPosition([Infinity, Infinity])
           editor.insertText('  builtin.callme')
@@ -620,7 +654,7 @@ describe 'Robot Framework keywords autocompletions', ->
           atom.config.set("#{CFG_KEY}.removeDotNotation", true)
         waitsFor ->
           return !provider.loading
-        , 'Provider should finish loading', 500
+        , 'Provider should finish loading', TIMEOUT
         runs ->
           editor.setCursorBufferPosition([Infinity, Infinity])
           editor.insertText('  UnknownLibrary.callme')
@@ -633,7 +667,7 @@ describe 'Robot Framework keywords autocompletions', ->
           atom.config.set("#{CFG_KEY}.removeDotNotation", false)
         waitsFor ->
           return !provider.loading
-        , 'Provider should finish loading', 500
+        , 'Provider should finish loading', TIMEOUT
         runs ->
           editor.setCursorBufferPosition([Infinity, Infinity])
           editor.insertText('  UnknownLibrary.callme')
@@ -657,7 +691,7 @@ describe 'Robot Framework keywords autocompletions', ->
         atom.config.set("#{CFG_KEY}.showArguments", true)
       waitsFor ->
         return !provider.loading
-      , 'Provider should finish loading', 500
+      , 'Provider should finish loading', TIMEOUT
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText('  runprog')
@@ -669,7 +703,7 @@ describe 'Robot Framework keywords autocompletions', ->
         atom.config.set("#{CFG_KEY}.showArguments", false)
       waitsFor ->
         return !provider.loading
-      , 'Provider should finish loading', 500
+      , 'Provider should finish loading', TIMEOUT
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText('  runprog')
@@ -682,7 +716,7 @@ describe 'Robot Framework keywords autocompletions', ->
         atom.config.set("#{CFG_KEY}.excludeDirectories", [])
       waitsFor ->
         return !provider.loading
-      , 'Provider should finish loading', 500
+      , 'Provider should finish loading', TIMEOUT
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText('  runprog')
@@ -702,7 +736,7 @@ describe 'Robot Framework keywords autocompletions', ->
         atom.config.set("#{CFG_KEY}.excludeDirectories", ['auto*'])
       waitsFor ->
         return !provider.loading
-      , 'Provider should finish loading', 500
+      , 'Provider should finish loading', TIMEOUT
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText('  runprog')
@@ -713,7 +747,7 @@ describe 'Robot Framework keywords autocompletions', ->
         atom.config.set("#{CFG_KEY}.excludeDirectories", ['*.robot'])
       waitsFor ->
         return !provider.loading
-      , 'Provider should finish loading', 500
+      , 'Provider should finish loading', TIMEOUT
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText('  .utility1')
@@ -733,7 +767,7 @@ describe 'Robot Framework keywords autocompletions', ->
         atom.config.set("#{CFG_KEY}.processLibdocFiles", false)
       waitsFor ->
         return !provider.loading
-      , 'Provider should finish loading', 500
+      , 'Provider should finish loading', TIMEOUT
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText('  autocompletelibdoc')
@@ -752,7 +786,7 @@ describe 'Robot Framework keywords autocompletions', ->
         atom.config.set("#{CFG_KEY}.maxFileSize", 39)
       waitsFor ->
         return !provider.loading
-      , 'Provider should finish loading', 500
+      , 'Provider should finish loading', TIMEOUT
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText('  limitfilesize')
@@ -771,7 +805,7 @@ describe 'Robot Framework keywords autocompletions', ->
         atom.config.set("#{CFG_KEY}.showLibrarySuggestions", false)
       waitsFor ->
         return !provider.loading
-      , 'Provider should finish loading', 500
+      , 'Provider should finish loading', TIMEOUT
       runs ->
         editor.setCursorBufferPosition([Infinity, Infinity])
         editor.insertText('  built')

@@ -5,6 +5,8 @@ fs = require 'fs'
 PACKAGE_NAME = 'autocomplete-robot-framework'
 CFG_KEY = 'autocomplete-robot-framework'
 
+TIMEOUT=5000 #ms
+
 describe 'Autocomplete Robot Provider', ->
   [provider, editor]=[]
   beforeEach ->
@@ -18,7 +20,7 @@ describe 'Autocomplete Robot Provider', ->
         editor = atom.workspace.getActiveTextEditor()
       waitsFor ->
         return !autocompletePlusProvider.loading
-      , 'Provider should finish loading', 500
+      , 'Provider should finish loading', TIMEOUT
   it 'finds keyword by name', ->
     keywords = provider.getKeywordsByName('Run Program')
     expect(keywords).toBeDefined()
