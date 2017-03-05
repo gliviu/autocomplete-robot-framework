@@ -100,9 +100,9 @@ It can be activated from **Packages->Robot Framework->Show autocomplete status**
 ## API
 An API is available to enable cooperation with other packages by providing access to underlying keyword repository.
 * getKeywordNames()
-* getResourcePaths()
 * getKeywordsByName(name)
-* getResourceByPath(path)
+* getResourceKeys()
+* getResourceByKey(resourceKey)
 
 Keyword
 ```
@@ -114,9 +114,15 @@ Keyword
     startColNo : 0,
     resource : {
       path : 'resource path',
+      name : 'resource name',
       libraryPath : 'python library source path if available',
       hasTestCases : true/false,
-      hasKeywords : true/false
+      hasKeywords : true/false,
+      isLibrary : true/false,
+      imports : {
+	    libraries : [{name : '', alias : ''}],
+	    resources : [{name : '', extension : ''}]
+      }
   }
 ```
 
@@ -124,9 +130,15 @@ Resource
 ```
   {
     path: 'resource path',
+    name : 'resource name',
     libraryPath : 'python library source path if available',
     hasTestCases: true/false,
     hasKeywords: true/false,
+    isLibrary : true/false,
+    imports : {
+      libraries : [{name : '', alias : ''}],
+      resources : [{name : '', extension : ''}]
+    },
     keywords: [keyword1, ...]
   }
 ```

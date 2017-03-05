@@ -34,10 +34,11 @@ describe 'Autocomplete Robot Provider', ->
     keywords = provider.getKeywordsByName('Duplicated keyword')
     expect(keywords).toBeDefined()
     expect(keywords.length).toEqual 2
-  it 'finds resource by path', ->
-    resource = provider.getResourceByPath('non existing resource')
+  it 'finds resource by key', ->
+    resource = provider.getResourceByKey('non existing resource')
     expect(resource).not.toBeDefined()
-    resource = provider.getResourceByPath(editor.getPath())
+    resourceKey = editor.getPath().toLowerCase()
+    resource = provider.getResourceByKey(resourceKey)
     expect(resource).toBeDefined()
     expect(resource.keywords.length).toBeGreaterThan 0
     expect(resource.keywords[0].name).toEqual 'Private keyword'
@@ -48,14 +49,14 @@ describe 'Autocomplete Robot Provider', ->
     for name in kwNames
       keywords = provider.getKeywordsByName(name)
       expect(keywords.length).toBeGreaterThan 0
-  it 'provides all keyword paths', ->
-    resourcePaths = provider.getResourcePaths()
+  it 'provides all resource keys', ->
+    resourceKeys = provider.getResourceKeys()
     resourceNames = []
-    for resourcePath in resourcePaths
-      resourceNames.push(pathUtils.basename(resourcePath))
-    expect(resourceNames).toContain 'Test_Autocomplete_Keywords.rOBOt'
-    for path in resourcePaths
-      resource = provider.getResourceByPath(path)
+    for resourceKey in resourceKeys
+      resourceNames.push(pathUtils.basename(resourceKey))
+    expect(resourceNames).toContain 'test_autocomplete_keywords.robot'
+    for resourceKey in resourceKeys
+      resource = provider.getResourceByKey(resourceKey)
       expect(resource).toBeDefined()
   it 'provides library source information', ->
     keywords = provider.getKeywordsByName('Should Match')
