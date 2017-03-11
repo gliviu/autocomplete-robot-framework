@@ -225,7 +225,7 @@ describe 'Robot Framework keywords autocompletions', ->
           expect(suggestions.length).toBeGreaterThan(0)
           expect(suggestions[0].snippet).toEqual('Log    ${1:message}')
       runs ->
-        atom.config.set("#{CFG_KEY}.includeDefaultArguments", true)
+        atom.config.set("#{CFG_KEY}.suggestArguments", false)
       waitsFor ->
         return !provider.loading
       , 'Provider should finish loading', TIMEOUT
@@ -235,8 +235,8 @@ describe 'Robot Framework keywords autocompletions', ->
       waitsForPromise ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(0)
-          expect(suggestions[0].snippet).toEqual('Log    ${1:message}    ${2:level=INFO}    ${3:html=False}    ${4:console=False}    ${5:repr=False}')
-    it 'is able to disable suggestions for keyword arguments with default values', ->
+          expect(suggestions[0].snippet).toEqual('Log')
+    it 'is able to hide optional arguments', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
       runs ->
         editor.insertText('  log')
@@ -256,6 +256,26 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toBeGreaterThan(0)
           expect(suggestions[0].snippet).toEqual('Log    ${1:message}    ${2:level=INFO}    ${3:html=False}    ${4:console=False}    ${5:repr=False}')
+    it 'supports changing argument separator', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      runs ->
+        editor.insertText('  runkeyword')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(0)
+          expect(suggestions[0].snippet).toEqual('Run Keyword    ${1:name}    ${2:*args}')
+      runs ->
+        atom.config.set("#{CFG_KEY}.argumentSeparator", ' | ')
+      waitsFor ->
+        return !provider.loading
+      , 'Provider should finish loading', TIMEOUT
+      runs ->
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  runkeyword')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(0)
+          expect(suggestions[0].snippet).toEqual('Run Keyword | ${1:name} | ${2:*args}')
     it 'supports unicode characters in keyword names and arguments', ->
       editor.setCursorBufferPosition([Infinity, Infinity])
       runs ->
