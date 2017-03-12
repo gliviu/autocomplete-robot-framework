@@ -832,3 +832,64 @@ describe 'Robot Framework keywords autocompletions', ->
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(0)
+
+  describe 'Ambiguous keywords', ->
+    it 'resolves keyword found in diffrent resources using default scope modifier', ->
+      waitsForPromise -> atom.workspace.open('autocomplete/test_kw_import1.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  ak')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(2)
+          expect(suggestions[0].snippet).toEqual('utils2.abk1')
+          expect(suggestions[1].snippet).toEqual('utils3.abk1')
+    it 'resolves keyword found in diffrent libraries using default scope modifier', ->
+      waitsForPromise -> atom.workspace.open('autocomplete/test_kw_import1.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  delete')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(2)
+          expect(suggestions[0].snippet.startsWith('FtpLibrary.Delete')).toBeTruthy()
+          expect(suggestions[1].snippet.startsWith('RequestsLibrary.Delete')).toBeTruthy()
+    it 'resolves keyword found in diffrent resources using global scope modifier', ->
+      waitsForPromise -> atom.workspace.open('autocomplete/test_kw_import1.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  .ak')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(2)
+          expect(suggestions[0].snippet).toEqual('utils2.abk1')
+          expect(suggestions[1].snippet).toEqual('utils3.abk1')
+    it 'resolves keyword found in diffrent resources using file scope modifier', ->
+      waitsForPromise -> atom.workspace.open('autocomplete/test_kw_import1.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  utils2.abk')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(0)
+          expect(suggestions[0].snippet).toEqual('utils2.abk1')
+      runs ->
+        editor.insertText('  utils3.abk')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toBeGreaterThan(0)
+          expect(suggestions[0].snippet).toEqual('utils3.abk1')
+    it 'resolves keyword found in diffrent resources using internal scope modifier', ->
+      waitsForPromise -> atom.workspace.open('autocomplete/a/utils2.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  this.abk')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0].snippet).toEqual('utils2.abk1')
