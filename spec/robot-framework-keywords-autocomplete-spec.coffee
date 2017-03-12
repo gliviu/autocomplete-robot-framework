@@ -893,3 +893,102 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0].snippet).toEqual('utils2.abk1')
+  describe 'Imported resource path resolver', ->
+    it 'resolves resource by resource name in the same directory', ->
+      waitsForPromise -> atom.workspace.open('path-resolver/path-resolver.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  pr1')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          suggestions = suggestions.filter (suggestion) -> suggestion.type=='keyword'
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('pr1k')
+          expect(suggestions[0]?.resourceKey.endsWith('path-resolver/pr1.robot')).toBeTruthy()
+    it 'resolves resource by resource name in different directory', ->
+      waitsForPromise -> atom.workspace.open('path-resolver/path-resolver.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  pr6')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          suggestions = suggestions.filter (suggestion) -> suggestion.type=='keyword'
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('pr6ka')
+          expect(suggestions[0]?.resourceKey.endsWith('path-resolver/a/pr6.robot')).toBeTruthy()
+    it 'resolves resource by relative resource path in the same directory', ->
+      waitsForPromise -> atom.workspace.open('path-resolver/path-resolver.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  pr2')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          suggestions = suggestions.filter (suggestion) -> suggestion.type=='keyword'
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('pr2k')
+          expect(suggestions[0]?.resourceKey.endsWith('path-resolver/pr2.robot')).toBeTruthy()
+    it 'resolves resource by relative resource path in different directory', ->
+      waitsForPromise -> atom.workspace.open('path-resolver/path-resolver.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  pr3')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          suggestions = suggestions.filter (suggestion) -> suggestion.type=='keyword'
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('pr3ka')
+          expect(suggestions[0]?.resourceKey.endsWith('path-resolver/a/pr3.robot')).toBeTruthy()
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  pr4')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          suggestions = suggestions.filter (suggestion) -> suggestion.type=='keyword'
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('pr4ka')
+          expect(suggestions[0]?.resourceKey.endsWith('path-resolver/a/pr4.robot')).toBeTruthy()
+    it 'suggests keywords from all resources with same name when import path is computed', ->
+      waitsForPromise -> atom.workspace.open('path-resolver/path-resolver.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  pr5')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          suggestions = suggestions.filter (suggestion) -> suggestion.type=='keyword'
+          expect(suggestions.length).toEqual(2)
+          expect(suggestions[0]?.displayText).toEqual('pr5k')
+          expect(suggestions[0]?.resourceKey.endsWith('path-resolver/pr5.robot')).toBeTruthy()
+          expect(suggestions[1]?.displayText).toEqual('pr5ka')
+          expect(suggestions[1]?.resourceKey.endsWith('path-resolver/a/pr5.robot')).toBeTruthy()
+    it 'suggests keywords from all resources with same name when import path is wrong', ->
+      waitsForPromise -> atom.workspace.open('path-resolver/path-resolver.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  pr7')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          suggestions = suggestions.filter (suggestion) -> suggestion.type=='keyword'
+          expect(suggestions.length).toEqual(2)
+          expect(suggestions[0]?.displayText).toEqual('pr7k')
+          expect(suggestions[0]?.resourceKey.endsWith('path-resolver/pr7.robot')).toBeTruthy()
+          expect(suggestions[1]?.displayText).toEqual('pr7ka')
+          expect(suggestions[1]?.resourceKey.endsWith('path-resolver/a/pr7.robot')).toBeTruthy()
+    it 'resolves external resources', ->
+      waitsForPromise -> atom.workspace.open('path-resolver/path-resolver.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+        editor.setCursorBufferPosition([Infinity, Infinity])
+        editor.insertText('  prex')
+      waitsForPromise ->
+        getCompletions(editor, provider).then (suggestions) ->
+          suggestions = suggestions.filter (suggestion) -> suggestion.type=='keyword'
+          expect(suggestions.length).toEqual(1)
+          expect(suggestions[0]?.displayText).toEqual('prext')
+          expect(suggestions[0]?.resourceKey.endsWith('path-resolver/external-resource.robot')).toBeTruthy()

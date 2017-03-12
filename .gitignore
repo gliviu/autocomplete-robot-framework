@@ -4,3 +4,6 @@ node_modules
 lib/test*.js
 **.pyc
 **.class
+**/log.html
+**/report.html
+**/output.xml

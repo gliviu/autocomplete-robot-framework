@@ -3,7 +3,7 @@ Library  Test_Autocomplete_Libdoc
 Library  package.modules.TestModule
 Library  HttpLibrary.HTTP
 Resource  FileSizeLimit.robot
-Resource  a/utils.robot
+Resource  utils.robot
 # OperatingSystem library must not be imported in this file
 # Screenshot and BuiltIn libraries should not be imported in any file
 
