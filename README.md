@@ -66,11 +66,9 @@ For this mechanism to work following requirements should be met.
 
 Be sure to have PYTHONPATH, JYTHONPATH, CLASSPATH and IRONPYTHONPATH environment properly defined.
 
-At this time libraries with mandatory parameters in constructor are not supported.
-
-Libraries identified by path do not work - 'Library    path/PythonLibrary.py'
-
-To help troubleshoot wrong imports and python environment problems take a look at [Status panel](#status) below.
+At this time libraries with mandatory parameters in constructor are not supported.  
+Libraries identified by path do not work - 'Library    path/PythonLibrary.py'  
+Take a look at [Status panel](#status) below for troubleshooting wrong imports and python environment problems .
 
 ## Fallback libraries
 Official Robot Framework [libraries](http://robotframework.org/#libraries) are included for convenience, just in case library import mechanism is not working for some reasons. This could be the case for example if using the RF Jar distribution without any python interpreter available.
@@ -104,31 +102,11 @@ An API is available to enable cooperation with other packages by providing acces
 * getResourceKeys()
 * getResourceByKey(resourceKey)
 
-Keyword
-```
-  {
-    name: 'keyword name',
-    documentation : 'documentation',
-    arguments : ['arg1', ...],
-    startRowNo : 0,
-    startColNo : 0,
-    resource : {
-      path : 'resource path',
-      name : 'resource name',
-      libraryPath : 'python library source path if available',
-      hasTestCases : true/false,
-      hasKeywords : true/false,
-      isLibrary : true/false,
-      imports : {
-	    libraries : [{name : '', alias : ''}],
-	    resources : [{name : '', extension : ''}]
-      }
-  }
-```
 
 Resource
-```
+```javascript
   {
+    resourceKey: 'unique resource identifier',
     path: 'resource path',
     name : 'resource name',
     libraryPath : 'python library source path if available',
@@ -137,9 +115,24 @@ Resource
     isLibrary : true/false,
     imports : {
       libraries : [{name : '', alias : ''}],
-      resources : [{name : '', extension : ''}]
+      resources : [{
+	      name : '',
+	      extension : '',
+	      resourceKey: '' // available if import is resolved
+	      }]
     },
     keywords: [keyword1, ...]
+  }
+```
+Keyword
+```javascript
+  {
+    name: 'keyword name',
+    documentation : 'documentation',
+    arguments : ['arg1', ...],
+    startRowNo : 0,
+    startColNo : 0,
+    resourceKey : 'parent resource key'
   }
 ```
 ## Testing
@@ -153,6 +146,8 @@ python/robot framework must be installed and operational. 'python' command must 
 * [https://robotframework.slack.com/messages/atom/](https://robotframework.slack.com/messages/atom/) discuss [atom.io](https://atom.io/) support for RF
 
 ## Changelog
+* v3.3.0
+   * Added keyword argument separator configuration
 * v3.2.0
     * Auto download Atom dependencies using [package-deps](https://github.com/steelbrain/package-deps)
 * v3.0.0
