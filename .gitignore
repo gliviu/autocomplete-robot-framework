@@ -1,7 +1,9 @@
 node_modules
 .project
 .settings
+.pydevproject
 lib/test*.js
+lib/test*.py
 **.pyc
 **.class
 **/log.html
