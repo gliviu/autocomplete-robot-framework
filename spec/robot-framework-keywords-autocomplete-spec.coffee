@@ -10,6 +10,7 @@ PACKAGE_NAME = 'autocomplete-robot-framework'
 CFG_KEY = 'autocomplete-robot-framework'
 
 TIMEOUT=5000 #ms
+SEP = pathUtils.sep
 
 # Credits - https://raw.githubusercontent.com/atom/autocomplete-atom-api/master/spec/provider-spec.coffee
 getCompletions = (editor, provider)->
@@ -905,7 +906,7 @@ describe 'Robot Framework keywords autocompletions', ->
           suggestions = suggestions.filter (suggestion) -> suggestion.type=='keyword'
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('pr1k')
-          expect(suggestions[0]?.resourceKey.endsWith('path-resolver/pr1.robot')).toBeTruthy()
+          expect(suggestions[0]?.resourceKey.endsWith("path-resolver#{SEP}pr1.robot")).toBeTruthy()
     it 'resolves resource by resource name in different directory', ->
       waitsForPromise -> atom.workspace.open('path-resolver/path-resolver.robot')
       runs ->
@@ -917,7 +918,7 @@ describe 'Robot Framework keywords autocompletions', ->
           suggestions = suggestions.filter (suggestion) -> suggestion.type=='keyword'
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('pr6ka')
-          expect(suggestions[0]?.resourceKey.endsWith('path-resolver/a/pr6.robot')).toBeTruthy()
+          expect(suggestions[0]?.resourceKey.endsWith("path-resolver#{SEP}a#{SEP}pr6.robot")).toBeTruthy()
     it 'resolves resource by relative resource path in the same directory', ->
       waitsForPromise -> atom.workspace.open('path-resolver/path-resolver.robot')
       runs ->
@@ -929,7 +930,7 @@ describe 'Robot Framework keywords autocompletions', ->
           suggestions = suggestions.filter (suggestion) -> suggestion.type=='keyword'
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('pr2k')
-          expect(suggestions[0]?.resourceKey.endsWith('path-resolver/pr2.robot')).toBeTruthy()
+          expect(suggestions[0]?.resourceKey.endsWith("path-resolver#{SEP}pr2.robot")).toBeTruthy()
     it 'resolves resource by relative resource path in different directory', ->
       waitsForPromise -> atom.workspace.open('path-resolver/path-resolver.robot')
       runs ->
@@ -941,7 +942,7 @@ describe 'Robot Framework keywords autocompletions', ->
           suggestions = suggestions.filter (suggestion) -> suggestion.type=='keyword'
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('pr3ka')
-          expect(suggestions[0]?.resourceKey.endsWith('path-resolver/a/pr3.robot')).toBeTruthy()
+          expect(suggestions[0]?.resourceKey.endsWith("path-resolver#{SEP}a#{SEP}pr3.robot")).toBeTruthy()
       runs ->
         editor = atom.workspace.getActiveTextEditor()
         editor.setCursorBufferPosition([Infinity, Infinity])
@@ -951,7 +952,7 @@ describe 'Robot Framework keywords autocompletions', ->
           suggestions = suggestions.filter (suggestion) -> suggestion.type=='keyword'
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('pr4ka')
-          expect(suggestions[0]?.resourceKey.endsWith('path-resolver/a/pr4.robot')).toBeTruthy()
+          expect(suggestions[0]?.resourceKey.endsWith("path-resolver#{SEP}a#{SEP}pr4.robot")).toBeTruthy()
     it 'suggests keywords from all resources with same name when import path is computed', ->
       waitsForPromise -> atom.workspace.open('path-resolver/path-resolver.robot')
       runs ->
@@ -963,9 +964,9 @@ describe 'Robot Framework keywords autocompletions', ->
           suggestions = suggestions.filter (suggestion) -> suggestion.type=='keyword'
           expect(suggestions.length).toEqual(2)
           expect(suggestions[0]?.displayText).toEqual('pr5k')
-          expect(suggestions[0]?.resourceKey.endsWith('path-resolver/pr5.robot')).toBeTruthy()
+          expect(suggestions[0]?.resourceKey.endsWith("path-resolver#{SEP}pr5.robot")).toBeTruthy()
           expect(suggestions[1]?.displayText).toEqual('pr5ka')
-          expect(suggestions[1]?.resourceKey.endsWith('path-resolver/a/pr5.robot')).toBeTruthy()
+          expect(suggestions[1]?.resourceKey.endsWith("path-resolver#{SEP}a#{SEP}pr5.robot")).toBeTruthy()
     it 'suggests keywords from all resources with same name when import path is wrong', ->
       waitsForPromise -> atom.workspace.open('path-resolver/path-resolver.robot')
       runs ->
@@ -977,9 +978,9 @@ describe 'Robot Framework keywords autocompletions', ->
           suggestions = suggestions.filter (suggestion) -> suggestion.type=='keyword'
           expect(suggestions.length).toEqual(2)
           expect(suggestions[0]?.displayText).toEqual('pr7k')
-          expect(suggestions[0]?.resourceKey.endsWith('path-resolver/pr7.robot')).toBeTruthy()
+          expect(suggestions[0]?.resourceKey.endsWith("path-resolver#{SEP}pr7.robot")).toBeTruthy()
           expect(suggestions[1]?.displayText).toEqual('pr7ka')
-          expect(suggestions[1]?.resourceKey.endsWith('path-resolver/a/pr7.robot')).toBeTruthy()
+          expect(suggestions[1]?.resourceKey.endsWith("path-resolver#{SEP}a#{SEP}pr7.robot")).toBeTruthy()
     it 'resolves external resources', ->
       waitsForPromise -> atom.workspace.open('path-resolver/path-resolver.robot')
       runs ->
@@ -991,4 +992,4 @@ describe 'Robot Framework keywords autocompletions', ->
           suggestions = suggestions.filter (suggestion) -> suggestion.type=='keyword'
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0]?.displayText).toEqual('prext')
-          expect(suggestions[0]?.resourceKey.endsWith('path-resolver/external-resource.robot')).toBeTruthy()
+          expect(suggestions[0]?.resourceKey.endsWith("path-resolver#{SEP}external-resource.robot")).toBeTruthy()
