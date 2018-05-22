@@ -9,3 +9,5 @@ lib/test*.py
 **/log.html
 **/report.html
 **/output.xml
+/test.js
+/test.robot

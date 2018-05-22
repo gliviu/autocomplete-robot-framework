@@ -319,6 +319,44 @@ describe 'Robot Framework keywords autocompletions', ->
           expect(suggestions.length).toBeGreaterThan(0)
           expect(suggestions[0]?.displayText).toEqual('FilePrefix')
 
+  describe 'BDD autocomplete', ->
+    beforeEach ->
+      waitsForPromise -> atom.workspace.open('autocomplete/bdd.robot')
+      runs ->
+        editor = atom.workspace.getActiveTextEditor()
+    it 'suggests keywords using BDD notation', ->
+      editor.setCursorBufferPosition([Infinity, Infinity])
+      runs ->
+        editor.insertText('  given welc')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0].displayText).toEqual('welcome page should be open')
+      runs ->
+        editor.insertText('  when welc')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0].displayText).toEqual('welcome page should be open')
+      runs ->
+        editor.insertText('  then welc')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0].displayText).toEqual('welcome page should be open')
+      runs ->
+        editor.insertText('  and welc')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0].displayText).toEqual('welcome page should be open')
+      runs ->
+        editor.insertText('  but welc')
+        waitsForPromise ->
+          getCompletions(editor, provider).then (suggestions) ->
+            expect(suggestions.length).toEqual(1)
+            expect(suggestions[0].displayText).toEqual('welcome page should be open')
+
   describe 'Library management', ->
     beforeEach ->
       waitsForPromise -> atom.workspace.open('autocomplete/Test_Libraries.robot')
@@ -894,6 +932,7 @@ describe 'Robot Framework keywords autocompletions', ->
         getCompletions(editor, provider).then (suggestions) ->
           expect(suggestions.length).toEqual(1)
           expect(suggestions[0].snippet).toEqual('utils2.abk1')
+
   describe 'Imported resource path resolver', ->
     it 'resolves resource by resource name in the same directory', ->
       waitsForPromise -> atom.workspace.open('path-resolver/path-resolver.robot')
