@@ -4,7 +4,7 @@
 <scope>global</scope>
 <namedargs>yes</namedargs>
 <doc></doc>
-<kw name="Autocomplete libdoc test">
+<kw name="Autocomplete libdoc test &quot; &apos; &lt; &gt; &amp;">
 <arguments>
 <arg>arg1</arg>
 <arg>arg2</arg>

@@ -821,7 +821,7 @@ describe 'Robot Framework keywords autocompletions', ->
         waitsForPromise ->
           getCompletions(editor, provider).then (suggestions) ->
             expect(suggestions.length).toEqual(1)
-            expect(suggestions[0].displayText).toEqual('Autocomplete libdoc test')
+            expect(suggestions[0].displayText).toEqual('Autocomplete libdoc test " \' < > &')
       runs ->
         atom.config.set("#{CFG_KEY}.processLibdocFiles", false)
       waitsFor ->
