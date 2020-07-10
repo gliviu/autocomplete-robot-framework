@@ -146,6 +146,8 @@ python/robot framework must be installed and operational. 'python' command must 
 * [https://robotframework.slack.com/messages/atom/](https://robotframework.slack.com/messages/atom/) discuss [atom.io](https://atom.io/) support for RF
 
 ## Changelog
+* v3.9.0 Support for RobotFramework 3.2
+* v3.7.0 Support for keywords with embedded arguments referenced using libdoc XML file 
 * v3.5.0
   * Add support for [Behavior-driven style](http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#behavior-driven-style)
   * Bug fixes
