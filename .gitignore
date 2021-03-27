@@ -11,3 +11,4 @@ lib/test*.py
 **/output.xml
 /test.js
 /test.robot
+.vscode
