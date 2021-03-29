@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keywordspec name="BuiltIn" type="LIBRARY" format="ROBOT" scope="GLOBAL" namedargs="true" generated="2021-03-27T21:50:44Z" specversion="2" source="../../home/liviu/.local/lib/python3.6/site-packages/robot/libraries/BuiltIn.py" lineno="3296">
+  <version>3.2.2</version>
+  <scope>global</scope>
+  <namedargs>yes</namedargs>
+  <doc>Some doc</doc>
+  <kw name="Call Method" lineno="3042">
+    <arguments>
+      <arg>object</arg>
+      <arg>method_name</arg>
+      <arg>*args</arg>
+      <arg>**kwargs</arg>
+    </arguments>
+    <doc>Call Method doc</doc>
+  </kw>
+  <kw name="Catenate&lt;x" lineno="2574">
+    <arguments>
+      <arg>*items</arg>
+    </arguments>
+    <doc>Catenate doc</doc>
+  </kw>
+</keywordspec>
