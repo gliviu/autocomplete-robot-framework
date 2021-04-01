@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keywordspec name="BuiltIn" type="LIBRARY" format="ROBOT" scope="GLOBAL" generated="2021-03-27T21:52:04Z" specversion="3" source="../../home/liviu/.local/lib/python3.6/site-packages/robot/libraries/BuiltIn.py" lineno="3444">
+  <version>4.0</version>
+  <doc>docs</doc>
+  <tags>
+  </tags>
+  <inits>
+  </inits>
+  <keywords>
+    <kw2 name="Call Method" lineno="3190">
+      <arguments repr="object, method_name, *args, **kwargs">
+        <arg kind="POSITIONAL_OR_NAMED" required="true" repr="object">
+          <name>object</name>
+        </arg>
+        <arg kind="POSITIONAL_OR_NAMED" required="true" repr="method_name">
+          <name>method_name</name>
+        </arg>
+        <arg kind="VAR_POSITIONAL" required="false" repr="*args">
+          <name>args</name>
+        </arg>
+        <arg kind="VAR_NAMED" required="false" repr="**kwargs">
+          <name>kwargs</name>
+        </arg>
+      </arguments>
+      <doc>call method doc</doc>
+      <shortdoc>Calls the named method of the given object with the provided arguments.</shortdoc>
+    </kw2>
+    <kw2 name="Catenate&lt;x" lineno="2715">
+      <arguments repr="*items">
+        <arg kind="VAR_POSITIONAL" required="false" repr="*items">
+          <name>items</name>
+        </arg>
+      </arguments>
+      <doc>catenate doc</doc>
+      <shortdoc>Catenates the given items together and returns the resulted string.</shortdoc>
+    </kw2>
+  </keywords>
+  <datatypes>
+  </datatypes>
+</keywordspec>
