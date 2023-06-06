@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "atom-package-deps": ">4.4.0",
-    "fast-xml-parser": "^3.19.0",
+    "fast-xml-parser": "^4.2.4",
     "fuzzaldrin-plus": "^0.1.0",
     "he": "^1.2.0",
     "minimatch": "3.0.3",
